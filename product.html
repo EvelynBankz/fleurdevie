@@ -319,14 +319,20 @@ main{
   gap:8px;
 }
 .quantity-controls button{
-  background:var(--panel-inner);
-  color:var(--brand-deepgreen);
+  background: var(--brand-deepgreen); /* 💚 controls background color */
+  color: #fff; /* controls the plus/minus text color */
   border:1px solid var(--soft-border);
   border-radius:8px;
   padding:8px 10px;
   font-size:0.95rem;
   cursor:pointer;
 }
+
+/* Optional hover effect */
+.quantity-control button:hover {
+  background: #0a8a4d; /* slightly lighter green on hover */
+}
+   
 .quantity-badge{ font-weight:700; min-width:34px; text-align:center; }
 
 /* ACTION BUTTONS — standalone & reduced to prevent overflow */
