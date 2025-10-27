@@ -422,8 +422,24 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
   .product-main-img img{ max-height:420px }
   .product-details h1{ font-size:1.5rem }
   .product-price{ font-size:1.25rem }
-  .action-row{ gap:8px; justify-content:center }
-  .action-row .action{ width:100%; max-width:420px; min-width:0 }
+   /* make the action buttons smaller and inline */
+  .action-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap; /* keep them in one row */
+    gap: 6px;
+    overflow-x: auto; /* allow horizontal scroll on very small screens */
+    padding-bottom: 4px;
+  }
+
+  .action-row .action {
+    flex: 1 1 auto;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    min-width: fit-content;
+    white-space: nowrap;
+  }
 }
 
 /* Accessibility focus */
