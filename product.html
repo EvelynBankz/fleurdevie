@@ -8,42 +8,41 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 /* =========================
-   Minimal Luxury — Brand Colors Applied (Product Page)
-   Uses the exact brand palette provided.
-   Layout / structure unchanged. No button gloss/slider.
+   Minimal Luxury - Product Page (Brand Colors)
+   Uses Fleur De Vie brand palette (from your shop page)
    ========================= */
 
 /* Brand palette tokens */
 :root{
-  --brand-deepgreen: #112e1f;  /* primary */
-  --brand-cream:    #f5e6cc;  /* background / soft */
-  --brand-peach:    #ffd6ba;  /* highlight / badge */
-  --brand-sky:      #c9e4ff;  /* subtle accent */
-  --brand-mint:     #d4f5e9;  /* subtle accent 2 */
-  --brand-blush:    #f7dad9;  /* soft accent */
-  --brand-lavender: #e6daf6;  /* soft accent 3 */
+  --brand-deepgreen: #112e1f;
+  --brand-cream: #f5e6cc;
+  --brand-peach: #ffd6ba;
+  --brand-sky: #c9e4ff;
+  --brand-mint: #d4f5e9;
+  --brand-blush: #f7dad9;
+  --brand-lavender: #e6daf6;
 
-  /* derived tokens */
-  --bg-ivory: var(--brand-cream);
+  --bg-base: #F5E6CC;        /* shop page background */
   --panel-white: #ffffff;
   --accent-dark: var(--brand-deepgreen);
-  --text-dark: var(--brand-deepgreen);
+  --text-dark: #112e1f;
   --muted-dark: rgba(17,46,31,0.72);
-  --muted-soft: rgba(17,46,31,0.60);
+  --muted-soft: rgba(17,46,31,0.65);
   --soft-border: rgba(17,46,31,0.12);
+  --cart-badge: #FFD6BA;
+  --shadow-soft: 0 10px 30px rgba(17,46,31,0.06);
+  --shadow-strong: 0 18px 48px rgba(17,46,31,0.10);
   --radius-lg: 14px;
   --radius-md: 10px;
   --page-max: 1180px;
   --btn-radius: 999px;
-  --shadow-soft: 0 10px 28px rgba(17,46,31,0.06);
-  --shadow-strong: 0 18px 48px rgba(17,46,31,0.10);
 }
 
 /* Reset & base */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  background:var(--bg-ivory);
+  background:var(--bg-base);
   color:var(--text-dark);
   font-family:"Montserrat",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
   -webkit-font-smoothing:antialiased;
@@ -54,41 +53,42 @@ body{
 }
 a{color:inherit;text-decoration:none}
 
-/* header — brand feel (matches shop header colors) */
+/* Header — match shop header colors & behavior */
 .site-header{
-  position:fixed;
-  inset:0 0 auto 0;
-  height:72px;
-  z-index:1200;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:12px 28px;
-  background: rgba(17,46,31,0.9); /* deep brand green translucent */
+  background: rgba(17,46,31,0.9); /* deep brand green translucent like shop */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--brand-cream);
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  backdrop-filter: blur(6px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 24px;
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:1000;
+  height:68px;
+  transition: background 0.3s ease, top 0.4s ease, opacity 0.4s ease;
 }
 .site-header.scrolled{ background: var(--brand-deepgreen); }
-.header-left{display:flex;align-items:center;gap:14px}
-.brand-logo{height:56px;width:auto;object-fit:contain;border-radius:8px}
-.brand-title{font-family:"Playfair Display",serif;font-size:20px;font-weight:700;color:var(--brand-cream);letter-spacing:0.2px}
-.header-right{display:flex;gap:18px;align-items:center}
-.header-right a{font-weight:500;color:var(--brand-cream);text-decoration:none;padding:8px 6px;border-radius:8px;transition:color .18s,transform .18s}
-.header-right a:hover{ color: var(--brand-sky); transform:translateY(-2px) }
-.cart-count{background:var(--brand-peach); color:var(--brand-deepgreen); font-size:12px; font-weight:700; border-radius:50%; padding:2px 6px; margin-left:6px}
-.hamburger{display:none;background:none;border:none;cursor:pointer;width:36px;height:30px;position:relative}
-.hamburger span{display:block;width:100%;height:3px;background:var(--brand-cream);border-radius:3px;position:absolute;left:0;transition:.28s}
-.hamburger span:nth-child(1){top:0}
-.hamburger span:nth-child(2){top:13px}
-.hamburger span:nth-child(3){top:26px}
-.hamburger.open span:nth-child(1){transform:rotate(45deg);top:13px}
-.hamburger.open span:nth-child(2){opacity:0}
-.hamburger.open span:nth-child(3){transform:rotate(-45deg);top:13px}
+.site-header.hidden{ opacity:0; top:-80px; pointer-events:none }
+.header-left{ display:flex; align-items:center; gap:10px; }
+.brand-logo{ height:70px; transition:height .3s ease; }
+.brand-title{ font-family:"Playfair Display", serif; font-size:22px; font-weight:700; color:var(--brand-cream) }
 
-/* Main content layout - two-column product area (unchanged) */
+.header-right{ display:flex; gap:18px; align-items:center; }
+.header-right a{ font-weight:500; color:inherit; position:relative; transition: color .3s ease, transform .3s ease; padding:8px 6px; border-radius:8px }
+.header-right a:hover{ color: var(--brand-sky); transform: translateY(-2px) }
+.cart-count{ background:var(--cart-badge); color:var(--brand-deepgreen); font-size:12px; font-weight:600; border-radius:50%; padding:2px 6px; margin-left:6px; }
+
+/* hamburger */
+.hamburger{ display:none; background:none; border:none; cursor:pointer; width:30px; height:24px; position:relative }
+.hamburger span{ display:block; width:100%; height:3px; background:var(--brand-cream); border-radius:2px; position:absolute; left:0; transition:0.3s }
+.hamburger span:nth-child(1){ top:0 } .hamburger span:nth-child(2){ top:10px } .hamburger span:nth-child(3){ top:20px }
+.hamburger.open span:nth-child(1){ transform:rotate(45deg); top:10px } .hamburger.open span:nth-child(2){ opacity:0 } .hamburger.open span:nth-child(3){ transform:rotate(-45deg); top:10px }
+
+/* Main layout - two-column product area (kept identical) */
 main{
-  padding:104px 20px 48px; /* space for header */
+  padding:104px 20px 48px; /* leave space for fixed header */
   max-width:var(--page-max);
   margin:0 auto;
   display:grid;
@@ -119,9 +119,10 @@ main{
   align-items:center;
   justify-content:center;
   padding:18px;
-  background:linear-gradient(180deg, #fff, rgba(245,230,204,0.08)); /* subtle brand cream tint */
+  /* subtle brand-tinted gradient */
+  background:linear-gradient(180deg, #fff, rgba(245,230,204,0.12));
   border-radius:12px;
-  border:1px solid rgba(0,0,0,0.03);
+  border:1px solid rgba(17,46,31,0.03);
 }
 
 .product-main-img img{
@@ -166,13 +167,13 @@ main{
   align-self:start;
 }
 
-/* Content block (keeps structure) */
+/* Content block */
 .product-details > div{
   background:var(--panel-white);
   padding:18px;
   border-radius:12px;
   border:1px solid var(--soft-border);
-  box-shadow:0 6px 20px rgba(10,10,10,0.03);
+  box-shadow:0 6px 20px rgba(17,46,31,0.03);
 }
 
 /* Title and meta */
@@ -180,7 +181,7 @@ main{
   font-family:"Playfair Display",serif;
   font-size:1.9rem;
   margin-bottom:6px;
-  color:var(--accent-dark);
+  color:var(--brand-deepgreen);
   font-weight:600;
   letter-spacing:0.2px;
 }
@@ -189,7 +190,7 @@ main{
   font-size:0.98rem;
   margin-bottom:8px;
 }
-.product-price{ font-weight:700; font-size:1.5rem; color:var(--accent-dark); margin-top:6px }
+.product-price{ font-weight:700; font-size:1.5rem; color:var(--brand-deepgreen); margin-top:6px }
 
 /* subtitle */
 .small-muted{ font-size:0.95rem; color:var(--muted-soft); margin-top:6px }
@@ -210,100 +211,21 @@ main{
   border-radius:10px;
   border:1px solid rgba(17,46,31,0.06);
   background: var(--panel-white);
-  color:var(--accent-dark);
+  color:var(--brand-deepgreen);
   cursor:pointer;
   font-weight:600;
   transition:all .18s;
   min-width:84px;
   box-shadow: 0 6px 18px rgba(17,17,17,0.02);
 }
-.options-row button:hover{ transform:translateY(-4px); box-shadow:var(--shadow-soft) }
+.options-row button:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-soft);
+  background: var(--brand-cream);
+}
 .options-row button.selected{ background:var(--brand-deepgreen); color:var(--panel-white); border-color:var(--brand-deepgreen) }
 
-/* variant group styles (unchanged classes) */
-.variant-group { margin-top: .75rem; }
-.variant-options { display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.4rem; }
-.variant-options button {
-  background:var(--panel-white);
-  border:1px solid rgba(17,46,31,0.06);
-  color:var(--accent-dark);
-  border-radius:8px;
-  padding:.5rem 1rem;
-  font-weight:600;
-  cursor:pointer;
-  transition:all .22s ease;
-  box-shadow:0 6px 18px rgba(17,17,17,0.02);
-}
-.variant-options button:hover,
-.variant-options button.selected {
-  background:var(--brand-deepgreen);
-  color:#fff;
-  transform:scale(1.04);
-}
-
-/* variant badge (brand tuned) */
-.variant-badge{
-  position:absolute; top:4px; right:6px;
-  background:var(--brand-deepgreen); color:#fff; font-size:.65rem; font-weight:700;
-  border-radius:999px; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center;
-  box-shadow:0 8px 20px rgba(17,17,17,0.18); border:2px solid rgba(255,255,255,0.06); z-index:3;
-}
-
-/* Actions row — always visible; no slider */
-.action-row{
-  display:flex; gap:10px; flex-wrap:nowrap; align-items:center; margin-top:8px; padding-bottom:4px;
-  /* ensure always visible (override) */
-  visibility:visible !important;
-  opacity:1 !important;
-  overflow:visible !important;
-}
-.action-row .action{
-  flex:0 0 auto; min-width:150px; padding:12px 18px; border-radius:var(--btn-radius);
-  text-align:center; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.98rem;
-  cursor:pointer; border:none; transition:transform .12s, box-shadow .12s; background:var(--brand-deepgreen); color:var(--panel-white);
-}
-
-/* remove any shiny/slider pseudo-element on buttons: nothing added here */
-/* hover lift only */
-.add-cart.action:hover,
-.customize-btn.action:hover,
-.clear-btn.action:hover,
-.back-btn.action:hover { transform:translateY(-4px); box-shadow:var(--shadow-strong); }
-
-/* Optional: color variants for buttons (subtle branded differences) */
-.add-cart.action { background: var(--brand-deepgreen); color: var(--panel-white); }
-.customize-btn.action { background: var(--brand-blush); color: var(--brand-deepgreen); box-shadow: 0 6px 18px rgba(247,218,217,0.08); }
-.clear-btn.action { background: var(--brand-peach); color: var(--brand-deepgreen); box-shadow: 0 6px 18px rgba(255,214,186,0.08); }
-.back-btn.action { background: var(--panel-white); color: var(--brand-deepgreen); border: 1px solid var(--soft-border); box-shadow: 0 6px 18px rgba(17,46,31,0.02); }
-
-/* quantity controls */
-.qty-and-actions{display:flex;flex-direction:column;gap:10px}
-.quantity-controls{display:flex;align-items:center;gap:10px;margin-top:6px}
-.quantity-controls button{background:var(--panel-white);color:var(--brand-deepgreen);border:1px solid var(--soft-border);border-radius:8px;padding:10px 14px;cursor:pointer}
-.quantity-badge{font-weight:700;min-width:36px;text-align:center;display:inline-block}
-
-/* floating support button — brand colored + tooltip in brand cream/peach text */
-#floatingSupportBtn{
-  position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:50%;border:none;background:var(--brand-deepgreen);color:#fff;z-index:10002;box-shadow:0 8px 30px rgba(17,46,31,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform .3s,box-shadow .3s
-}
-#floatingSupportBtn:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(17,46,31,.18)}
-#floatingSupportBtn::after{
-  content:"Support";
-  position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:var(--brand-deepgreen);color:var(--brand-peach);padding:6px 12px;border-radius:6px;font-size:14px;font-weight:500;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .28s,transform .28s
-}
-#floatingSupportBtn:hover::after{opacity:1;transform:translateX(-50%) translateY(-6px)}
-
-/* footer */
-footer{text-align:center;padding:20px;background:transparent;color:var(--muted-soft);margin-top:44px}
-
-/* small utility */
-.hidden { display: none !important; }
-.small-muted{font-size:.92rem;color:var(--muted-soft)}
-
-/* ensure options-group visible when JS toggles it */
-#optionsGroup { visibility:visible !important; }
-
-/* variant-style group (unchanged) */
+/* variant group (unchanged structure) */
 .variant-group { margin-top: .75rem; }
 .variant-options { display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.4rem; }
 .variant-options button {
@@ -323,9 +245,89 @@ footer{text-align:center;padding:20px;background:transparent;color:var(--muted-s
   transform:scale(1.05);
 }
 
-/* responsive adjustments (keep behavior) */
+/* variant badge (brand tuned) */
+.variant-badge{
+  position:absolute; top:4px; right:6px;
+  background:var(--brand-deepgreen); color:#fff; font-size:.65rem; font-weight:700;
+  border-radius:999px; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 20px rgba(17,17,17,0.18); border:2px solid rgba(255,255,255,0.06); z-index:3;
+}
+
+/* Actions (buttons) — always visible, no slider/shine */
+.action-row{
+  display:flex; gap:10px; flex-wrap:nowrap; align-items:center; margin-top:8px; padding-bottom:4px;
+  visibility:visible !important;
+  opacity:1 !important;
+  overflow:visible !important;
+}
+.action-row .action{
+  flex:0 0 auto; min-width:150px; padding:12px 18px; border-radius:var(--btn-radius);
+  text-align:center; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.98rem;
+  cursor:pointer; border:none; transition:transform .12s, box-shadow .12s;
+}
+
+/* Unified button look — brand deep green pill by default */
+.add-cart.action,
+.customize-btn.action,
+.clear-btn.action,
+.back-btn.action {
+  background:var(--brand-deepgreen);
+  color:var(--panel-white);
+  border:none;
+  box-shadow:var(--shadow-soft);
+  padding:12px 18px;
+  border-radius:999px;
+  text-decoration:none;
+  /* removed pseudo-element slider/shine intentionally */
+}
+
+/* Hover lift (subtle) */
+.add-cart.action:hover,
+.customize-btn.action:hover,
+.clear-btn.action:hover,
+.back-btn.action:hover {
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-strong);
+}
+
+/* If you want different button colors, can assign individually — kept unified as deep green per shop */
+
+/* quantity controls */
+.qty-and-actions{display:flex;flex-direction:column;gap:10px}
+.quantity-controls{display:flex;align-items:center;gap:10px;margin-top:6px}
+.quantity-controls button{background:var(--panel-white);color:var(--brand-deepgreen);border:1px solid var(--soft-border);border-radius:8px;padding:10px 14px;cursor:pointer}
+.quantity-badge{font-weight:700;min-width:36px;text-align:center;display:inline-block}
+
+/* floating support button — use shop styling */
+#floatingSupportBtn{
+  position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:50%;border:none;
+  background:var(--brand-deepgreen);color:#fff;z-index:10002;box-shadow:0 8px 30px rgba(212,245,105,1);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform .3s,box-shadow .3s;
+}
+#floatingSupportBtn:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(212,245,105,.8);animation:glowPulse 1.5s infinite ease-in-out}
+#floatingSupportBtn::after{
+  content:"Support";
+  position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:var(--brand-deepgreen);color:var(--cart-badge);padding:6px 12px;border-radius:6px;font-size:14px;font-weight:500;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .4s ease, transform .4s ease;
+}
+#floatingSupportBtn:hover::after{opacity:1;transform:translateX(-50%) translateY(-6px)}
+@keyframes glowPulse {
+  0%,100%{ box-shadow:0 8px 30px rgba(212,245,105,1); }
+  50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6); }
+}
+
+/* footer */
+footer{ text-align:center; padding:20px; background:transparent; color:var(--brand-deepgreen); margin-top:44px }
+.small-muted{ font-size:.92rem; color:var(--muted-soft) }
+
+/* small utility */
+.hidden { display: none !important; }
+
+/* ensure options-group visible when JS toggles it */
+#optionsGroup { visibility:visible !important; }
+
+/* responsive adjustments */
 @media(max-width: 980px){
-  .header-right{ position:absolute; top:72px; right:0; background: rgba(17,46,31,0.98); flex-direction:column; width:260px; padding:18px; display:none; border-radius:0 0 0 12px; border-left:1px solid var(--soft-border) }
+  .header-right{ position:absolute; top:72px; right:0; background:var(--brand-deepgreen); flex-direction:column; width:260px; padding:18px; display:none; border-radius:0 0 0 12px; border-left:1px solid var(--soft-border) }
   .header-right.open{ display:flex }
   .hamburger{ display:block }
   main{ grid-template-columns: 1fr; padding-top:110px; gap:20px }
@@ -345,8 +347,17 @@ footer{text-align:center;padding:20px;background:transparent;color:var(--muted-s
   .product-main-img img{ max-height:420px }
   .product-details h1{ font-size:1.5rem }
   .product-price{ font-size:1.25rem }
-  .action-row{ gap:8px; flex
+  .action-row{ gap:8px }
+  .add-cart.action{ min-width:120px; padding:10px 12px }
+}
+
+/* accessibility focus */
+.add-cart.action:focus,
+.customize-btn.action:focus,
+.clear-btn.action:focus,
+.back-btn.action:focus { outline:3px solid rgba(201,228,255,0.14); outline-offset:3px; }
 </style>
+
 
 
 </head>
