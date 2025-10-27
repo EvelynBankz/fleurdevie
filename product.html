@@ -310,29 +310,59 @@ main{
 .quantity-badge{ font-weight:700; min-width:34px; text-align:center; }
 
 /* ACTION BUTTONS — standalone & reduced to prevent overflow */
+/* ACTION BUTTONS — standalone inline row, hover color effects */
 .action-row{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
   align-items:center;
-  margin-top:12px;
-  padding-bottom:4px;
   justify-content:flex-start;
+  margin-top:16px;
+  flex-shrink:0;
 }
+
 .action-row .action{
   background:var(--brand-deepgreen);
   color:var(--panel-inner);
   border:none;
-  border-radius:12px;
-  padding:8px 14px;        /* reduced size */
-  font-size:0.9rem;        /* reduced text */
-  font-weight:700;
-  box-shadow:0 8px 22px rgba(17,46,31,0.06);
+  border-radius:10px;
+  padding:6px 12px;         /* smaller padding */
+  font-size:0.85rem;        /* smaller font */
+  font-weight:600;
+  box-shadow:0 6px 14px rgba(17,46,31,0.08);
   cursor:pointer;
-  transition: transform .12s, box-shadow .12s;
-  min-width:120px;         /* smaller min width so they don't force horizontal scroll */
+  min-width:auto;
+  flex-shrink:0;
+  transition: background .25s ease, color .25s ease, transform .18s ease, box-shadow .18s ease;
 }
-.action-row .action:hover{ transform:translateY(-3px); box-shadow:var(--shadow-strong); }
+
+/* hover + active effects with brand hover tones */
+.action-row .add-cart.action:hover {
+  background: var(--brand-peach);
+  color: var(--brand-deepgreen);
+}
+
+.action-row .clear-btn.action:hover {
+  background: var(--brand-lavender);
+  color: var(--brand-deepgreen);
+}
+
+.action-row .back-btn.action:hover {
+  background: var(--brand-sky);
+  color: var(--brand-deepgreen);
+}
+
+.action-row .customize-btn.action:hover {
+  background: var(--brand-mint);
+  color: var(--brand-deepgreen);
+}
+
+/* pressed / active feel */
+.action-row .action:active {
+  transform: scale(0.96);
+  box-shadow: 0 4px 10px rgba(17,46,31,0.12);
+}
+
 
 /* ensure no shiny pseudo elements on actions */
 .add-cart.action::after,
