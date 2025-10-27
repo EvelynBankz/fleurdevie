@@ -8,11 +8,17 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 /* =========================
-   Minimal Luxury - Product Page (Brand Colors)
-   Uses Fleur De Vie brand palette (from your shop page)
+   Full page CSS — Fleur De Vie (final)
+   - Brand colors applied
+   - All cards share background + lifted shadow
+   - Product image fills card with slight padding
+   - Summary (total + qty) in one card
+   - Action buttons standalone, reduced size
+   - Variant buttons reduced size & font
+   - Removed any slider/shine ::after on action buttons
    ========================= */
 
-/* Brand palette tokens */
+/* Brand palette + legacy aliases for compatibility */
 :root{
   --brand-deepgreen: #112e1f;
   --brand-cream: #f5e6cc;
@@ -22,20 +28,27 @@
   --brand-blush: #f7dad9;
   --brand-lavender: #e6daf6;
 
-  --bg-base: #F5E6CC;        /* shop page background */
-  --panel-white: #ffffff;
+  /* aliases used in original inline styles / scripts */
+  --fdv-green: #112e1f;
+  --fdv-gold: #f5e6cc;
+
+  /* UI tokens */
+  --bg-base: #F5E6CC;        /* main background */
+  --panel-surface: #F5E6CC;  /* cards use same look as background, then lifted with shadow */
+  --panel-inner: #ffffff;    /* subtle inner white for small padding areas */
   --accent-dark: var(--brand-deepgreen);
   --text-dark: #112e1f;
   --muted-dark: rgba(17,46,31,0.72);
   --muted-soft: rgba(17,46,31,0.65);
   --soft-border: rgba(17,46,31,0.12);
   --cart-badge: #FFD6BA;
-  --shadow-soft: 0 10px 30px rgba(17,46,31,0.06);
-  --shadow-strong: 0 18px 48px rgba(17,46,31,0.10);
-  --radius-lg: 14px;
-  --radius-md: 10px;
+  --shadow-soft: 0 10px 28px rgba(17,46,31,0.08);
+  --shadow-strong: 0 18px 48px rgba(17,46,31,0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --btn-radius-pill: 999px;
   --page-max: 1180px;
-  --btn-radius: 999px;
 }
 
 /* Reset & base */
@@ -49,203 +62,204 @@ body{
   -moz-osx-font-smoothing:grayscale;
   line-height:1.6;
   font-size:16px;
-  padding:0;
+  -webkit-font-feature-settings: "liga" 1;
 }
+
+/* links */
 a{color:inherit;text-decoration:none}
 
-/* Header — match shop header colors & behavior */
+/* Header (kept behavior & look from your shop page) */
 .site-header{
-  background: rgba(17,46,31,0.9); /* deep brand green translucent like shop */
+  background: rgba(17,46,31,0.9);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--brand-cream);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:10px 24px;
+  padding:10px 22px;
   position:fixed;
   top:0; left:0; right:0;
   z-index:1000;
   height:68px;
-  transition: background 0.3s ease, top 0.4s ease, opacity 0.4s ease;
+  transition: background .3s ease, top .4s ease, opacity .4s ease;
 }
 .site-header.scrolled{ background: var(--brand-deepgreen); }
 .site-header.hidden{ opacity:0; top:-80px; pointer-events:none }
-.header-left{ display:flex; align-items:center; gap:10px; }
-.brand-logo{ height:70px; transition:height .3s ease; }
-.brand-title{ font-family:"Playfair Display", serif; font-size:22px; font-weight:700; color:var(--brand-cream) }
-
+.header-left{ display:flex; gap:12px; align-items:center; }
+.brand-logo{ height:70px; transition:height .3s; display:block; }
+.brand-title{ font-family:"Playfair Display",serif; font-size:22px; font-weight:700; color:var(--brand-cream); }
 .header-right{ display:flex; gap:18px; align-items:center; }
-.header-right a{ font-weight:500; color:inherit; position:relative; transition: color .3s ease, transform .3s ease; padding:8px 6px; border-radius:8px }
-.header-right a:hover{ color: var(--brand-sky); transform: translateY(-2px) }
+.header-right a{ font-weight:500; padding:8px 6px; border-radius:8px; transition: color .25s, transform .25s; }
+.header-right a:hover{ color: var(--brand-sky); transform: translateY(-2px); }
 .cart-count{ background:var(--cart-badge); color:var(--brand-deepgreen); font-size:12px; font-weight:600; border-radius:50%; padding:2px 6px; margin-left:6px; }
 
 /* hamburger */
-.hamburger{ display:none; background:none; border:none; cursor:pointer; width:30px; height:24px; position:relative }
-.hamburger span{ display:block; width:100%; height:3px; background:var(--brand-cream); border-radius:2px; position:absolute; left:0; transition:0.3s }
-.hamburger span:nth-child(1){ top:0 } .hamburger span:nth-child(2){ top:10px } .hamburger span:nth-child(3){ top:20px }
-.hamburger.open span:nth-child(1){ transform:rotate(45deg); top:10px } .hamburger.open span:nth-child(2){ opacity:0 } .hamburger.open span:nth-child(3){ transform:rotate(-45deg); top:10px }
+.hamburger{ display:none;background:none;border:none;cursor:pointer;width:34px;height:26px;position:relative }
+.hamburger span{ display:block;width:100%;height:3px;background:var(--brand-cream);border-radius:2px;position:absolute;left:0;transition:.28s }
+.hamburger span:nth-child(1){top:0}
+.hamburger span:nth-child(2){top:11px}
+.hamburger span:nth-child(3){top:22px}
+.hamburger.open span:nth-child(1){transform:rotate(45deg);top:11px}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg);top:11px}
 
-/* Main layout - two-column product area (kept identical) */
+/* Main layout */
 main{
-  padding:104px 20px 48px; /* leave space for fixed header */
+  padding:120px 12px 48px; /* preserve space for header */
   max-width:var(--page-max);
   margin:0 auto;
   display:grid;
   grid-template-columns: 1fr 420px;
-  gap:36px;
+  gap:24px;
   align-items:start;
   width:100%;
 }
 
-/* Gallery (left) */
+/* ---- CARDS: product-gallery & product-details cards ----
+   Both cards use same background as page (soft cream) and are lifted
+   with subtle shadows to appear detached from background.
+*/
 .product-gallery{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  align-items:center;
-  justify-content:flex-start;
-  padding:18px;
-  background:var(--panel-white);
+  background:var(--panel-surface);
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow-soft);
   border:1px solid var(--soft-border);
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
 }
 
+/* product image card — container holds small padding; image fills inner area */
 .product-main-img{
   width:100%;
   max-width:760px;
+  padding:10px; /* small padding allowance round image */
+  background:var(--panel-surface); /* same as page surface */
+  border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:18px;
-  /* subtle brand-tinted gradient */
-  background:linear-gradient(180deg, #fff, rgba(245,230,204,0.12));
-  border-radius:12px;
+  box-shadow:var(--shadow-soft);
   border:1px solid rgba(17,46,31,0.03);
+  overflow:hidden;
 }
-
 .product-main-img img{
   width:100%;
-  height:auto;
-  max-height:620px;
-  object-fit:contain;
-  border-radius:10px;
+  height:100%;
+  max-height:660px; /* reasonable cap so pages don't get huge */
+  object-fit:cover; /* fills the card area while preserving centering */
+  border-radius:8px;
   display:block;
 }
 
 /* thumbnail strip */
 .thumbnail-container{
   display:flex;
-  gap:12px;
+  gap:10px;
   overflow-x:auto;
-  padding:8px 6px 0 6px;
+  padding-top:8px;
   width:100%;
-  align-items:center;
 }
 .thumbnail-container img{
-  width:72px;
-  height:72px;
-  object-fit:cover;
+  width:72px; height:72px; object-fit:cover;
   border-radius:10px;
   border:1px solid var(--soft-border);
-  background:var(--panel-white);
+  background:var(--panel-inner);
   cursor:pointer;
-  transition:transform .22s, box-shadow .22s, border-color .18s;
+  transition:transform .18s, box-shadow .18s, border-color .18s;
   flex:0 0 auto;
 }
 .thumbnail-container img:hover{ transform:translateY(-4px); box-shadow:var(--shadow-soft); }
 .thumbnail-container img.selected{ border-color:var(--brand-deepgreen); transform:scale(1.02); box-shadow:var(--shadow-strong); }
 
-/* Product details (right) */
+/* DETAILS column — overall container uses same lifted card style for each internal block */
 .product-details{
-  padding:20px 22px;
-  background:transparent;
   display:flex;
   flex-direction:column;
   gap:12px;
-  align-self:start;
+  padding:0;
 }
 
-/* Content block */
+/* product details top block (title/description/price) */
 .product-details > div{
-  background:var(--panel-white);
-  padding:18px;
-  border-radius:12px;
+  background:var(--panel-surface);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-soft);
   border:1px solid var(--soft-border);
-  box-shadow:0 6px 20px rgba(17,46,31,0.03);
+  padding:16px;
 }
-
-/* Title and meta */
 .product-details h1{
   font-family:"Playfair Display",serif;
-  font-size:1.9rem;
+  font-size:2rem;
   margin-bottom:6px;
   color:var(--brand-deepgreen);
   font-weight:600;
-  letter-spacing:0.2px;
 }
 .product-details .description{
   color:var(--muted-dark);
-  font-size:0.98rem;
+  font-size:1rem;
   margin-bottom:8px;
 }
-.product-price{ font-weight:700; font-size:1.5rem; color:var(--brand-deepgreen); margin-top:6px }
+.product-price{
+  font-weight:700;
+  font-size:1.4rem;
+  color:var(--brand-deepgreen);
+  margin-top:6px;
+}
+.small-muted{ font-size:.95rem; color:var(--muted-soft); margin-top:6px }
 
-/* subtitle */
-.small-muted{ font-size:0.95rem; color:var(--muted-soft); margin-top:6px }
-
-/* Options group */
+/* Options group container (keeps present structure) */
 .options-group{
   display:flex;
   flex-direction:column;
   gap:10px;
-  margin-top:10px;
+  margin-top:8px;
   position:relative;
 }
 
-/* options row */
-.options-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+/* options-row & variant buttons — reduced sizes and font */
+.options-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
 .options-row button{
-  padding:10px 14px;
-  border-radius:10px;
+  padding:8px 10px;
+  border-radius:8px;
   border:1px solid rgba(17,46,31,0.06);
-  background: var(--panel-white);
+  background:var(--panel-surface);
   color:var(--brand-deepgreen);
   cursor:pointer;
   font-weight:600;
-  transition:all .18s;
-  min-width:84px;
-  box-shadow: 0 6px 18px rgba(17,17,17,0.02);
+  font-size:0.92rem;
+  min-width:64px;
+  box-shadow: 0 6px 14px rgba(17,17,17,0.03);
+  transition: transform .14s, box-shadow .14s;
 }
-.options-row button:hover{
-  transform:translateY(-4px);
-  box-shadow:var(--shadow-soft);
-  background: var(--brand-cream);
-}
-.options-row button.selected{ background:var(--brand-deepgreen); color:var(--panel-white); border-color:var(--brand-deepgreen) }
+.options-row button:hover{ transform:translateY(-3px); box-shadow:var(--shadow-soft); background:var(--brand-cream); }
+.options-row button.selected{ background:var(--brand-deepgreen); color:var(--panel-inner); border-color:var(--brand-deepgreen) }
 
-/* variant group (unchanged structure) */
-.variant-group { margin-top: .75rem; }
-.variant-options { display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.4rem; }
+/* variant group (keeps structure) */
+.variant-group { margin-top: .5rem; }
+.variant-options { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.4rem; }
 .variant-options button {
-  background:var(--panel-white);
+  background:var(--panel-surface);
   border:2px solid var(--brand-deepgreen);
   color:var(--brand-deepgreen);
   border-radius:8px;
-  padding:.5rem 1rem;
+  padding:.35rem .6rem; /* smaller */
   font-weight:600;
+  font-size:.85rem; /* smaller font */
   cursor:pointer;
-  transition:all .25s ease;
+  transition:all .18s ease;
 }
 .variant-options button:hover,
 .variant-options button.selected {
   background:var(--brand-deepgreen);
   color:#fff;
-  transform:scale(1.05);
+  transform:scale(1.04);
 }
 
-/* variant badge (brand tuned) */
+/* variant badge */
 .variant-badge{
   position:absolute; top:4px; right:6px;
   background:var(--brand-deepgreen); color:#fff; font-size:.65rem; font-weight:700;
@@ -253,52 +267,80 @@ main{
   box-shadow:0 8px 20px rgba(17,17,17,0.18); border:2px solid rgba(255,255,255,0.06); z-index:3;
 }
 
-/* Actions (buttons) — always visible, no slider/shine */
+/* SUMMARY CARD: total + quantity in one box */
+.summary-card,
+.qty-and-actions { /* support both class names in case of slight HTML differences */
+  background:var(--panel-surface);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-soft);
+  border:1px solid var(--soft-border);
+  padding:12px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:12px;
+  width:100%;
+  align-self:flex-start;
+}
+
+/* total text */
+#totalVariantCount{
+  font-weight:700;
+  font-size:1rem;
+  color:var(--brand-deepgreen);
+  min-width:fit-content;
+}
+
+/* quantity controls smaller & neat */
+.quantity-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.quantity-controls button{
+  background:var(--panel-inner);
+  color:var(--brand-deepgreen);
+  border:1px solid var(--soft-border);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:0.95rem;
+  cursor:pointer;
+}
+.quantity-badge{ font-weight:700; min-width:34px; text-align:center; }
+
+/* ACTION BUTTONS — standalone & reduced to prevent overflow */
 .action-row{
-  display:flex; gap:10px; flex-wrap:nowrap; align-items:center; margin-top:8px; padding-bottom:4px;
-  visibility:visible !important;
-  opacity:1 !important;
-  overflow:visible !important;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:12px;
+  padding-bottom:4px;
+  justify-content:flex-start;
 }
 .action-row .action{
-  flex:0 0 auto; min-width:150px; padding:12px 18px; border-radius:var(--btn-radius);
-  text-align:center; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.98rem;
-  cursor:pointer; border:none; transition:transform .12s, box-shadow .12s;
-}
-
-/* Unified button look — brand deep green pill by default */
-.add-cart.action,
-.customize-btn.action,
-.clear-btn.action,
-.back-btn.action {
   background:var(--brand-deepgreen);
-  color:var(--panel-white);
+  color:var(--panel-inner);
   border:none;
-  box-shadow:var(--shadow-soft);
-  padding:12px 18px;
-  border-radius:999px;
-  text-decoration:none;
-  /* removed pseudo-element slider/shine intentionally */
+  border-radius:12px;
+  padding:8px 14px;        /* reduced size */
+  font-size:0.9rem;        /* reduced text */
+  font-weight:700;
+  box-shadow:0 8px 22px rgba(17,46,31,0.06);
+  cursor:pointer;
+  transition: transform .12s, box-shadow .12s;
+  min-width:120px;         /* smaller min width so they don't force horizontal scroll */
 }
+.action-row .action:hover{ transform:translateY(-3px); box-shadow:var(--shadow-strong); }
 
-/* Hover lift (subtle) */
-.add-cart.action:hover,
-.customize-btn.action:hover,
-.clear-btn.action:hover,
-.back-btn.action:hover {
-  transform:translateY(-4px);
-  box-shadow:var(--shadow-strong);
-}
+/* ensure no shiny pseudo elements on actions */
+.add-cart.action::after,
+.customize-btn.action::after,
+.clear-btn.action::after,
+.back-btn.action::after { display:none !important; content:none !important; }
 
-/* If you want different button colors, can assign individually — kept unified as deep green per shop */
-
-/* quantity controls */
-.qty-and-actions{display:flex;flex-direction:column;gap:10px}
-.quantity-controls{display:flex;align-items:center;gap:10px;margin-top:6px}
-.quantity-controls button{background:var(--panel-white);color:var(--brand-deepgreen);border:1px solid var(--soft-border);border-radius:8px;padding:10px 14px;cursor:pointer}
-.quantity-badge{font-weight:700;min-width:36px;text-align:center;display:inline-block}
-
-/* floating support button — use shop styling */
+/* floating support button — matches shop styling */
 #floatingSupportBtn{
   position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:50%;border:none;
   background:var(--brand-deepgreen);color:#fff;z-index:10002;box-shadow:0 8px 30px rgba(212,245,105,1);
@@ -322,23 +364,21 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
 /* small utility */
 .hidden { display: none !important; }
 
-/* ensure options-group visible when JS toggles it */
+/* make sure options group becomes visible when JS toggles it */
 #optionsGroup { visibility:visible !important; }
 
-/* responsive adjustments */
-@media(max-width: 980px){
-  .header-right{ position:absolute; top:72px; right:0; background:var(--brand-deepgreen); flex-direction:column; width:260px; padding:18px; display:none; border-radius:0 0 0 12px; border-left:1px solid var(--soft-border) }
+/* Responsive adjustments */
+@media(max-width:980px){
+  .header-right{ position:absolute; top:68px; right:0; background:var(--brand-deepgreen); flex-direction:column; width:260px; padding:18px; display:none; border-radius:0 0 0 12px; border-left:1px solid var(--soft-border) }
   .header-right.open{ display:flex }
   .hamburger{ display:block }
-  main{ grid-template-columns: 1fr; padding-top:110px; gap:20px }
-  .product-gallery{ padding:14px }
-  .product-main-img{ padding:14px }
-  .product-details > div{ padding:14px }
+  main{ grid-template-columns:1fr; padding-top:110px; gap:20px }
+  .product-gallery{ padding:12px }
+  .product-main-img{ padding:8px }
+  .product-details > div{ padding:12px }
   .thumbnail-container img{ width:64px; height:64px }
-  .action-row .action{ min-width:120px }
+  .action-row .action{ min-width:110px }
 }
-
-/* small phones */
 @media(max-width:540px){
   body{ font-size:15px }
   main{ padding:88px 14px 40px }
@@ -347,18 +387,18 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
   .product-main-img img{ max-height:420px }
   .product-details h1{ font-size:1.5rem }
   .product-price{ font-size:1.25rem }
-  .action-row{ gap:8px }
-  .add-cart.action{ min-width:120px; padding:10px 12px }
+  .action-row{ gap:8px; justify-content:center }
+  .action-row .action{ width:100%; max-width:420px; min-width:0 }
 }
 
-/* accessibility focus */
+/* Accessibility focus */
 .add-cart.action:focus,
 .customize-btn.action:focus,
 .clear-btn.action:focus,
-.back-btn.action:focus { outline:3px solid rgba(201,228,255,0.14); outline-offset:3px; }
+.back-btn.action:focus {
+  outline:3px solid rgba(201,228,255,0.14); outline-offset:3px;
+}
 </style>
-
-
 
 </head>
 <body>
@@ -422,16 +462,18 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
 
 
     <!-- Total placed BEFORE quantity controls (will be populated by JS) -->
-    <div id="totalVariantCount" style="margin-top:6px;"></div>
+   
+   <div class="summary-card">
+     <div id="totalVariantCount" style="margin-top:6px;"></div>
+     <div class="quantity-controls" style="margin-top:6px;">
+       <button id="minus" aria-label="Decrease">-</button>
+       <span class="quantity-badge" id="quantityBadge">0</span>
+       <button id="plus" aria-label="Increase">+</button>
+     </div>
+   </div>
+   
 
-    <div class="qty-and-actions">
-      <div class="quantity-controls" style="margin-top:6px;">
-        <button id="minus" aria-label="Decrease">-</button>
-        <span class="quantity-badge" id="quantityBadge">0</span>
-        <button id="plus" aria-label="Increase">+</button>
-      </div>
-
-      <div class="action-row" id="actionRow" role="group" aria-label="Product actions">
+    <div class="action-row" id="actionRow" role="group" aria-label="Product actions">
         <!-- Add to Cart -->
         <button class="add-cart action" id="addCartBtn" type="button">Add to Cart</button>
 
@@ -444,8 +486,7 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
         <!-- SINGLE Back to Shop (duplicate removed) -->
         <a href="shop.html" class="back-btn action" id="backToShop">← Back to Shop</a>
       </div>
-    </div>
-
+     
     <!-- Removed the duplicate mobile actions back-to-shop to avoid double back link -->
     <!-- (mobile-actions element removed so JS which references mobileActions will safely see null) -->
 
