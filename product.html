@@ -106,12 +106,12 @@ a{color:inherit;text-decoration:none}
 
 /* Main layout */
 main{
-  padding:140px 2px 48px; /* preserve space for header */
+  padding:140px 40px 48px; /* preserve space for header */
   max-width:var(--page-max);
   margin:0 auto;
   display:grid;
-  grid-template-columns: 1fr 420px;
-  gap:30px;
+  grid-template-columns: 1.1fr 420px;
+  gap:60px;
   align-items:start;
   width:100%;
 }
@@ -135,7 +135,8 @@ main{
 /* product image card — container holds small padding; image fills inner area */
 .product-main-img{
   width:100%;
-  max-width:760px;
+  height: auto;
+  max-width:520px;
   padding:10px; /* small padding allowance round image */
   background:var(--panel-surface); /* same as page surface */
   border-radius:12px;
