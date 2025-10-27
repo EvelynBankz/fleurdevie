@@ -34,7 +34,7 @@
 
   /* UI tokens */
   --bg-base: #F5E6CC;        /* main background */
-  --panel-surface: #F5E6CC;  /* cards use same look as background, then lifted with shadow */
+  --panel-surface: #FFD6BA;  /* cards use same look as background, then lifted with shadow */
   --panel-inner: #ffffff;    /* subtle inner white for small padding areas */
   --accent-dark: var(--brand-deepgreen);
   --text-dark: #112e1f;
@@ -264,6 +264,21 @@ main{
   transform:scale(1.04);
 }
 
+ /* ✨ Add this new part for double border effect */
+.variant-options button.selected {
+  position: relative;
+}
+
+.variant-options button.selected::after {
+  content: "";
+  position: absolute;
+  inset: -3px; /* slightly larger than button size */
+  border: 2px solid var(--brand-deepgreen);
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(0, 100, 0, 0.3); /* optional glow */
+}
+  
 /* variant badge */
 .variant-badge{
   position:absolute; top:4px; right:6px;
@@ -533,10 +548,10 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
         <a id="customizeBtn" class="customize-btn action" href="#" style="display:none;">Customize</a>
 
         <!-- Clear selections -->
-        <button class="clear-btn action" id="clearButton" type="button">Clear selections</button>
+        <button class="clear-btn action" id="clearButton" type="button">Clear All</button>
 
         <!-- SINGLE Back to Shop (duplicate removed) -->
-        <a href="shop.html" class="back-btn action" id="backToShop">← Back to Shop</a>
+        <a href="shop.html" class="back-btn action" id="backToShop">Back to Shop</a>
       </div>
      
     <!-- Removed the duplicate mobile actions back-to-shop to avoid double back link -->
@@ -1184,6 +1199,33 @@ minusBtn?.addEventListener('click', ()=> {
   if(!baseRemoved) showModal('No items to remove.');
 });
 
+/* ---------- CLEAR SELECTIONS BUTTON ---------- */
+if (clearButton) {
+  clearButton.addEventListener('click', () => {
+    // 1️⃣ Clear selected variants (remove 'selected' class)
+    document.querySelectorAll('.variant-options button.selected').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+
+    // 2️⃣ Reset displayed quantity badge
+    if (quantityBadge) quantityBadge.textContent = '0';
+
+    // 3️⃣ Clear all product combos from cart (using your existing helper)
+    clearProductCombos(productId);
+
+    // 4️⃣ Reset product total display
+    updateProductTotalUI(productId);
+
+    // 5️⃣ Refresh button visibility (so it hides again)
+    refreshClearButtonVisibility();
+
+    // 6️⃣ Optionally show feedback
+    showModal('Cleared all.');
+    setTimeout(hideModalAndReset, 1500);
+  });
+}
+
+   
 /* ---------- Selection validation ---------- */
 function validateSelectionForAdd(){
   const sel = getSelectedOptions();
