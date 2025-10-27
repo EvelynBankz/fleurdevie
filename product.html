@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* ---------- Fleur De Vie visual style (preserved + adjusted) ---------- */
+/* ---------- Fleur De Vie visual style (preserved + adjustments) ---------- */
 :root{
   --fdv-bg: #F5E6CC;
   --fdv-green: #112e1f;
@@ -50,22 +50,9 @@ a{color:inherit;text-decoration:none}
 .hamburger.open span:nth-child(2){opacity:0}
 .hamburger.open span:nth-child(3){transform:rotate(-45deg);top:11px}
 
-/* layout - reduced gap between gallery and details */
-main{
-  padding:120px 20px 48px;
-  max-width:1080px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:1fr 400px;
-  gap:40px; /* reduced from ~80px equivalent */
-  align-items:start;
-}
-@media(max-width:980px){
-  main{grid-template-columns:1fr;padding-top:110px}
-  .header-right{position:absolute;top:68px;right:0;background:rgba(17,46,31,0.95);flex-direction:column;width:260px;padding:20px;display:none;border-radius:0 0 0 10px}
-  .header-right.open{display:flex}
-  .hamburger{display:block}
-}
+/* layout - further reduced gap between gallery & details */
+main{padding:120px 20px 48px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 410px;gap:12px;align-items:start}
+@media(max-width:980px){ main{grid-template-columns:1fr;padding-top:110px} .header-right{position:absolute;top:68px;right:0;background:rgba(17,46,31,0.95);flex-direction:column;width:260px;padding:20px;display:none;border-radius:0 0 0 10px} .header-right.open{display:flex} .hamburger{display:block} }
 
 /* gallery */
 .product-gallery{display:flex;flex-direction:column;gap:12px}
@@ -88,34 +75,15 @@ main{
 .options-row button{padding:10px 12px;border-radius:8px;border:1px solid var(--fdv-green);background:var(--fdv-gold);cursor:pointer;transition:transform .18s,box-shadow .18s,font-weight .1s;font-weight:600;min-width:72px;position:relative}
 .options-row button:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(17,46,31,0.12)}
 .options-row button.selected{background:var(--fdv-green);color:var(--fdv-gold)}
+
+/* variant badge (unchanged) */
 .variant-badge{position:absolute;top:4px;right:6px;background:var(--fdv-green);color:var(--fdv-gold);font-size:.65rem;font-weight:700;border-radius:50%;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(17,46,31,0.22);border:2px solid rgba(255,255,255,0.08);z-index:3}
 
-/* actions: fixed back-to-shop + glossy hover */
-.action-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-top:8px;
-  overflow:visible; /* FIX: prevent scrollbars */
-  padding-bottom:0;
-}
-.action-row .action{
-  flex:0 0 auto;
-  min-width:140px;
-  padding:var(--btn-padding-vertical) var(--btn-padding-horizontal);
-  border-radius:var(--btn-radius);
-  text-align:center;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  font-size:1rem;
-  position:relative;
-  overflow:hidden; /* for glossier sheen */
-}
+/* actions container */
+.action-row{display:flex;gap:10px;flex-wrap:nowrap;align-items:center;margin-top:8px;overflow-x:auto;padding-bottom:4px}
+.action-row .action{flex:0 0 auto;min-width:140px;padding:var(--btn-padding-vertical) var(--btn-padding-horizontal);border-radius:var(--btn-radius);text-align:center;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;}
 
-/* unified button style */
+/* UNIFIED button style */
 .add-cart.action,
 .customize-btn.action,
 .clear-btn.action,
@@ -123,86 +91,98 @@ main{
   background:var(--fdv-green);
   color:var(--fdv-gold);
   border:none;
-  transition:transform .18s,box-shadow .18s,opacity .12s,background .18s;
   cursor:pointer;
   text-decoration:none;
   white-space:nowrap;
   border-radius:var(--btn-radius);
   box-shadow:0 8px 24px rgba(17,46,31,0.12);
+  transition:transform .18s,box-shadow .18s,background .18s,filter .18s;
+  position:relative;
+  overflow:hidden;
 }
 
-/* glossy hover effect (Glossier-inspired) */
+/* ✅ NEW glossier hover shine effect */
 .add-cart.action::after,
 .customize-btn.action::after,
 .clear-btn.action::after,
 .back-btn.action::after {
   content:"";
   position:absolute;
-  top:-50%;
-  left:-60%;
-  width:40%;
-  height:200%;
-  background:linear-gradient(120deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
-  transform:skewX(-25deg);
-  transition:all .5s ease;
-  opacity:0;
+  top:0; left:-120%;
+  width:120%;
+  height:100%;
+  background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  transition:transform .6s ease;
 }
 
 .add-cart.action:hover::after,
 .customize-btn.action:hover::after,
 .clear-btn.action:hover::after,
 .back-btn.action:hover::after {
-  left:120%;
-  opacity:1;
+  transform:translateX(130%);
 }
 
+/* hover lift */
 .add-cart.action:hover,
 .customize-btn.action:hover,
 .clear-btn.action:hover,
 .back-btn.action:hover {
-  transform:translateY(-3px);
+  transform:translateY(-4px);
   box-shadow:0 14px 36px rgba(17,46,31,0.18);
 }
 
-/* focus styles */
+/* accessibility */
 .add-cart.action:focus,
 .customize-btn.action:focus,
 .clear-btn.action:focus,
 .back-btn.action:focus { outline:3px solid rgba(201,228,255,0.18); outline-offset:3px; }
 
-/* responsive cleanup */
+/* mobile scrolling buttons */
 @media(max-width:540px){
-  .action-row{gap:10px;flex-wrap:wrap;overflow:visible}
+  .action-row{gap:10px;flex-wrap:nowrap;}
   .action-row .action{flex:0 0 auto;min-width:120px;}
+  .action-row::-webkit-scrollbar{height:6px}
+  .action-row::-webkit-scrollbar-thumb{background:rgba(17,46,31,0.12);border-radius:99px}
 }
+
+/* quantity controls */
+.qty-and-actions{display:flex;flex-direction:column;gap:10px}
+.quantity-controls{display:flex;align-items:center;gap:10px;margin-top:6px}
+.quantity-controls button{background:var(--fdv-green);color:var(--fdv-gold);border:none;border-radius:8px;padding:10px 14px;cursor:pointer}
+.quantity-badge{font-weight:700;min-width:36px;text-align:center;display:inline-block}
+
+/* floating support button */
+#floatingSupportBtn{position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:50%;border:none;background:var(--fdv-green);color:#fff;z-index:10002;box-shadow:0 8px 30px rgba(212,245,105,1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform .3s,box-shadow .3s}
+#floatingSupportBtn:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(212,245,105,.8)}
+#floatingSupportBtn::after{content:"Support";position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:var(--fdv-green);color:var(--fdv-gold);padding:6px 12px;border-radius:6px;font-size:14px;font-weight:500;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .28s,transform .28s}
+#floatingSupportBtn:hover::after{opacity:1;transform:translateX(-50%) translateY(-6px)}
+footer{text-align:center;padding:20px;background:transparent;color:var(--fdv-green);margin-top:44px}
+.small-muted{font-size:.92rem;color:var(--muted)}
 
 /* small utility */
 .hidden { display: none !important; }
+
+/* ensure options-group hidden initially */
 #optionsGroup { visibility:hidden; }
 
-/* variants */
-.variant-group { margin-top: 0.75rem; }
-.variant-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.4rem;
-}
+/* variant-style group (unchanged) */
+.variant-group { margin-top: .75rem; }
+.variant-options { display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.4rem; }
 .variant-options button {
-  background: #d4f5e9;
-  border: 2px solid var(--fdv-green, #1a5632);
-  color: var(--fdv-green, #1a5632);
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
+  background:#d4f5e9;
+  border:2px solid var(--fdv-green);
+  color:var(--fdv-green);
+  border-radius:8px;
+  padding:.5rem 1rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .25s ease;
 }
 .variant-options button:hover,
 .variant-options button.selected {
-  background: var(--fdv-green, #1a5632);
-  color: #fff;
-  transform: scale(1.05);
+  background:var(--fdv-green);
+  color:#fff;
+  transform:scale(1.05);
 }
 </style>
 
