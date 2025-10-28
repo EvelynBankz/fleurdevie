@@ -423,6 +423,11 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
 /* make sure options group becomes visible when JS toggles it */
 #optionsGroup { visibility:visible !important; }
 
+/* Hide mobile cart by default (desktop) */
+.mobile-cart {
+  display: none;
+}
+
 /* Responsive adjustments */
 @media(max-width:980px){
   .header-right{ position:absolute; top:68px; right:0; background:var(--brand-deepgreen); flex-direction:column; width:260px; padding:18px; display:none; border-radius:0 0 0 12px; border-left:1px solid var(--soft-border) }
@@ -434,6 +439,9 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
   .product-details > div{ padding:12px }
   .thumbnail-container img{ width:64px; height:64px }
   .action-row .action{ min-width:110px }
+  .mobile-cart { display:flex; align-items:center; margin-right:10px; }
+  .mobile-cart a { color:#FFD6BA; font-size:20px; position:relative; }
+  .mobile-cart .cart-count { position:absolute; top:-8px; right:-8px; }
 }
 @media(max-width:540px){
   body{ font-size:15px }
@@ -480,6 +488,10 @@ footer{ text-align:center; padding:20px; background:transparent; color:var(--bra
   <div class="header-left">
     <img src="asset/logo.png" alt="Fleur De Vie Logo" class="brand-logo">
     <div class="brand-title">Fleur De Vie</div>
+  </div>
+
+   <div class="mobile-cart">
+    <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile">0</span></a>
   </div>
 
   <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
@@ -653,10 +665,20 @@ function mergeCartItems(cartArray){
 }
 
 /* update cart count in header */
+// function updateCartCount(){
+//   const total = (getCart() || []).reduce((sum, i) => sum + (Number(i.quantity)||0), 0);
+//   if(cartCountElem) cartCountElem.textContent = total;
+// }
+
+/* ---------- Cart Count ---------- */
 function updateCartCount(){
-  const total = (getCart() || []).reduce((sum, i) => sum + (Number(i.quantity)||0), 0);
-  if(cartCountElem) cartCountElem.textContent = total;
+  const c = getCart();
+  const total = (c || []).reduce((s,i) => s + (i.quantity||0), 0);
+  if (cartCountElem) cartCountElem.textContent = total;
+  if (cartCountMobileElem) cartCountMobileElem.textContent = total;
+  cart = mergeCartItems(c);
 }
+   
 
 /* price formatting */
 function formatPriceForDisplay(amount, currency) {
@@ -1254,6 +1276,7 @@ if(hamburger && headerRight){
   });
 }
 
+   
 /* ---------- Thumbnail swipe ---------- */
 let isDown=false, startX, scrollLeft;
 if(thumbnailContainer){
