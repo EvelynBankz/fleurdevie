@@ -83,8 +83,10 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
 .quantity-controls button:hover { background:#0a1d14; }
 .quantity-controls input { width:50px; text-align:center; padding:4px; border-radius:6px; border:1px solid #112e1f; background:#fff; color:#112e1f; font-weight:600; }
 
-/* single variable for variant card background so you can change easily */
-:root { --variant-bg: transparent; }
+/* single variable for variant card background */
+:root {
+  --variant-bg: transparent;
+}
 
 /* Variants container + animation (max-height animation) */
 .variants-container {
@@ -97,12 +99,11 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   border-left: none;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.36s cubic-bezier(.2,.9,.2,1), opacity 0.24s ease, padding 0.24s ease;
+  transition: max-height 0.36s cubic-bezier(.2, .9, .2, 1), opacity 0.24s ease, padding 0.24s ease;
   opacity: 0;
   background: transparent;
   border-radius: 10px;
 }
-
 
 /* open state */
 .variants-container.open {
@@ -137,19 +138,19 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   padding: 10px;
   border-radius: 8px;
   background: var(--variant-bg);
-  border: 1px solid rgba(17,46,31,0.06);
+  border: 1px solid rgba(17, 46, 31, 0.06);
 }
 
 /* Variant text */
 .variant-meta {
   font-size: 0.95rem;
-  color: #112e1f; /* deep green for variant labels */
+  color: #112e1f;
   flex: 1 1 auto;
-  font-weight:600;
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Variant controls match main controls */
@@ -165,19 +166,21 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   border: none;
   background: #112e1f;
   color: #F5E6CC;
-  font-weight:700;
-  cursor:pointer;
+  font-weight: 700;
+  cursor: pointer;
 }
-.variant-controls button:hover { background:#0a1d14; }
+.variant-controls button:hover {
+  background: #0a1d14;
+}
 .variant-controls input {
-  width:46px;
-  height:36px;
-  border-radius:6px;
-  border:1px solid #112e1f;
-  text-align:center;
-  background:#fff;
-  color:#112e1f;
-  font-weight:700;
+  width: 46px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #112e1f;
+  text-align: center;
+  background: #fff;
+  color: #112e1f;
+  font-weight: 700;
 }
 
 /* Product name + quantity stacked (quantity under name) */
@@ -241,56 +244,62 @@ footer {
   .hero-text p { font-size:clamp(14px,2.5vw,18px); margin:0 auto; }
 
   /* Keep item visuals same, but slightly smaller */
-  .cart-item-header { align-items:flex-start; }
-  .cart-item-header img { width:90px; height:90px; }
+  /* .cart-item-header { align-items:flex-start; }
+  .cart-item-header img { width:90px; height:90px; } */
   
-  /* --- VARIANT MOBILE FIX: align under image and spread full width --- */
-.variants-container {
-  margin-left: 0;
-  width: 100%;
-  padding: 6px 0 0 0;
+
+/* ---------------- MOBILE ---------------- */
+@media (max-width: 900px) {
+  .cart-item-header {
+    align-items: flex-start;
+  }
+  .cart-item-header img {
+    width: 90px;
+    height: 90px;
+  }
+
+  /* VARIANT MOBILE FIX */
+  .variants-container {
+    margin-left: 0;
+    width: 100%;
+    padding: 6px 0 0 0;
+  }
+  .variant-row {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .variant-meta {
+    flex: 1;
+    font-size: 13px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .variant-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .variant-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+  .variant-controls input {
+    width: 36px;
+    height: 24px;
+    text-align: center;
+  }
 }
-
-.variant-row {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  margin-left: 0;
-}
-
-.variant-meta {
-  flex: 1;
-  font-size: 13px;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.variant-controls {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.variant-controls button {
-  width: 30px;
-  height: 30px;
-  font-size: 12px;
-}
-
-.variant-controls input {
-  width: 36px;
-  height: 24px;
-  text-align: center;
-}
-
-
+  
 
 /* Floating Support Button + Tooltip */
 #floatingSupportBtn {
@@ -314,64 +323,7 @@ footer {
 }
 #floatingSupportBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(212,245,105,0.8); }
 
-/* --- Fix variant layout alignment and spacing --- */
 
-/* Align variants under image instead of far right */
-.cart-item {
-  position: relative;
-}
-.cart-item-header {
-  align-items: flex-start;
-}
-
-/* Make variant content align with image left edge */
-.variants-container {
-  margin-left: 136px; /* matches image width (120px + 16px gap) */
-  margin-top: 10px;
-  padding-left: 0;
-}
-
-/* Clean horizontal layout for variant rows */
-.variant-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: nowrap;
-}
-
-/* Prevent controls from stacking and overlapping */
-.variant-controls {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 6px;
-}
-
-/* Adjust mobile layout for tighter alignment */
-@media (max-width: 900px) {
-  .variants-container {
-    margin-left: 106px; /* image smaller on mobile */
-  }
-
-  .variant-row {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 8px;
-  }
-
-  .variant-meta {
-    flex: 1 1 100%;
-    text-align: left;
-    font-size: 13px;
-  }
-
-  .variant-controls {
-    flex: 1 1 auto;
-    justify-content: flex-start;
-  }
-}
-  
 </style>
 </head>
 <body>
