@@ -243,37 +243,53 @@ footer {
   /* Keep item visuals same, but slightly smaller */
   .cart-item-header { align-items:flex-start; }
   .cart-item-header img { width:90px; height:90px; }
-   .variants-container {
-    margin-left: 0 !important;
-    width: 100%;
-    padding: 8px 0 0 0;
-  }
+  
+  /* --- VARIANT MOBILE FIX: align under image and spread full width --- */
+.variants-container {
+  margin-left: 0;
+  width: 100%;
+  padding: 6px 0 0 0;
+}
 
-  .variant-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 8px;
-  }
+.variant-row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-left: 0;
+}
 
-  .variant-meta {
-    flex: 1 1 100%;
-    font-size: 13px;
-    text-align: left;
-  }
+.variant-meta {
+  flex: 1;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .variant-controls {
-    flex: 1 1 auto;
-    justify-content: flex-start;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+.variant-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
 
-  .variant-controls button { width:30px; height:30px; font-size:12px; }
-  .variant-controls input { width:36px; height:24px; }
-  .quantity-controls input { width:36px; height:24px; }
+.variant-controls button {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.variant-controls input {
+  width: 36px;
+  height: 24px;
+  text-align: center;
+}
+
 
 
 /* Floating Support Button + Tooltip */
