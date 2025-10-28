@@ -677,7 +677,7 @@ function updateCartCount(){
   const total = (c || []).reduce((s,i) => s + (i.quantity||0), 0);
   if (cartCountElem) cartCountElem.textContent = total;
   if (cartCountMobileElem) cartCountMobileElem.textContent = total;
-  cart = mergeCartItems(c);
+  // cart = mergeCartItems(c);
 }
    
 
