@@ -822,6 +822,36 @@ function handleMobileCart(){ const el = document.querySelector('.mobile-cart'); 
 window.addEventListener('resize', handleMobileCart);
 handleMobileCart();
 
+
+
+  /* ---------- HEADER HIDE/SHOW (Serac parity) ---------- */
+/*------New header Settings-----*/
+let lastScrollY = window.scrollY;
+const header = document.querySelector('.site-header');
+const hero = document.querySelector('.hero');
+
+window.addEventListener('scroll', () => {
+  const heroBottom = hero.offsetTop + hero.offsetHeight;
+  if (window.scrollY > heroBottom) {
+    if (window.scrollY > lastScrollY) {
+      header.classList.add('hidden');
+    } else {
+      header.classList.remove('hidden');
+      header.classList.add('scrolled');
+    }
+  } else {
+    header.classList.remove('hidden', 'scrolled');
+  }
+  lastScrollY = window.scrollY;
+});
+
+// Show header again on hover when below hero
+document.addEventListener('mousemove', (e) => {
+  if (e.clientY < 100) header.classList.remove('hidden');
+});
+  
+
+  
 /* ---------- Storage sync (other tabs) and pageshow to reflect product page changes ---------- */
 window.addEventListener('storage', () => {
   cart = getCart();
