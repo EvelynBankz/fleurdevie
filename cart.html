@@ -244,7 +244,7 @@ footer {
   .variants-container.open {padding: 4px; }
   .variant-row { flex-direction:row; }
   .variant-meta { font-size:12px; }
-  .variant-controls button { width:34px; height:32px; font-size:15px; }
+  .variant-controls button { width:30px; height:30px; font-size:12px; }
   .variant-controls input { width:36px; height:24px; }
   .quantity-controls input { width:36px; height:24px; }
 }
@@ -271,6 +271,64 @@ footer {
 }
 #floatingSupportBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(212,245,105,0.8); }
 
+/* --- Fix variant layout alignment and spacing --- */
+
+/* Align variants under image instead of far right */
+.cart-item {
+  position: relative;
+}
+.cart-item-header {
+  align-items: flex-start;
+}
+
+/* Make variant content align with image left edge */
+.variants-container {
+  margin-left: 136px; /* matches image width (120px + 16px gap) */
+  margin-top: 10px;
+  padding-left: 0;
+}
+
+/* Clean horizontal layout for variant rows */
+.variant-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+/* Prevent controls from stacking and overlapping */
+.variant-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+/* Adjust mobile layout for tighter alignment */
+@media (max-width: 900px) {
+  .variants-container {
+    margin-left: 106px; /* image smaller on mobile */
+  }
+
+  .variant-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .variant-meta {
+    flex: 1 1 100%;
+    text-align: left;
+    font-size: 13px;
+  }
+
+  .variant-controls {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+  }
+}
+  
 </style>
 </head>
 <body>
