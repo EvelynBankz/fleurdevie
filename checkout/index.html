@@ -495,9 +495,6 @@ let paidUIRenderedFor = null;
 let paidRenderInProgress = false;
 
 /* -------------------- UTIL: cart helpers -------------------- */
-const cartCountElem = document.getElementById('cartCount');
-const cartCountMobileElem = document.getElementById('cartCountMobile');
-
 /* -------------------- CART COUNT / MODE-AWARE SYNC (desktop + mobile) -------------------- */
 function totalQtyFromCartArray(arr) {
   try { return (arr || []).reduce((s, i) => s + Number(i.quantity || 0), 0); } 
