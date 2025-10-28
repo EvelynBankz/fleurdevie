@@ -111,6 +111,7 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   background: rgba(0,0,0,0.02);
   border-radius: 10px;
 }
+
 /* open state */
 .variants-container.open {
   max-height: 1200px; /* large enough to reveal content */
@@ -119,20 +120,21 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
 
 /* Show choices button style */
 .show-variants-btn {
-  background: #2f2b29; /* dark pill to match screenshot */
+  background: #2f2b29; /* dark pill to match theme */
   color: #fff;
   border: none;
   border-radius: 10px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   cursor: pointer;
   font-weight: 700;
-  width: 100%;
+  width: fit-content; /* auto width */
   text-align: center;
   box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
   margin-top: 6px;
+  align-self: flex-start;
 }
 
-/* Variant row layout — left text, right controls (rounded card) */
+/* Variant row layout — left text, right controls */
 .variant-row {
   display: flex;
   align-items: center;
@@ -149,6 +151,7 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   font-size: 1.05rem;
   color: #e6e6e6;
   flex: 1 1 auto;
+  font-weight: 500;
 }
 
 /* Variant controls */
@@ -158,6 +161,7 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   gap: 10px;
   flex: 0 0 auto;
 }
+
 .variant-controls button {
   width: 44px;
   height: 44px;
@@ -168,6 +172,7 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   font-weight: 700;
   cursor: pointer;
 }
+
 .variant-controls input {
   width: 56px;
   height: 44px;
@@ -179,32 +184,39 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   font-weight: 600;
 }
 
-/* Header row: name + qty + button inline on larger screens */
-.cart-item-details .header-row {
-  display:flex;
-  align-items:center;
-  gap:16px;
-  width:100%;
-  margin-bottom:10px;
+/* Product name + quantity stacked (quantity under name) */
+.cart-item-details .product-name {
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
-.cart-item-details .header-row .product-name {
-  font-family:"Playfair Display", serif;
-  font-size:20px;
-  font-weight:700;
-  flex:1 1 auto;
-}
-.cart-item-details .header-row .total-qty {
-  font-size:16px;
+
+.cart-item-details .total-qty {
+  font-size: 16px;
   color: #cfcfcf;
-  flex:0 0 auto;
+  margin-bottom: 10px;
+}
+
+/* Keep quantity text color consistent */
+.main-quantity input,
+.main-quantity button {
+  color: inherit;
 }
 
 /* Responsive adjustments */
 @media (max-width:900px){
-  .cart-item-details .header-row { flex-direction: column; align-items:flex-start; gap:8px; }
-  .show-variants-btn { width: auto; align-self: flex-start; padding:8px 12px; }
-  .variant-row { flex-direction: row; }
-  .variant-meta { font-size: 1rem; }
+  .show-variants-btn {
+    width: auto;
+    align-self: flex-start;
+    padding: 8px 12px;
+  }
+  .variant-row {
+    flex-direction: row;
+  }
+  .variant-meta {
+    font-size: 1rem;
+  }
 }
 
 
@@ -564,23 +576,31 @@ async function renderCart() {
     itemDiv.id = `cart-item-${pid}`;
     itemDiv.dataset.productId = pid;
 
-    itemDiv.innerHTML = `
+    const variantSummaryText = hasVariantMeta
+  ? variants.map(v => `${v.color ? v.color + ' / ' : ''}${v.size ? v.size + ' x ' : ''}${v.quantity}`).join(', ')
+  : `Quantity: ${totalQty}`;
+
+ itemDiv.innerHTML = `
   <div class="cart-item-header">
     <img src="${thumbnail}" alt="${(product && product.name) ? escapeHtml(product.name) : 'Product'}">
     <div class="cart-item-details">
-      <div class="header-row">
-        <div class="product-name">${(product && product.name) ? escapeHtml(product.name) : 'Product'}</div>
-        <div class="total-qty">Quantity: <strong>${totalQty}</strong></div>
-      </div>
-
+      <h3 class="product-name">${(product && product.name) ? escapeHtml(product.name) : 'Product'}</h3>
+      <div class="total-qty">Quantity: <strong>${totalQty}</strong></div>
       <div class="price">${formatPrice(lineTotal, currency)}</div>
+      <div class="quantity-controls main-quantity" ${hasVariantMeta ? 'style="display:flex;"' : ''}>
+        <button class="qty-minus" data-id="${pid}">-</button>
+        <input type="number" min="0" value="${totalQty}" data-id="${pid}">
+        <button class="qty-plus" data-id="${pid}">+</button>
+      </div>
 
       ${showButton ? '<button class="show-variants-btn">View Choices</button>' : ''}
 
       <div class="variants-container">
         ${variants.map(v => `
           <div class="variant-row" data-id="${v.id}" data-color="${(v.color || '')}" data-size="${(v.size || '')}">
-            <div class="variant-meta">${v.color ? escapeHtml(v.color) + ' / ' : ''}${v.size ? escapeHtml(v.size) + ' x ' : ''}${v.quantity}</div>
+            <div class="variant-meta">
+              ${v.color ? v.color + ' / ' : ''}${v.size ? v.size + ' x ' : ''}${v.quantity}
+            </div>
             <div class="quantity-controls variant-controls">
               <button class="v-minus" data-id="${v.id}" data-color="${(v.color || '')}" data-size="${(v.size || '')}">-</button>
               <input type="number" min="0" value="${v.quantity}" data-id="${v.id}" data-color="${(v.color || '')}" data-size="${(v.size || '')}">
@@ -591,6 +611,8 @@ async function renderCart() {
     </div>
   </div>
 `;
+
+
 
 
     // const variantSummaryText = hasVariantMeta
