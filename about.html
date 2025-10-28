@@ -43,7 +43,7 @@
       background: rgba(17,46,31,0.9);
     }
     
-    .header-left { display:flex; align-items:center; gap:10px; }
+    .header-left { display:flex; align-items:left; gap:10px; }
     .brand-logo { height:70px; transition:height 0.3s ease; }
     .brand-title { font-family:"Playfair Display", serif; font-size:22px; font-weight:700; }
     
@@ -527,5 +527,94 @@ document.addEventListener('mousemove', (e) => {
 });
 
 </script>
+
+<!-- Smart Mobile Input Experience: Final Universal Version -->
+<script>
+(() => {
+  // --- 1️⃣ Ensure proper viewport meta ---
+  const meta = document.querySelector('meta[name="viewport"]');
+  if (meta) {
+    meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+  } else {
+    const newMeta = document.createElement('meta');
+    newMeta.name = 'viewport';
+    newMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
+    document.head.appendChild(newMeta);
+  }
+
+  // --- 2️⃣ Global mobile-friendly styles ---
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width: 768px) {
+      input, textarea, select {
+        font-size: 16px !important;
+      }
+    }
+    html, body {
+      min-height: 100dvh;
+      scroll-behavior: smooth;
+    }
+    /* Smoothly hide sticky/fixed UI when keyboard opens */
+    .keyboard-open [data-sticky],
+    .keyboard-open footer,
+    .keyboard-open .sticky,
+    .keyboard-open .fixed-bottom,
+    .keyboard-open [class*="sticky"],
+    .keyboard-open [class*="fixed"] {
+      transform: translateY(120%);
+      transition: transform 0.3s ease;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // --- 3️⃣ Keyboard open/close detection ---
+  let lastWindowHeight = window.innerHeight;
+  let lastScrollY = 0;
+
+  const onResize = () => {
+    const diff = lastWindowHeight - window.innerHeight;
+    if (diff > 150) {
+      // Keyboard opened
+      lastScrollY = window.scrollY;
+      document.body.classList.add('keyboard-open');
+    } else if (diff < -150) {
+      // Keyboard closed
+      document.body.classList.remove('keyboard-open');
+      // Restore scroll position
+      setTimeout(() => window.scrollTo({ top: lastScrollY, behavior: 'smooth' }), 200);
+    }
+    lastWindowHeight = window.innerHeight;
+  };
+
+  window.addEventListener('resize', onResize);
+  window.addEventListener('focusin', () => {
+    lastScrollY = window.scrollY;
+    document.body.classList.add('keyboard-open');
+  });
+  window.addEventListener('focusout', () => {
+    document.body.classList.remove('keyboard-open');
+    setTimeout(() => window.scrollTo({ top: lastScrollY, behavior: 'smooth' }), 200);
+  });
+
+  // --- 4️⃣ iOS Safari input-jump prevention ---
+  let activeInput = null;
+  document.addEventListener('focusin', e => {
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+      activeInput = e.target;
+      setTimeout(() => {
+        const rect = activeInput.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight - 100) {
+          activeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  });
+  document.addEventListener('focusout', () => {
+    activeInput = null;
+  });
+})();
+</script>
+
+  
 </body>
 </html>
