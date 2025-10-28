@@ -112,7 +112,25 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   text-align: center;
   align-self: flex-start;
 }
-.variants-container { display:none; flex-direction:column; gap:8px; margin-top:8px; padding-left:8px; border-left:2px solid #112e1f; }
+
+  
+.variants-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-left: 8px;
+  border-left: 2px solid #112e1f;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+.variants-container.open {
+  max-height: 500px; /* Adjust as needed */
+  opacity: 1;
+}
+
 
 /* Cart Subtotal */
 .cart-subtotal { text-align:right; font-weight:600; margin-top:10px; transition: all 0.3s ease; }
@@ -196,6 +214,26 @@ footer {
     0%,100%{ box-shadow:0 8px 30px rgba(212,245,105,1);}
     50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);}
   }
+
+  @media (max-width: 768px) {
+  .cart-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cart-item-header img {
+    width: 100%;
+    height: auto;
+  }
+  .quantity-controls {
+    flex-wrap: wrap;
+  }
+  .variant-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
 
 </style>
 </head>
@@ -581,14 +619,22 @@ cartGrid.addEventListener('click', e => {
     }
   }
 
+//   if (t.classList.contains('show-variants-btn')) {
+//     const container = t.nextElementSibling;
+//     if (!container) return;
+//     const open = container.style.display === 'flex';
+//     container.style.display = open ? 'none' : 'flex';
+//     t.textContent = open ? 'Show Choices' : 'Hide Choices';
+//   }
+// });
+
   if (t.classList.contains('show-variants-btn')) {
-    const container = t.nextElementSibling;
-    if (!container) return;
-    const open = container.style.display === 'flex';
-    container.style.display = open ? 'none' : 'flex';
-    t.textContent = open ? 'Show Choices' : 'Hide Choices';
-  }
-});
+  const container = t.nextElementSibling;
+  if (!container) return;
+  const open = container.classList.toggle('open');
+  t.textContent = open ? 'Hide Choices' : 'View Choices';
+}
+
 
 /* ---------- Input Quantity ---------- */
 cartGrid.addEventListener('input', e => {
