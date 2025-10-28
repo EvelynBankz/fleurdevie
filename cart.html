@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Fleur De Vie - Cart</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
@@ -30,10 +30,33 @@ a { text-decoration:none; color:inherit; }
 }
 .site-header.scrolled { background: #112e1f; }
 .site-header.hidden { opacity: 0; top: -80px; pointer-events: none; }
+.site-header:hover { background: rgba(17,46,31,0.9); }
+
 .header-left { display:flex; align-items:center; gap:10px; }
 .brand-logo { height:70px; transition:height 0.3s ease; }
 .brand-title { font-family:"Playfair Display", serif; font-size:22px; font-weight:700; }
+
 .header-right { display:flex; gap:20px; align-items:center; }
+.header-right a { font-weight: 500; color: inherit; position: relative; transition: color 0.3s ease, transform 0.3s ease; }
+.header-right a:hover { color: #c9e4ff; transform: translateY(-2px); }
+.cart-count { background:#FFD6BA; color:#112e1f; font-size:12px; font-weight:600; border-radius:50%; padding:2px 6px; margin-left:4px; }
+
+/* hamburger */
+.hamburger { display:none; background:none; border:none; cursor:pointer; width:30px; height:24px; position:relative; }
+.hamburger span { display:block; width:100%; height:3px; background:#F5E6CC; border-radius:2px; position:absolute; left:0; transition:0.3s; }
+.hamburger span:nth-child(1){ top:0; }
+.hamburger span:nth-child(2){ top:10px; }
+.hamburger span:nth-child(3){ top:20px; }
+.hamburger.open span:nth-child(1){ transform:rotate(45deg); top:10px; }
+.hamburger.open span:nth-child(2){ opacity:0; }
+.hamburger.open span:nth-child(3){ transform:rotate(-45deg); top:10px; }
+
+/* HERO */
+.hero { position: relative; height:90vh; display:flex; justify-content:center; align-items:center; text-align:center; margin-top:0; overflow:hidden; }
+.hero::after { content:""; position:absolute; inset:0; background:url('asset/bg21.jpg') center/cover no-repeat; transform:scale(1.1); z-index:-1; border-radius:12px; box-shadow: inset 0 0 0 2000px rgba(17,46,31,0.3); }
+.hero-text { position:relative; display:inline-block; color:#FFD6BA; margin-bottom:12px; animation: shimmer 3s infinite linear; }
+.hero-text h1 { font-family:"Playfair Display", serif; font-size:clamp(36px,5vw,64px); margin-bottom:12px; }
+.hero-text p { font-size:clamp(16px,2vw,24px); max-width:700px; }
 
 /* ---------------- CART ---------------- */
 section.cart { padding:60px 20px; background:#F5E6CC; }
@@ -44,135 +67,130 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
 
 .cart-grid { display:flex; flex-direction:column; gap:20px; }
 
-/* card */
-.cart-item {
-  background:#F5E6CC;
-  padding:16px;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* header row */
+.cart-item { background:#F5E6CC; padding:16px; border-radius:12px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 10px rgba(0,0,0,0.2); opacity:1; transition: opacity 0.3s ease, transform 0.3s ease; }
 .cart-item-header { display:flex; align-items:center; gap:16px; }
 .cart-item-header img { width:120px; height:120px; object-fit:cover; border-radius:8px; }
 .cart-item-details { flex:1; display:flex; flex-direction:column; }
-
-/* product name + stacked quantity under name */
-.cart-item-details .product-name {
-  font-family:"Playfair Display", serif;
-  font-size:20px;
-  font-weight:700;
-  margin-bottom:4px;
-  color:#112e1f;
-}
-.cart-item-details .total-qty {
-  font-size:16px;
-  color:#112e1f;     /* preserve deep green for quantity text as requested */
-  margin-bottom:10px;
-  font-weight:600;
-}
-
-/* price */
-.price { font-weight:600; margin-bottom:8px; color:#112e1f; }
-
-/* main quantity controls (for single-SKU items) */
-.quantity-controls { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
-.quantity-controls button {
-  background:#112e1f; color:#F5E6CC; border:none; border-radius:8px; padding:6px 12px; cursor:pointer;
-  font-weight:700; font-size:16px; transition: background 0.25s ease;
-}
+.cart-item-details h3 { font-family:"Playfair Display", serif; margin-bottom:6px; }
+.variant-summary { font-size:0.95rem; color:#334d3a; margin-bottom:6px; }
+.price { font-weight:600; margin-bottom:8px; }
+.quantity-controls { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+.quantity-controls button { background:#112e1f; color:#F5E6CC; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-weight:600; transition:0.3s; }
 .quantity-controls button:hover { background:#0a1d14; }
+.quantity-controls input { width:50px; text-align:center; padding:4px; border-radius:6px; border:1px solid #112e1f; background:#fff; color:#112e1f; font-weight:600; }
 
-/* main input style (white background, deep green text) */
-.quantity-controls input {
-  width:55px; height:38px; text-align:center; border:1px solid #112e1f; border-radius:8px;
-  background:#fff; color:#112e1f; font-weight:700; font-size:15px;
-}
+/* single variable for variant card background so you can change easily */
+:root { --variant-bg: #ffffff; }
 
-/* Show choices button */
-.show-variants-btn {
-  background: #2f2b29;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 6px 14px;
-  cursor: pointer;
-  font-weight: 700;
-  width: auto;
-  text-align: center;
-  margin-top: 6px;
-  align-self: flex-start;
-  transition: background 0.3s ease;
-}
-.show-variants-btn:hover { background:#1e1b19; }
-
-/* variants container collapsed/open with animation */
+/* Variants container + animation */
 .variants-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 0;
+  border-left: 2px solid rgba(17,46,31,0.12);
   max-height: 0;
   overflow: hidden;
+  transition: max-height 0.42s cubic-bezier(.2,.9,.2,1), opacity 0.28s ease, padding 0.28s ease;
   opacity: 0;
-  transform-origin: top;
-  transition: max-height 0.36s cubic-bezier(.2,.9,.2,1), opacity 0.24s ease, padding 0.24s ease;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  padding:0 0;
-  border-left: 2px solid rgba(17,46,31,0.06);
-  margin-top:8px;
-  border-radius:8px;
   background: transparent;
+  border-radius: 10px;
 }
+
+/* open state */
 .variants-container.open {
-  max-height: 1000px;
+  max-height: 1200px;
   opacity: 1;
-  padding:10px 10px;
-  background: rgba(0,0,0,0.01);
+  padding: 10px;
 }
 
-/* variant row */
+/* Show choices button style */
+.show-variants-btn {
+  background: #FFD6BA;
+  color: #112e1f;
+  border: 1px solid #112e1f;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 6px;
+  width: auto;
+  display: inline-block;
+  font-size: 14px;
+  text-align: center;
+  align-self: flex-start;
+}
+
+/* Variant row layout — left text, right controls */
 .variant-row {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:10px;
-  border-radius:8px;
-  background:transparent; /* white variant cards to match the counter background */
-  border:1px solid rgba(17,46,31,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--variant-bg); /* change this to control each variant box background */
+  border: 1px solid rgba(17,46,31,0.06);
 }
 
-/* variant meta text - keep deep green color */
+/* Variant text */
 .variant-meta {
-  font-size:15px;
-  color:#112e1f;   /* deep green for variant labels */
+  font-size: 0.95rem;
+  color: #112e1f; /* deep green for variant labels */
+  flex: 1 1 auto;
   font-weight:600;
-  flex:1;
 }
 
-/* variant controls: deep green +/- buttons and white counter */
+/* Variant controls */
 .variant-controls {
-  display:flex;
-  align-items:center;
-  gap:8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .variant-controls button {
-  width:40px; height:36px; border-radius:8px; border:none;
-  background:#112e1f; color:#F5E6CC; font-weight:800; font-size:16px; cursor:pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  background: #112e1f;
+  color: #F5E6CC;
+  font-weight:700;
+  cursor:pointer;
 }
 .variant-controls button:hover { background:#0a1d14; }
-
-/* variant input counter (white background, deep green text) */
 .variant-controls input {
-  width:56px; height:36px; border-radius:8px; border:1px solid #112e1f;
-  text-align:center; background:#fff; color:#112e1f; font-weight:700;
+  width:46px;
+  height:36px;
+  border-radius:6px;
+  border:1px solid #112e1f;
+  text-align:center;
+  background:#fff;
+  color:#112e1f;
+  font-weight:700;
 }
 
-/* keep main quantity color consistent */
-.main-quantity input, .main-quantity button { color:inherit; }
+/* Product name + quantity stacked (quantity under name) */
+.cart-item-details .product-name {
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color:#112e1f;
+}
+
+.cart-item-details .total-qty {
+  font-size: 16px;
+  color: #112e1f;
+  margin-bottom: 10px;
+  font-weight:600;
+}
+
+/* Keep quantity text color consistent */
+.main-quantity input,
+.main-quantity button {
+  color: inherit;
+}
 
 /* Cart Subtotal */
 .cart-subtotal { text-align:right; font-weight:600; margin-top:10px; transition: all 0.3s ease; }
@@ -183,27 +201,60 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
 .cart-buttons .continue-btn { background:#112e1f; color:#F5E6CC; }
 .cart-buttons .checkout-btn { background:#FFD6BA; color:#112e1f; }
 
-/* Footer */
-footer { text-align:center; padding:20px; background:transparent; color:#112e1f; margin-top:60px; }
+/* ---------------- FOOTER ---------------- */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: transparent;
+  color: #112e1f;
+  margin-top: 60px;
+}
 
-/* Mobile small adjustments but keep layout similar */
+/* ---------------- MOBILE ---------------- */
 @media (max-width:900px){
+  .header-right { display:none; flex-direction:column; background:#112e1f; position:absolute; top:70px; right:0; width:200px; padding:20px; }
+  .header-right.open { display:flex; }
+  .hamburger { display:block; }
+  .mobile-cart { display:flex; align-items:center; margin-right:10px; }
+  .mobile-cart a { color:#FFD6BA; font-size:20px; position:relative; }
+  .mobile-cart .cart-count { position:absolute; top:-8px; right:-8px; }
+  .customize-badge { font-size:14px; padding:8px 12px; }
+  .hero { height:40vh; margin-top:0; padding-top:80px; } 
+  .hero-text h1 { font-size:clamp(24px,5vw,32px); line-height:1.2; margin:0; }
+  .hero-text p { font-size:clamp(14px,2.5vw,18px); margin:0 auto; }
+
+  /* Keep item visuals same, but slightly smaller */
   .cart-item-header { align-items:flex-start; }
   .cart-item-header img { width:100px; height:100px; }
   .variant-row { flex-direction:row; }
   .variant-meta { font-size:14px; }
-  .variant-controls button { width:36px; height:34px; font-size:15px; }
-  .variant-controls input { width:48px; height:34px; }
-  .quantity-controls input { width:48px; height:34px; }
+  .variant-controls button { width:34px; height:32px; font-size:15px; }
+  .variant-controls input { width:44px; height:32px; }
+  .quantity-controls input { width:44px; height:32px; }
 }
 
-/* Floating Support Button */
+/* Floating Support Button + Tooltip */
 #floatingSupportBtn {
-  position: fixed; right:22px; bottom:22px; width:60px; height:60px; border-radius:50%;
-  border:none; background:#112e1f; color:#fff; z-index:10002; box-shadow:0 8px 30px rgba(212,245,105,1);
-  cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:28px;
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #112e1f;
+  color: #fff;
+  z-index: 10002;
+  box-shadow: 0 8px 30px rgba(212,245,105,1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-#floatingSupportBtn:hover { transform: translateY(-3px); box-shadow:0 12px 36px rgba(212,245,105,0.8); }
+#floatingSupportBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(212,245,105,0.8); }
+
 </style>
 </head>
 <body>
@@ -214,10 +265,10 @@ footer { text-align:center; padding:20px; background:transparent; color:#112e1f;
     <div class="brand-title">Fleur De Vie</div>
   </div>
 
-  <div class="mobile-cart" style="display:none;">
+   <div class="mobile-cart" style="display:none;">
     <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile">0</span></a>
   </div>
-
+  
   <nav class="header-right">
     <a href="index.html">Home</a>
     <a href="shop.html">Shop</a>
@@ -249,7 +300,6 @@ footer { text-align:center; padding:20px; background:transparent; color:#112e1f;
         <option value="GBP">GBP</option>
       </select>
     </div>
-
     <div class="cart-grid" id="cartGrid"></div>
     <div class="cart-empty" id="cartEmpty">Your cart is empty.</div>
     <div class="cart-subtotal" id="cartSubtotal"></div>
@@ -259,8 +309,15 @@ footer { text-align:center; padding:20px; background:transparent; color:#112e1f;
     </div>
   </div>
 </section>
-
-<button id="floatingSupportBtn" aria-label="Support"><i class="fas fa-headset"></i></button>
+  
+<!-- Floating support button -->
+<button id="floatingSupportBtn" aria-label="Support">
+  <i class="fas fa-headset"></i>
+</button>
+  
+<footer>
+  <p>© 2025 Fleur De Vie</p>
+</footer>
 
 <script type="module">
 /* ---------- Firebase ---------- */
@@ -352,47 +409,15 @@ function computeSubtotal(currency) {
   return subtotal;
 }
 
-function getCart(){ try { return JSON.parse(localStorage.getItem('cart')) || []; } catch(e) { return []; } }
+/* ---------- Storage helpers ---------- */
+function getCart(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
 function setCart(cartArray){
   cart = mergeCartItems(cartArray || []);
-  try { localStorage.setItem('cart', JSON.stringify(cart)); } catch(e){ console.warn('Could not set cart', e); }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)); } catch(e){ console.warn('Could not set cart', e); }
   updateCartCount();
 }
 
-/* robust total quantity for product (accounts for variants) */
-function getTotalQuantity(productId){
-  const c = getCart();
-  let total = 0;
-  (c || []).forEach(i => {
-    if (String(i.id) === String(productId)) { total += (i.quantity||0); return; }
-    if (i.parentId && String(i.parentId) === String(productId)) { total += (i.quantity||0); return; }
-    if (i.productId && String(i.productId) === String(productId)) { total += (i.quantity||0); return; }
-    if (typeof i.id === 'string' && String(i.id).startsWith(String(productId) + '-')) { total += (i.quantity||0); return; }
-  });
-  return total;
-}
-
-/* add/remove */
-function addToCart(product){
-  const currentCart = getCart();
-  const idx = currentCart.findIndex(i => i.id === product.id && (i.color||'') === (product.color||'') && (i.size||'') === (product.size||''));
-  if (idx > -1) currentCart[idx].quantity += 1;
-  else currentCart.push({ ...product, quantity: 1 });
-  setCart(currentCart);
-  updateProductUI(product.id);
-}
-function removeFromCart(productId){
-  const currentCart = getCart();
-  const idx = currentCart.findIndex(i => i.id === productId);
-  if (idx > -1) {
-    currentCart[idx].quantity -= 1;
-    if (currentCart[idx].quantity <= 0) currentCart.splice(idx, 1);
-  }
-  setCart(currentCart);
-  updateProductUI(productId);
-}
-
-/* update cart count display */
+/* ---------- Cart Count ---------- */
 function updateCartCount(){
   const c = getCart();
   const total = (c || []).reduce((s,i) => s + (i.quantity||0), 0);
@@ -403,7 +428,7 @@ function updateCartCount(){
 
 /* ---------- Render Cart ---------- */
 async function renderCart() {
-  updateCartCount();
+  updateCartCount(); // instant
   cartGrid.innerHTML = '';
   if (!cart.length) {
     cartEmpty.style.display = 'block';
@@ -456,9 +481,7 @@ async function renderCart() {
           <div class="variants-container">
             ${variants.map(v => `
               <div class="variant-row" data-id="${v.id}" data-color="${(v.color || '')}" data-size="${(v.size || '')}">
-                <div class="variant-meta">
-                  ${v.color ? escapeHtml(v.color) + ' / ' : ''}${v.size ? escapeHtml(v.size) + ' x ' : ''}${v.quantity}
-                </div>
+                <div class="variant-meta">${v.color ? escapeHtml(v.color) + ' / ' : ''}${v.size ? escapeHtml(v.size) + ' x ' : ''}${v.quantity}</div>
                 <div class="quantity-controls variant-controls">
                   <button class="v-minus" data-id="${v.id}" data-color="${(v.color || '')}" data-size="${(v.size || '')}">-</button>
                   <input type="number" min="0" value="${v.quantity}" data-id="${v.id}" data-color="${(v.color || '')}" data-size="${(v.size || '')}">
@@ -470,10 +493,9 @@ async function renderCart() {
         </div>
       </div>
     `;
-
     cartGrid.appendChild(itemDiv);
 
-    // hide main quantity if product has variants (we still update it programmatically)
+    // hide main quantity input controls if product has variants (we update it programmatically)
     if (hasVariantMeta) {
       const mainQtyEl = itemDiv.querySelector('.main-quantity');
       if (mainQtyEl) mainQtyEl.style.display = 'none';
@@ -490,7 +512,7 @@ async function updateItemRow(productId) {
   const itemDiv = document.getElementById(`cart-item-${productId}`);
   const currency = currencySelect.value || 'NGN';
 
-  // remove zero-quantity items
+  // Clean zero-quantity items
   cart = cart.filter(i => (i.quantity || 0) > 0);
   const productVariants = groupVariants(productId);
 
@@ -514,18 +536,19 @@ async function updateItemRow(productId) {
 
   if (!itemDiv) return renderCart();
 
-  // update price and total quantity under name
+  // Update price
   const priceEl = itemDiv.querySelector('.price');
   if (priceEl) priceEl.textContent = formatPrice(lineTotal, currency);
 
+  // Update total qty under name
   const totalQtyEl = itemDiv.querySelector('.total-qty');
   if (totalQtyEl) totalQtyEl.innerHTML = `Quantity: <strong>${totalQty}</strong>`;
 
-  // update main-quantity input value (if visible)
+  // Update main input if present
   const mainInput = itemDiv.querySelector('.main-quantity input');
   if (mainInput) mainInput.value = totalQty;
 
-  // rebuild variants container (keeps inputs in sync)
+  // Rebuild variants container to sync inputs + meta text
   const variantsContainer = itemDiv.querySelector('.variants-container');
   if (variantsContainer) {
     variantsContainer.innerHTML = productVariants.map(v => `
@@ -558,36 +581,32 @@ cartGrid.addEventListener('click', e => {
   const t = e.target;
   const pid = t.dataset.id;
 
-  // main qty +/-
+  // main qty +/- (for non-variant items or main SKU)
   if (t.classList.contains('qty-plus') || t.classList.contains('qty-minus')) {
-    const itemIdx = cart.findIndex(i => i.id === pid && !(i.color || i.size)); // target "main" SKU if exists
-    // fallback: if multiple entries exist with same id (variants), we won't handle main +/- (hidden anyway).
-    if (itemIdx !== -1) {
-      cart[itemIdx].quantity += t.classList.contains('qty-plus') ? 1 : -1;
-      if (cart[itemIdx].quantity <= 0) cart.splice(itemIdx, 1);
-      persistAndUpdate(cart[itemIdx] ? (cart[itemIdx].id) : pid);
+    // Try to find an item without color/size first
+    let idx = cart.findIndex(i => i.id === pid && !(i.color || i.size));
+    if (idx === -1) {
+      // fallback: adjust first matching item for product id
+      idx = cart.findIndex(i => i.id === pid);
+    }
+    if (idx !== -1) {
+      cart[idx].quantity += t.classList.contains('qty-plus') ? 1 : -1;
+      if (cart[idx].quantity <= 0) cart.splice(idx, 1);
+      persistAndUpdate(cart[idx] ? cart[idx].id : pid);
     } else {
-      // If main item not found, find product-level (aggregate) and adjust first matching variant
-      const firstIdx = cart.findIndex(i => i.id === pid);
-      if (firstIdx !== -1) {
-        cart[firstIdx].quantity += t.classList.contains('qty-plus') ? 1 : -1;
-        if (cart[firstIdx].quantity <= 0) cart.splice(firstIdx, 1);
-        persistAndUpdate(cart[firstIdx] ? (cart[firstIdx].id) : pid);
-      } else {
-        persistAndUpdate(pid);
-      }
+      persistAndUpdate(pid);
     }
   }
 
-  // variant +/-
+  // variant +/- (specific variant row)
   if (t.classList.contains('v-plus') || t.classList.contains('v-minus')) {
     const { id, color = '', size = '' } = t.dataset;
     const idx = cart.findIndex(i => i.id === id && (i.color || '') === color && (i.size || '') === size);
     if (idx !== -1) {
       cart[idx].quantity += t.classList.contains('v-plus') ? 1 : -1;
       if (cart[idx].quantity <= 0) cart.splice(idx, 1);
-      // determine productId for the row update:
-      const productIdForUpdate = cart[idx]?.id || id;
+      // product id that group belongs to:
+      const productIdForUpdate = id;
       persistAndUpdate(productIdForUpdate);
     }
   }
@@ -608,19 +627,17 @@ cartGrid.addEventListener('input', e => {
   const { id, color = '', size = '' } = t.dataset;
   const val = parseInt(t.value, 10);
   if (isNaN(val) || val < 0) return;
-  // identify index for variant or main
   const idx = cart.findIndex(i => i.id === id && (i.color || '') === color && (i.size || '') === size);
   if (idx !== -1) {
     cart[idx].quantity = val;
-    if (val <= 0) cart.splice(idx, 1);
-    const productIdForUpdate = cart[idx]?.id || id;
-    persistAndUpdate(productIdForUpdate);
+    if (cart[idx].quantity <= 0) cart.splice(idx, 1);
+    persistAndUpdate(id);
   } else {
-    // If editing a main-level input (no color/size), find a matching item by id
+    // main-level input fallback
     const mainIdx = cart.findIndex(i => i.id === id && !(i.color || i.size));
     if (mainIdx !== -1) {
       cart[mainIdx].quantity = val;
-      if (val <= 0) cart.splice(mainIdx, 1);
+      if (cart[mainIdx].quantity <= 0) cart.splice(mainIdx, 1);
       persistAndUpdate(cart[mainIdx] ? cart[mainIdx].id : id);
     }
   }
@@ -648,36 +665,46 @@ function escapeHtml(str) {
 /* ---------- Init ---------- */
 (async function init() {
   cart = mergeCartItems(cart);
-  updateCartCount();
+  updateCartCount(); // instant count on load
   const savedCurrency = localStorage.getItem(CURRENCY_KEY);
   if (savedCurrency) currencySelect.value = savedCurrency;
   await renderCart();
 })();
 
-/* Header scroll behavior */
+/* Header scroll show/hide behavior (kept as original) */
 let lastScrollY = window.scrollY;
 const header = document.querySelector('.site-header');
 const hero = document.querySelector('.hero');
+
 window.addEventListener('scroll', () => {
   const heroBottom = hero.offsetTop + hero.offsetHeight;
   if (window.scrollY > heroBottom) {
-    if (window.scrollY > lastScrollY) header.classList.add('hidden');
-    else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
-  } else header.classList.remove('hidden', 'scrolled');
+    if (window.scrollY > lastScrollY) {
+      header.classList.add('hidden');
+    } else {
+      header.classList.remove('hidden');
+      header.classList.add('scrolled');
+    }
+  } else {
+    header.classList.remove('hidden', 'scrolled');
+  }
   lastScrollY = window.scrollY;
 });
-document.addEventListener('mousemove', (e) => { if (e.clientY < 100) header.classList.remove('hidden'); });
+
+// Show header again on hover when below hero
+document.addEventListener('mousemove', (e) => {
+  if (e.clientY < 100) header.classList.remove('hidden');
+});
 
 /* Floating support */
 const supportBtn = document.getElementById('floatingSupportBtn');
 supportBtn?.addEventListener('click', () => {
   window.location.href = 'mailto:yourstruly.fleurdevie@gmail.com?subject=Support%20Request';
 });
-</script>
 
+</script>
 </body>
 </html>
-
 
 
 
