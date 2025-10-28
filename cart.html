@@ -91,9 +91,10 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 12px;
-  padding: 0;
-  border-left: 2px solid rgba(17,46,31,0.12);
+  margin-top: 10px;
+  padding-left: 0;
+  margin-left: 0;
+  border-left: none;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.36s cubic-bezier(.2,.9,.2,1), opacity 0.24s ease, padding 0.24s ease;
@@ -101,6 +102,7 @@ h2 { text-align:center; font-size:24px; font-family:"Playfair Display", serif; m
   background: transparent;
   border-radius: 10px;
 }
+
 
 /* open state */
 .variants-container.open {
@@ -241,13 +243,38 @@ footer {
   /* Keep item visuals same, but slightly smaller */
   .cart-item-header { align-items:flex-start; }
   .cart-item-header img { width:90px; height:90px; }
-  .variants-container.open {padding: 4px; }
-  .variant-row { flex-direction:row; }
-  .variant-meta { font-size:12px; }
+   .variants-container {
+    margin-left: 0 !important;
+    width: 100%;
+    padding: 8px 0 0 0;
+  }
+
+  .variant-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .variant-meta {
+    flex: 1 1 100%;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .variant-controls {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   .variant-controls button { width:30px; height:30px; font-size:12px; }
   .variant-controls input { width:36px; height:24px; }
   .quantity-controls input { width:36px; height:24px; }
-}
+
 
 /* Floating Support Button + Tooltip */
 #floatingSupportBtn {
