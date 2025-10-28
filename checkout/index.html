@@ -116,6 +116,11 @@
     /* FOOTER */
     footer { text-align:center; padding:20px; background:transparent; color:#112e1f; margin-top:60px; }
 
+    /* Hide mobile cart by default (desktop) */
+    .mobile-cart {
+      display: none;
+    }  
+    
     /* responsive */
     @media(max-width:900px){.container{grid-template-columns:1fr}}
 
@@ -147,8 +152,12 @@
       .brand-logo{height:clamp(40px,15vw,80px)}
       .brand-title{font-size:clamp(16px,7vw,22px)}
       .hero{height:40vh}
+      .mobile-cart { display:flex; align-items:center; margin-right:10px; }
+      .mobile-cart a { color:#FFD6BA; font-size:20px; position:relative; }
+      .mobile-cart .cart-count { position:absolute; top:-8px; right:-8px; }
+      
      }
-
+    
     /* small blur loader & spinner (injected by script) */
     .fdv-blur-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);background:rgba(0,0,0,0.45)}
     .fdv-blur-spinner{width:54px;height:54px;border:6px solid rgba(255,255,255,0.15);border-top:6px solid rgba(255,255,255,0.95);border-radius:50%;animation:fdv-spin 1s linear infinite}
@@ -206,7 +215,69 @@
     50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);}
   }
 
-    
+/* ---------- Checkout Variants Dropdown ---------- */
+.checkout-variants-toggle {
+  background: transparent;
+  border: 1px solid var(--fleur-green, #1a3c34);
+  color: var(--fleur-green, #1a3c34);
+  font-family: "Playfair Display", serif;
+  font-size: 0.95rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.checkout-variants-toggle:hover {
+  background: var(--fleur-green, #1a3c34);
+  color: #fff;
+}
+
+/* Container for the variant list */
+.checkout-variants-container {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.35s ease;
+  margin-top: 0;
+}
+
+/* When open */
+.checkout-variants-container.open {
+  max-height: 400px; /* enough for multiple variants */
+  opacity: 1;
+  margin-top: 8px;
+}
+
+/* Each variant row */
+.checkout-variant-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(26, 60, 52, 0.05); /* soft transparent green tint */
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+}
+
+/* Variant text */
+.checkout-variant-meta {
+  font-family: "Playfair Display", serif;
+  font-size: 0.9rem;
+  color: var(--fleur-green, #1a3c34);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .checkout-variants-toggle {
+    font-size: 0.85rem;
+    padding: 5px 12px;
+  }
+  .checkout-variant-meta {
+    font-size: 0.85rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -215,6 +286,11 @@
       <img src="../asset/logo.png" alt="Fleur De Vie Logo" class="brand-logo">
       <div class="brand-title">Fleur De Vie</div>
     </div>
+
+    <div class="mobile-cart">
+    <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile">0</span></a>
+  </div>
+    
     <!-- Hamburger -->
     <button class="hamburger" id="hamburger-btn">
       <span></span><span></span><span></span>
@@ -398,6 +474,8 @@ const nameInput = document.getElementById('name');
 const emailInput = document.getElementById('email');
 const phoneInput = document.getElementById('phone');
 const addressInput = document.getElementById('address');
+const cartCountMobileElem = document.getElementById('cartCountMobile');
+
 
 let productCache = {};
 let selectedCurrency = localStorage.getItem(CURRENCY_KEY) || 'NGN';
@@ -417,67 +495,111 @@ let paidUIRenderedFor = null;
 let paidRenderInProgress = false;
 
 /* -------------------- UTIL: cart helpers -------------------- */
-function mergeCartItems(cartArray){
-  const merged=[];
-  (cartArray||[]).forEach(item=>{
-    const idx = merged.findIndex(i => i.id === item.id && (i.color||'') === (item.color||'') && (i.size||'') === (item.size||''));
-    if(idx === -1) merged.push({...item});
-    else merged[idx].quantity = Number(merged[idx].quantity||0) + Number(item.quantity||0);
+const cartCountElem = document.getElementById('cartCount');
+const cartCountMobileElem = document.getElementById('cartCountMobile');
+
+/* -------------------- CART COUNT / MODE-AWARE SYNC (desktop + mobile) -------------------- */
+function totalQtyFromCartArray(arr) {
+  try { return (arr || []).reduce((s, i) => s + Number(i.quantity || 0), 0); } 
+  catch (e) { return 0; }
+}
+
+function totalQtyFromQuoteNormalized(q) {
+  try { 
+    return (q && Array.isArray(q.items)) 
+      ? q.items.reduce((s, i) => s + Number(i.totalQuantity || 0), 0) 
+      : 0; 
+  } catch (e) { return 0; }
+}
+
+/* FIXED & CONSISTENT mergeCartItems */
+function mergeCartItems(cartArr) {
+  const merged = [];
+  (cartArr || []).forEach(item => {
+    const keyMatch = i => i.id === item.id && (i.color || '') === (item.color || '') && (i.size || '') === (item.size || '');
+    const idx = merged.findIndex(keyMatch);
+    if (idx === -1) merged.push({ ...item });
+    else merged[idx].quantity = Number(merged[idx].quantity || 0) + Number(item.quantity || 0);
   });
   return merged;
 }
-rawCart = mergeCartItems(rawCart);
-function totalQtyFromCartArray(arr){ try { return (arr||[]).reduce((s,i)=>s + Number(i.quantity||0),0); } catch(e){ return 0; } }
 
-function computeAndUpdateCartCount(){
+/* compute/update cart count for desktop and mobile icons */
+function computeAndUpdateCartCount() {
   try {
-    const cartArr = mergeCartItems(safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || []);
-    const cartQty = totalQtyFromCartArray(cartArr);
-    const isUnpaidQuoteView = (quoteId && !isPaidOrder && quote && Array.isArray(quote.items) && quote.items.length > 0 && !quote._isOrder && !quote._paidFlag);
+    const rawCart = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
+    const mergedCart = mergeCartItems(rawCart);
+    const cartQty = totalQtyFromCartArray(mergedCart);
+
+    const isUnpaidQuoteView = (!isPaidOrder && quote && Array.isArray(quote.items) && quote.items.length > 0 && !quote._isOrder && !quote._paidFlag);
+
+    let displayCount = cartQty;
     if (isUnpaidQuoteView) {
-      const quoteQty = (quote && Array.isArray(quote.items)) ? quote.items.reduce((s,i)=>s + Number(i.totalQuantity||0),0) : 0;
-      const displayCount = Number(quoteQty || 0) + Number(cartQty || 0);
-      if(cartCountElem) cartCountElem.textContent = String(displayCount || 0);
-    } else {
-      if(cartCountElem) cartCountElem.textContent = String(cartQty || 0);
+      const quoteQty = totalQtyFromQuoteNormalized(quote);
+      if (quoteId) displayCount = Number(quoteQty || 0) + Number(cartQty || 0);
+      else displayCount = cartQty;
     }
-  } catch(e){ if(cartCountElem) cartCountElem.textContent = '0'; }
+
+    // Update desktop cart count
+    if (cartCountElem) cartCountElem.textContent = String(displayCount || 0);
+    // Update mobile cart count
+    if (cartCountMobileElem) cartCountMobileElem.textContent = String(displayCount || 0);
+
+  } catch (e) {
+    if (cartCountElem) cartCountElem.textContent = '0';
+    if (cartCountMobileElem) cartCountMobileElem.textContent = '0';
+  }
 }
 
-window.addEventListener('storage', (e)=>{
-  if(e.key === STORAGE_KEY || e.key === CURRENCY_KEY || e.key === 'paidQuoteInfo'){
+/* react to storage changes from other tabs */
+window.addEventListener('storage', (e) => {
+  if (e.key === STORAGE_KEY || e.key === CURRENCY_KEY || e.key === 'paidQuoteInfo') {
     computeAndUpdateCartCount();
   }
-  if(e.key === 'paidQuoteInfo'){
+  if (e.key === 'paidQuoteInfo') {
     const paid = safeParseJSON(localStorage.getItem('paidQuoteInfo'), null);
-    if(paid && paid.verified) syncPaidQuoteUI().catch(()=>{});
+    if (paid && paid.verified) syncPaidQuoteUI().catch(() => { });
   }
 });
+
+/* Initialize on load */
+document.addEventListener('DOMContentLoaded', computeAndUpdateCartCount);
+
 
 /* -------------------- PRODUCT HELPERS (fetch product docs for fleurdevie) -------------------- */
 async function fetchProductData(productId){
   try {
     if(productCache[productId]) return productCache[productId];
     const snap = await getDoc(doc(db, "brands", "fleurdevie", "products", productId));
-    if(snap.exists()){ productCache[productId] = snap.data(); return productCache[productId]; }
-  } catch(e){ console.warn("fetchProductData failed", e); }
+    if(snap.exists()){ 
+      productCache[productId] = snap.data(); 
+      return productCache[productId]; 
+    }
+  } catch(e){ 
+    console.warn("fetchProductData failed", e); 
+  }
   return null;
 }
 
 async function buildQuoteFromCart(){
   rawCart = mergeCartItems(rawCart || []);
   const byProduct = new Map();
-  rawCart.forEach(r=> { if(!byProduct.has(r.id)) byProduct.set(r.id, []); byProduct.get(r.id).push(r); });
+  rawCart.forEach(r=> { 
+    if(!byProduct.has(r.id)) byProduct.set(r.id, []); 
+    byProduct.get(r.id).push(r); 
+  });
   const ids = Array.from(byProduct.keys());
   const pdPromises = ids.map(id => fetchProductData(id).then(d=>[id,d]));
   const pd = await Promise.all(pdPromises);
   const productsMap = Object.fromEntries(pd.map(([id,doc])=>[id,doc]));
   const items = [];
+
   for(const id of ids){
     const rows = byProduct.get(id) || [];
     const productDoc = productsMap[id] || null;
     const image = productDoc?.images?.[0] || productDoc?.imageUrl || rows[0]?.imageUrl || '';
     const name = productDoc?.name || rows[0]?.name || 'Product';
+
     const variants = rows.map(r=>{
       const qty = Number(r.quantity||1);
       const unitPrices = {
@@ -486,18 +608,99 @@ async function buildQuoteFromCart(){
         EUR: Number(productDoc?.priceEUR ?? 0),
         GBP: Number(productDoc?.priceGBP ?? 0)
       };
-      return { id: r.id||id, color:r.color||'', size:r.size||'', quantity:qty, unitPrices, linePrices:{
-        NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty
-      } };
+      return { 
+        id: r.id||id, 
+        color:r.color||'', 
+        size:r.size||'', 
+        quantity:qty, 
+        unitPrices, 
+        linePrices:{
+          NGN: unitPrices.NGN*qty, 
+          USD: unitPrices.USD*qty, 
+          EUR: unitPrices.EUR*qty, 
+          GBP: unitPrices.GBP*qty
+        } 
+      };
     });
+
     const totalQty = variants.reduce((s,v)=>s+v.quantity,0);
     const totalPrices = { NGN:0, USD:0, EUR:0, GBP:0 };
-    variants.forEach(v=>{ totalPrices.NGN += v.linePrices.NGN||0; totalPrices.USD += v.linePrices.USD||0; totalPrices.EUR += v.linePrices.EUR||0; totalPrices.GBP += v.linePrices.GBP||0; });
-    items.push({ productId:id, name, image, totalQuantity: totalQty, totalPrices, variants, description: productDoc?.description||'' });
+    variants.forEach(v=>{
+      totalPrices.NGN += v.linePrices.NGN||0; 
+      totalPrices.USD += v.linePrices.USD||0; 
+      totalPrices.EUR += v.linePrices.EUR||0; 
+      totalPrices.GBP += v.linePrices.GBP||0; 
+    });
+
+    items.push({ 
+      productId:id, 
+      name, 
+      image, 
+      totalQuantity: totalQty, 
+      totalPrices, 
+      variants, 
+      description: productDoc?.description||'' 
+    });
   }
+
   return { items };
 }
 
+/* ✅ Add this AFTER buildQuoteFromCart() closes */
+async function renderCheckoutItems() {
+  const checkoutList = document.getElementById('checkoutList');
+  if (!checkoutList) return;
+
+  const { items } = await buildQuoteFromCart();
+  const currency = localStorage.getItem('currency') || 'NGN';
+  checkoutList.innerHTML = '';
+
+  items.forEach(item => {
+    const hasVariantMeta =
+      item.variants.length > 1 ||
+      item.variants.some(v => v.color || v.size);
+
+    const div = document.createElement('div');
+    div.className = 'checkout-item';
+    div.innerHTML = `
+      <div class="checkout-item-inner" data-id="${item.productId}">
+        <img src="${item.image}" alt="${item.name}" class="checkout-thumb">
+
+        <div class="checkout-details">
+          <h3 class="checkout-name">${escapeHtml(item.name)}</h3>
+          <div class="checkout-price">${formatPrice(item.totalPrices[currency], currency)}</div>
+
+          ${hasVariantMeta ? `
+            <button class="checkout-variants-toggle">View Choices</button>
+            <div class="checkout-variants-container">
+              ${item.variants.map(v => `
+                <div class="checkout-variant-row">
+                  <div class="checkout-variant-meta">
+                    ${v.color ? v.color + ' / ' : ''}${v.size ? v.size + ' x ' : ''}${v.quantity}
+                  </div>
+                </div>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    checkoutList.appendChild(div);
+  });
+
+  // toggle dropdown open/close
+  checkoutList.addEventListener('click', e => {
+    const btn = e.target.closest('.checkout-variants-toggle');
+    if (!btn) return;
+    const container = btn.nextElementSibling;
+    const open = container.classList.toggle('open');
+    btn.textContent = open ? 'Hide Choices' : 'View Choices';
+  });
+}
+
+// run after DOM is ready
+document.addEventListener('DOMContentLoaded', renderCheckoutItems);
+
+  
 /* -------------------- NORMALIZERS (quote/order) -------------------- */
 function normalizeQuoteItems(rawQuote){
   const arr = Array.isArray(rawQuote.items) ? rawQuote.items : [];
