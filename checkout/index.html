@@ -155,7 +155,8 @@
       .mobile-cart { display:flex; align-items:center; margin-right:10px; }
       .mobile-cart a { color:#FFD6BA; font-size:20px; position:relative; }
       .mobile-cart .cart-count { position:absolute; top:-8px; right:-8px; }
-      
+      .cart-item-header img { width:90px; height:90px; }
+      .quantity-controls input { width:56px; }
      }
     
     /* small blur loader & spinner (injected by script) */
@@ -1262,7 +1263,7 @@ async function initiatePaymentFlow(ev){
       showSpinner(false);
 
       // redirect exactly as requested (no params)
-      window.location.assign('/FleurDeVie/thankyou.html');
+      window.location.assign('thankyou.html');
     } catch(e){
       console.error('finalizeAfterSuccess error', e);
       showSpinner(false);
