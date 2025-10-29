@@ -847,20 +847,20 @@ if (Array.isArray(item.variants) && item.variants.length > 1) {
 }
 
     // ---------- RIGHT ----------
-    const right = document.createElement('div');
-    right.className = 'right';
-    right.style.minWidth = '120px';
-    right.style.textAlign = 'right';
-    right.innerHTML = `<div style="font-weight:600">${formatPrice(itemTotal, currency)}</div>`;
+//     const right = document.createElement('div');
+//     right.className = 'right';
+//     right.style.minWidth = '120px';
+//     right.style.textAlign = 'right';
+//     right.innerHTML = `<div style="font-weight:600">${formatPrice(itemTotal, currency)}</div>`;
 
-    li.appendChild(left);
-    li.appendChild(right);
-    orderItemsEl.appendChild(li);
-  });
+//     li.appendChild(left);
+//     li.appendChild(right);
+//     orderItemsEl.appendChild(li);
+//   });
 
-  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
-  computeAndUpdateCartCount();
-}
+//   orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
+//   computeAndUpdateCartCount();
+// }
 
 
 /* -------------------- FILL BILLING -------------------- */
