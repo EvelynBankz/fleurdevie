@@ -698,80 +698,60 @@ document.addEventListener('DOMContentLoaded', renderCheckoutItems);
 
   
 /* -------------------- NORMALIZERS (quote/order) -------------------- */
-/* -------------------- NORMALIZERS -------------------- */
-
-// Normalize raw quote items (cart or unpaid quote)
 function normalizeQuoteItems(rawQuote){
   const arr = Array.isArray(rawQuote.items) ? rawQuote.items : [];
   const items = arr.map(ci => {
-    const variants = Array.isArray(ci.variants) && ci.variants.length
-      ? ci.variants.map(v => {
-          const qty = Number(v.qty || v.quantity || 0);
-          const unitPrices = {
-            NGN: Number(v.priceNGN ?? v.price ?? 0),
-            USD: Number(v.priceUSD ?? 0),
-            EUR: Number(v.priceEUR ?? 0),
-            GBP: Number(v.priceGBP ?? 0)
-          };
-          return {
-            id: v.id || ci.id || '',
-            color: v.color || '',
-            size: v.size || '',
-            quantity: qty,
-            unitPrices,
-            linePrices: {
-              NGN: unitPrices.NGN * qty,
-              USD: unitPrices.USD * qty,
-              EUR: unitPrices.EUR * qty,
-              GBP: unitPrices.GBP * qty
-            }
-          };
-        })
-      : [{ 
-          id: ci.id || '', 
-          color: '', 
-          size: '', 
-          quantity: Number(ci.qty || ci.quantity || 1), 
-          unitPrices: {
-            NGN: Number(ci.priceNGN ?? ci.price ?? 0),
-            USD: Number(ci.priceUSD ?? 0),
-            EUR: Number(ci.priceEUR ?? 0),
-            GBP: Number(ci.priceGBP ?? 0)
-          },
-          linePrices: {
-            NGN: Number(ci.priceNGN ?? ci.price ?? 0) * Number(ci.qty || ci.quantity || 1),
-            USD: Number(ci.priceUSD ?? 0) * Number(ci.qty || ci.quantity || 1),
-            EUR: Number(ci.priceEUR ?? 0) * Number(ci.qty || ci.quantity || 1),
-            GBP: Number(ci.priceGBP ?? 0) * Number(ci.qty || ci.quantity || 1)
-          }
-        }];
-
-    const totalQuantity = variants.reduce((s,v)=>s+v.quantity,0);
-    const totalPrices = { NGN:0, USD:0, EUR:0, GBP:0 };
-    variants.forEach(v => {
-      totalPrices.NGN += v.linePrices.NGN||0;
-      totalPrices.USD += v.linePrices.USD||0;
-      totalPrices.EUR += v.linePrices.EUR||0;
-      totalPrices.GBP += v.linePrices.GBP||0;
-    });
-
-    return {
-      productId: ci.id || '',
-      name: ci.name || '',
-      image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
-      totalQuantity,
-      totalPrices,
-      variants,
-      description: ci.desc || ci.description || ''
-    };
+    if(Array.isArray(ci.variants) && ci.variants.length){
+      const variants = ci.variants.map(v => {
+        const qty = Number(v.qty || v.quantity || 0);
+        const unitPrices = {
+          NGN: Number(v.priceNGN ?? v.price ?? 0),
+          USD: Number(v.priceUSD ?? 0),
+          EUR: Number(v.priceEUR ?? 0),
+          GBP: Number(v.priceGBP ?? 0)
+        };
+        return {
+          id: v.id || ci.id || '',
+          color: v.color||'',
+          size: v.size||'',
+          quantity: qty,
+          unitPrices,
+          linePrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty }
+        };
+      });
+      return {
+        productId: ci.id || '',
+        name: ci.name || '',
+        image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
+        totalQuantity: variants.reduce((s,a)=>s+(a.quantity||0),0),
+        totalPrices: {
+          NGN: variants.reduce((s,a)=>s+(a.linePrices.NGN||0),0),
+          USD: variants.reduce((s,a)=>s+(a.linePrices.USD||0),0),
+          EUR: variants.reduce((s,a)=>s+(a.linePrices.EUR||0),0),
+          GBP: variants.reduce((s,a)=>s+(a.linePrices.GBP||0),0)
+        },
+        variants,
+        description: ci.desc || ci.description || ''
+      };
+    } else {
+      const qty = Number(ci.qty || ci.quantity || 1);
+      const unitPrices = { NGN: Number(ci.priceNGN ?? ci.price ?? 0), USD: Number(ci.priceUSD ?? 0), EUR: Number(ci.priceEUR ?? 0), GBP: Number(ci.priceGBP ?? 0) };
+      return {
+        productId: ci.id || '',
+        name: ci.name || '',
+        image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
+        totalQuantity: qty,
+        totalPrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty },
+        variants: [{ id:ci.id||'', color:'', size:'', quantity: qty, unitPrices, linePrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty } }],
+        description: ci.desc || ci.description || ''
+      };
+    }
   });
   const normalized = { items };
   normalized._isOrder = false;
   normalized._paidFlag = (rawQuote && (rawQuote.status || '').toLowerCase() === 'paid') || false;
   return normalized;
 }
-
-// Normalize order items (past orders)
 function normalizeOrderItems(items){
   const normalized = (items||[]).map(it => ({
     productId: it.id || '',
@@ -782,79 +762,40 @@ function normalizeOrderItems(items){
     totalPrices: it.totalPrices || it.linePrices || {},
     variants: it.variants || []
   }));
-  return { items: normalized, _isOrder: true, _paidFlag: true };
+  const result = { items: normalized };
+  result._isOrder = true;
+  result._paidFlag = true;
+  return result;
 }
 
-// Normalize Firestore doc (paid order)
-function buildNormalizedFromFirestoreDoc(docData){
-  const itemsRaw = Array.isArray(docData.items) ? docData.items : [];
-  const normalizedItems = itemsRaw.map(raw => {
-    const qty = Number(raw.qty ?? raw.quantity ?? raw.totalQuantity ?? 0) || 0;
-    const unitPrices = {
-      NGN: Number(raw.priceNGN ?? raw.price ?? 0),
-      USD: Number(raw.priceUSD ?? 0),
-      EUR: Number(raw.priceEUR ?? 0),
-      GBP: Number(raw.priceGBP ?? 0)
-    };
-    const linePrices = {
-      NGN: unitPrices.NGN * qty,
-      USD: unitPrices.USD * qty,
-      EUR: unitPrices.EUR * qty,
-      GBP: unitPrices.GBP * qty
-    };
-    return {
-      productId: raw.productId || raw.id || '',
-      name: raw.name || raw.productName || raw.title || '',
-      image: (raw.image && raw.image !== '../asset/placeholder.jpg') ? raw.image : null,
-      totalQuantity: qty,
-      totalPrices: linePrices,
-      variants: raw.variants && raw.variants.length
-        ? raw.variants.map(v => ({
-            id: v.id || '',
-            color: v.color || '',
-            size: v.size || '',
-            quantity: Number(v.quantity || 1),
-            unitPrices: v.unitPrices || unitPrices,
-            linePrices: v.linePrices || linePrices
-          }))
-        : [{ id: raw.id || '', color: raw.color || '', size: raw.size || '', quantity: qty, unitPrices, linePrices }],
-      description: raw.description || raw.desc || ''
-    };
-  });
-  return { items: normalizedItems, _isOrder: true, _paidFlag: true };
-}
-
-/* -------------------- RENDER ORDER / QUOTE -------------------- */
+/* -------------------- RENDER (keeps Fleur De Vie DOM & styles) -------------------- */
 function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
   if(!orderItemsEl || !orderSubtotalEl) return;
   orderItemsEl.innerHTML = '';
-
-  if(!quoteNormalized || !Array.isArray(quoteNormalized.items)){
+  if(!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
     orderItemsEl.innerHTML = '<li class="small-note">No items</li>';
     orderSubtotalEl.textContent = `Subtotal: —`;
     computeAndUpdateCartCount();
     return;
   }
-
   let subtotal = 0;
-
-  quoteNormalized.items.forEach((item, idx)=>{
-    const value = Number(item.totalPrices?.[currency] ?? 0) || 0;
-    subtotal += value;
+  quoteNormalized.items.forEach((item, idx) => {
+    const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
+    const fallbackFromVariants = Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0))), 0) : 0;
+    const finalValue = valueFromTotals || fallbackFromVariants || 0;
+    subtotal += finalValue;
 
     const li = document.createElement('li');
     li.className = 'order-item';
-    li.dataset.idx = String(idx);
 
-    // LEFT SIDE
     const left = document.createElement('div');
     left.className = 'left';
-    const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.alignItems = 'center';
-    header.style.gap = '12px';
 
-    // IMAGE
+    const headerWrapper = document.createElement('div');
+    headerWrapper.style.display = 'flex';
+    headerWrapper.style.alignItems = 'center';
+    headerWrapper.style.gap = '10px';
+
     if(item.image){
       const img = document.createElement('img');
       img.src = item.image;
@@ -862,91 +803,87 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       img.style.width = '56px';
       img.style.height = '56px';
       img.style.objectFit = 'cover';
-      img.style.borderRadius = '8px';
-      img.style.border = '1px solid rgba(0,0,0,0.04)';
-      header.appendChild(img);
+      img.style.borderRadius = '6px';
+      img.style.border = '1px solid rgba(0,0,0,0.06)';
+      headerWrapper.appendChild(img);
     }
 
-    // TEXT
     const textWrap = document.createElement('div');
-    textWrap.style.minWidth = '0';
-
     const titleDiv = document.createElement('div');
     titleDiv.className = 'title';
-    titleDiv.textContent = item.name;
+    titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
     textWrap.appendChild(titleDiv);
 
-    const variants = Array.isArray(item.variants) ? item.variants : [];
-    const metaDiv = document.createElement('div');
-    metaDiv.className = 'meta';
-
-    if(variants.length === 1){
-      const v = variants[0];
-      const parts = [];
-      if(v.color) parts.push(`Color: ${v.color}`);
-      if(v.size) parts.push(`Size: ${v.size}`);
-      metaDiv.textContent = parts.length ? `${parts.join(' · ')} ×${v.quantity}` : `${item.totalQuantity} item(s)`;
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const info = document.createElement('div');
+      info.className = 'meta';
+      info.textContent = 'Multiple options selected';
+      textWrap.appendChild(info);
     } else {
-      metaDiv.textContent = `${item.totalQuantity} item(s)`;
+      const singleV = item.variants && item.variants[0];
+      if(singleV && (singleV.color || singleV.size)){
+        const info = document.createElement('div');
+        info.className = 'meta';
+        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
+        textWrap.appendChild(info);
+      }
     }
+    headerWrapper.appendChild(textWrap);
+    left.appendChild(headerWrapper);
 
-    textWrap.appendChild(metaDiv);
-    header.appendChild(textWrap);
-    left.appendChild(header);
-
-    // VARIANTS (Show Choices)
-    if(variants.length > 1){
-      const showBtn = document.createElement('button');
-      showBtn.className = 'show-variants-btn';
-      showBtn.type = 'button';
-      showBtn.textContent = 'Show Choices ▾';
-      textWrap.appendChild(showBtn);
+    // variants container (hidden by default)
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const toggle = document.createElement('button');
+      toggle.className = 'variant-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded','false');
+      toggle.title = 'View variants';
+      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
+      headerWrapper.appendChild(toggle);
 
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
-      variantsContainer.style.display = 'none';
-
-      variants.forEach(v=>{
-        const line = document.createElement('div');
-        line.className = 'variant-line';
-        const labelParts = [];
-        if(v.color) labelParts.push(v.color);
-        if(v.size) labelParts.push(v.size);
-        const label = labelParts.length ? `${labelParts.join(' · ')} ×${v.quantity}` : `×${v.quantity}`;
-        const linePrice = Number(v.linePrices?.[currency] ?? (v.unitPrices?.[currency]||0)*v.quantity);
-
-        line.innerHTML = `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</div>
-                          <div style="min-width:110px;text-align:right;color:var(--muted)">${formatPrice(linePrice, currency)}</div>`;
-        variantsContainer.appendChild(line);
+      item.variants.forEach(v=>{
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        const leftRow = document.createElement('div');
+        leftRow.style.display = 'flex';
+        leftRow.style.gap = '8px';
+        leftRow.style.alignItems = 'center';
+        const attrs = document.createElement('div');
+        attrs.className = 'variant-attrs';
+        attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
+        leftRow.appendChild(attrs);
+        const rightPrice = document.createElement('div');
+        rightPrice.className = 'variant-price';
+        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
+        rightPrice.textContent = formatPrice(variantLinePrice, currency);
+        row.appendChild(leftRow);
+        row.appendChild(rightPrice);
+        variantsContainer.appendChild(row);
       });
+      left.appendChild(variantsContainer);
 
-      li.appendChild(left);
-      li.appendChild(variantsContainer);
-
-      showBtn.addEventListener('click', ()=>{
-        const shown = variantsContainer.classList.toggle('show');
-        variantsContainer.style.display = shown ? 'flex' : 'none';
-        showBtn.textContent = shown ? 'Hide Choices ▴' : 'Show Choices ▾';
+      toggle.addEventListener('click', () => {
+        const isShown = variantsContainer.classList.toggle('show');
+        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
       });
-    } else {
-      li.appendChild(left);
     }
 
-    // RIGHT SIDE
     const right = document.createElement('div');
     right.className = 'right';
     right.style.minWidth = '120px';
     right.style.textAlign = 'right';
-    right.innerHTML = `<div style="font-weight:700">${formatPrice(value, currency)}</div>`;
-    li.appendChild(right);
+    right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
 
+    li.appendChild(left);
+    li.appendChild(right);
     orderItemsEl.appendChild(li);
   });
 
-  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
+  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, selectedCurrency)}`;
   computeAndUpdateCartCount();
 }
-
 
 /* -------------------- FILL BILLING -------------------- */
 function fillBillingFields(data){
