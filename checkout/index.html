@@ -214,7 +214,69 @@
     50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);}
   }
 
- 
+/* ---------- Checkout Variants Dropdown ---------- */
+.checkout-variants-toggle {
+  background: transparent;
+  border: 1px solid var(--fleur-green, #1a3c34);
+  color: var(--fleur-green, #1a3c34);
+  font-family: "Playfair Display", serif;
+  font-size: 0.95rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.checkout-variants-toggle:hover {
+  background: var(--fleur-green, #1a3c34);
+  color: #fff;
+}
+
+/* Container for the variant list */
+.checkout-variants-container {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.35s ease;
+  margin-top: 0;
+}
+
+/* When open */
+.checkout-variants-container.open {
+  max-height: 400px; /* enough for multiple variants */
+  opacity: 1;
+  margin-top: 8px;
+}
+
+/* Each variant row */
+.checkout-variant-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(26, 60, 52, 0.05); /* soft transparent green tint */
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+}
+
+/* Variant text */
+.checkout-variant-meta {
+  font-family: "Playfair Display", serif;
+  font-size: 0.9rem;
+  color: var(--fleur-green, #1a3c34);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .checkout-variants-toggle {
+    font-size: 0.85rem;
+    padding: 5px 12px;
+  }
+  .checkout-variant-meta {
+    font-size: 0.85rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -716,128 +778,112 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
     computeAndUpdateCartCount();
     return;
   }
-
   let subtotal = 0;
-
   quoteNormalized.items.forEach((item, idx) => {
-    const value = (item.totalPrices && (item.totalPrices[currency] ?? 0)) || 0;
-    subtotal += value;
+    const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
+    const fallbackFromVariants = Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0))), 0) : 0;
+    const finalValue = valueFromTotals || fallbackFromVariants || 0;
+    subtotal += finalValue;
 
     const li = document.createElement('li');
     li.className = 'order-item';
-    li.dataset.idx = String(idx);
 
-    // Image HTML
-    const imageHtml = item.image ? `<img src="${item.image}" alt="${item.name}" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,0,0,0.06)">` : '';
+    const left = document.createElement('div');
+    left.className = 'left';
 
-    // Left side
-    const leftDiv = document.createElement('div');
-    leftDiv.className = 'left';
-    leftDiv.style.display = 'flex';
-    leftDiv.style.alignItems = 'center';
-    leftDiv.style.gap = '10px';
-    leftDiv.innerHTML = imageHtml;
+    const headerWrapper = document.createElement('div');
+    headerWrapper.style.display = 'flex';
+    headerWrapper.style.alignItems = 'center';
+    headerWrapper.style.gap = '10px';
+
+    if(item.image){
+      const img = document.createElement('img');
+      img.src = item.image;
+      img.alt = item.name;
+      img.style.width = '56px';
+      img.style.height = '56px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '6px';
+      img.style.border = '1px solid rgba(0,0,0,0.06)';
+      headerWrapper.appendChild(img);
+    }
 
     const textWrap = document.createElement('div');
-    textWrap.style.minWidth = '0';
-
     const titleDiv = document.createElement('div');
     titleDiv.className = 'title';
     titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
     textWrap.appendChild(titleDiv);
 
-    // Meta for multiple variants or single variant
     if(Array.isArray(item.variants) && item.variants.length > 1){
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.textContent = 'Multiple options selected';
-      textWrap.appendChild(meta);
-
-      // Show Choices button
-      const btn = document.createElement('button');
-      btn.className = 'show-variants-btn';
-      btn.dataset.idx = String(idx);
-      btn.textContent = 'Show Choices ▾';
-      btn.style.marginTop = '6px';
-      btn.style.fontSize = '0.9rem';
-      btn.style.fontWeight = '600';
-      btn.style.background = 'transparent';
-      btn.style.border = '1px dashed rgba(0,0,0,0.3)';
-      btn.style.padding = '4px 10px';
-      btn.style.borderRadius = '6px';
-      btn.style.cursor = 'pointer';
-      btn.style.color = '#334d3a';
-      textWrap.appendChild(btn);
-
-      // Variants container (hidden)
-      const variantsContainer = document.createElement('div');
-      variantsContainer.className = 'variants-container';
-      variantsContainer.dataset.forIdx = String(idx);
-      variantsContainer.style.display = 'none';
-      variantsContainer.style.flexDirection = 'column';
-      variantsContainer.style.marginTop = '8px';
-
-      item.variants.forEach(v => {
-        const row = document.createElement('div');
-        row.className = 'variant-line';
-        row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
-        row.style.padding = '6px 0';
-        row.style.borderTop = '1px solid rgba(0,0,0,0.05)';
-
-        const labelParts = [];
-        if(v.color) labelParts.push(`Color: ${v.color}`);
-        if(v.size) labelParts.push(`Size: ${v.size}`);
-        const label = labelParts.length ? `${labelParts.join(' · ')} · Qty: ${v.quantity}` : `Qty: ${v.quantity}`;
-
-        const linePrice = (v.linePrices && (v.linePrices[currency] ?? 0)) || (Number(v.unitPrices?.[currency]||0) * Number(v.quantity||0));
-
-        row.innerHTML = `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</div>
-                         <div style="min-width:110px;text-align:right;color:#556b59">${formatPrice(linePrice, currency)}</div>`;
-
-        variantsContainer.appendChild(row);
-      });
-
-      li.appendChild(textWrap);
-      li.appendChild(variantsContainer);
-
-      // Button click toggle
-      btn.addEventListener('click', () => {
-        const isVisible = variantsContainer.style.display === 'flex';
-        variantsContainer.style.display = isVisible ? 'none' : 'flex';
-        btn.textContent = isVisible ? 'Show Choices ▾' : 'Hide Choices ▴';
-      });
-
+      const info = document.createElement('div');
+      info.className = 'meta';
+      info.textContent = 'Multiple options selected';
+      textWrap.appendChild(info);
     } else {
-      // Single variant meta
       const singleV = item.variants && item.variants[0];
       if(singleV && (singleV.color || singleV.size)){
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        meta.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
-        textWrap.appendChild(meta);
+        const info = document.createElement('div');
+        info.className = 'meta';
+        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
+        textWrap.appendChild(info);
       }
-      li.appendChild(textWrap);
+    }
+    headerWrapper.appendChild(textWrap);
+    left.appendChild(headerWrapper);
+
+    // variants container (hidden by default)
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const toggle = document.createElement('button');
+      toggle.className = 'variant-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded','false');
+      toggle.title = 'View variants';
+      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
+      headerWrapper.appendChild(toggle);
+
+      const variantsContainer = document.createElement('div');
+      variantsContainer.className = 'variants-container';
+      item.variants.forEach(v=>{
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        const leftRow = document.createElement('div');
+        leftRow.style.display = 'flex';
+        leftRow.style.gap = '8px';
+        leftRow.style.alignItems = 'center';
+        const attrs = document.createElement('div');
+        attrs.className = 'variant-attrs';
+        attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
+        leftRow.appendChild(attrs);
+        const rightPrice = document.createElement('div');
+        rightPrice.className = 'variant-price';
+        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
+        rightPrice.textContent = formatPrice(variantLinePrice, currency);
+        row.appendChild(leftRow);
+        row.appendChild(rightPrice);
+        variantsContainer.appendChild(row);
+      });
+      left.appendChild(variantsContainer);
+
+      toggle.addEventListener('click', () => {
+        const isShown = variantsContainer.classList.toggle('show');
+        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+      });
     }
 
-    leftDiv.appendChild(textWrap);
-    li.appendChild(leftDiv);
+    const right = document.createElement('div');
+    right.className = 'right';
+    right.style.minWidth = '120px';
+    right.style.textAlign = 'right';
+    right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
 
-    // Right side price
-    const rightDiv = document.createElement('div');
-    rightDiv.className = 'right';
-    rightDiv.style.minWidth = '120px';
-    rightDiv.style.textAlign = 'right';
-    rightDiv.innerHTML = `<div style="font-weight:600">${formatPrice(value, currency)}</div>`;
-    li.appendChild(rightDiv);
-
+    li.appendChild(left);
+    li.appendChild(right);
     orderItemsEl.appendChild(li);
   });
 
-  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
+  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, selectedCurrency)}`;
   computeAndUpdateCartCount();
 }
-
 
 /* -------------------- FILL BILLING -------------------- */
 function fillBillingFields(data){
