@@ -214,70 +214,7 @@
     50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);}
   }
 
-  /* ---------- Checkout Variants Dropdown ---------- */
-.checkout-variants-toggle {
-  background: transparent;
-  border: 1px solid var(--fleur-green, #1a3c34);
-  color: var(--fleur-green, #1a3c34);
-  font-family: "Playfair Display", serif;
-  font-size: 0.95rem;
-  padding: 6px 14px;
-  border-radius: 6px;
-  margin-top: 6px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.checkout-variants-toggle:hover {
-  background: var(--fleur-green, #1a3c34);
-  color: #fff;
-}
-
-/* Container for the variant list */
-.checkout-variants-container {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 0.35s ease;
-  margin-top: 0;
-}
-
-/* When open */
-.checkout-variants-container.open {
-  max-height: 400px; /* enough for multiple variants */
-  opacity: 1;
-  margin-top: 8px;
-}
-
-/* Each variant row */
-.checkout-variant-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(26, 60, 52, 0.05); /* soft transparent green tint */
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  border-radius: 8px;
-}
-
-/* Variant text */
-.checkout-variant-meta {
-  font-family: "Playfair Display", serif;
-  font-size: 0.9rem;
-  color: var(--fleur-green, #1a3c34);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .checkout-variants-toggle {
-    font-size: 0.85rem;
-    padding: 5px 12px;
-  }
-  .checkout-variant-meta {
-    font-size: 0.85rem;
-  }
-}  
-
+ 
   </style>
 </head>
 <body>
@@ -824,19 +761,17 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       headerWrapper.appendChild(img);
     }
 
-    // name + variant meta
+    // name + meta
     const textWrap = document.createElement('div');
     const titleDiv = document.createElement('div');
     titleDiv.className = 'title';
     titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
     textWrap.appendChild(titleDiv);
 
-    // handle single or multiple variants
     if (Array.isArray(item.variants) && item.variants.length > 1) {
       const info = document.createElement('div');
       info.className = 'meta';
-      info.textContent = 'Show Choices';
-      info.style.cursor = 'pointer';
+      info.textContent = 'Multiple options selected';
       textWrap.appendChild(info);
     } else {
       const singleV = item.variants && item.variants[0];
@@ -853,22 +788,24 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
     headerWrapper.appendChild(textWrap);
     left.appendChild(headerWrapper);
 
-    // ---- Variants toggle for multiple options ----
+    // ---- Variants toggle (Show Choices button) ----
     if (Array.isArray(item.variants) && item.variants.length > 1) {
-      // ▼ arrow toggle
-      const toggle = document.createElement('button');
-      toggle.className = 'variant-toggle';
-      toggle.type = 'button';
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.title = 'View choices';
-      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" 
-        viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-        d="M19 9l-7 7-7-7"/>
-      </svg>`;
-      headerWrapper.appendChild(toggle);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Show Choices';
+      btn.className = 'variant-toggle-btn';
+      btn.style.marginTop = '6px';
+      btn.style.fontSize = '0.9rem';
+      btn.style.fontWeight = '600';
+      btn.style.background = 'transparent';
+      btn.style.border = '1px dashed rgba(0,0,0,0.2)';
+      btn.style.padding = '4px 10px';
+      btn.style.borderRadius = '6px';
+      btn.style.cursor = 'pointer';
+      btn.style.color = '#334d3a';
+      textWrap.appendChild(btn);
 
-      // variants detail container (collapsed by default)
+      // variants list (hidden by default)
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
       variantsContainer.style.display = 'none';
@@ -906,32 +843,22 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
         variantsContainer.appendChild(row);
       });
 
-      left.appendChild(variantsContainer);
+      textWrap.appendChild(variantsContainer);
 
-      // toggle click: expands/collapses
-      const toggleVariants = () => {
+      // toggle function
+      btn.addEventListener('click', () => {
         const showing = variantsContainer.style.display === 'block';
         variantsContainer.style.display = showing ? 'none' : 'block';
-        toggle.setAttribute('aria-expanded', showing ? 'false' : 'true');
-        toggle.querySelector('svg').style.transform = showing
-          ? 'rotate(0deg)'
-          : 'rotate(180deg)';
-      };
-
-      toggle.addEventListener('click', toggleVariants);
-      // clicking "Multiple options selected" also toggles
-      textWrap.querySelector('.meta').addEventListener('click', toggleVariants);
+        btn.textContent = showing ? 'Show Choices' : 'Hide Choices';
+      });
     }
 
-    // ---- Price on right ----
+    // ---- Price ----
     const right = document.createElement('div');
     right.className = 'right';
     right.style.minWidth = '120px';
     right.style.textAlign = 'right';
-    right.innerHTML = `<div style="font-weight:600">${formatPrice(
-      finalValue,
-      currency
-    )}</div>`;
+    right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
 
     li.appendChild(left);
     li.appendChild(right);
@@ -941,6 +868,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
   orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
   computeAndUpdateCartCount();
 }
+
 
 /* -------------------- FILL BILLING -------------------- */
 function fillBillingFields(data){
