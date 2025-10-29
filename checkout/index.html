@@ -214,58 +214,6 @@
     50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);}
   }
 
-/* ---------- Checkout Variants Dropdown ---------- */
-.checkout-variants-toggle {
-  background: transparent;
-  border: 1px solid var(--fleur-green, #1a3c34);
-  color: var(--fleur-green, #1a3c34);
-  font-family: "Playfair Display", serif;
-  font-size: 0.95rem;
-  padding: 6px 14px;
-  border-radius: 6px;
-  margin-top: 6px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.checkout-variants-toggle:hover {
-  background: var(--fleur-green, #1a3c34);
-  color: #fff;
-}
-.checkout-variants-container {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 0.35s ease;
-  margin-top: 0;
-}
-.checkout-variants-container.open {
-  max-height: 400px;
-  opacity: 1;
-  margin-top: 8px;
-}
-.checkout-variant-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(26, 60, 52, 0.05);
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  border-radius: 8px;
-}
-.checkout-variant-meta {
-  font-family: "Playfair Display", serif;
-  font-size: 0.9rem;
-  color: var(--fleur-green, #1a3c34);
-}
-@media (max-width: 768px) {
-  .checkout-variants-toggle {
-    font-size: 0.85rem;
-    padding: 2px 6px;
-  }
-  .checkout-variant-meta {
-    font-size: 0.85rem;
-  }
-}
 
   </style>
 </head>
@@ -326,7 +274,6 @@
             <option value="GBP">GBP</option>
           </select>
         </div>
-        <div id="checkoutList"></div> <!-- ✅ ADD THIS -->
         <ul id="orderItems" aria-live="polite"></ul>
         <div class="subtotal" id="orderSubtotal"></div>
         <div class="note">You will be redirected to payment after clicking Proceed to Payment.</div>
@@ -635,8 +582,7 @@ async function buildQuoteFromCart(){
 
 /* ✅ Add this AFTER buildQuoteFromCart() closes */
 async function renderCheckoutItems() {
-  // support both possible container IDs
-  const checkoutList = document.getElementById('checkoutList') || document.getElementById('orderItems');
+  const checkoutList = document.getElementById('checkoutList');
   if (!checkoutList) return;
 
   const { items } = await buildQuoteFromCart();
@@ -645,124 +591,48 @@ async function renderCheckoutItems() {
 
   items.forEach(item => {
     const hasVariantMeta =
-      Array.isArray(item.variants) && (item.variants.length > 1 || item.variants.some(v => v.color || v.size));
+      item.variants.length > 1 ||
+      item.variants.some(v => v.color || v.size);
 
-    const container = document.createElement('li');
-    container.className = 'order-item'; // keep same container class for your list
+    const div = document.createElement('div');
+    div.className = 'checkout-item';
+    div.innerHTML = `
+      <div class="checkout-item-inner" data-id="${item.productId}">
+        <img src="${item.image}" alt="${item.name}" class="checkout-thumb">
 
-    // left column markup
-    const left = document.createElement('div');
-    left.className = 'left';
-    left.style.display = 'flex';
-    left.style.gap = '12px';
-    left.style.alignItems = 'flex-start';
+        <div class="checkout-details">
+          <h3 class="checkout-name">${escapeHtml(item.name)}</h3>
+          <div class="checkout-price">${formatPrice(item.totalPrices[currency], currency)}</div>
 
-    if (item.image) {
-      const img = document.createElement('img');
-      img.src = item.image;
-      img.alt = item.name;
-      img.style.width = '56px';
-      img.style.height = '56px';
-      img.style.objectFit = 'cover';
-      img.style.borderRadius = '6px';
-      img.style.border = '1px solid rgba(0,0,0,0.06)';
-      left.appendChild(img);
-    }
-
-    const textWrap = document.createElement('div');
-    textWrap.style.flex = '1';
-
-    const title = document.createElement('div');
-    title.className = 'title';
-    title.textContent = `${item.name} (x${item.totalQuantity})`;
-    title.style.fontWeight = '600';
-    textWrap.appendChild(title);
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.style.marginTop = '6px';
-    meta.style.fontSize = '0.95rem';
-    meta.style.color = '#334d3a';
-
-    // single-variant meta or multi-variant fallback text
-    if (Array.isArray(item.variants) && item.variants.length === 1) {
-      const sv = item.variants[0];
-      const parts = [];
-      if (sv.color) parts.push(`Color: ${sv.color}`);
-      if (sv.size) parts.push(`Size: ${sv.size}`);
-      parts.push(`Qty: ${sv.quantity}`);
-      meta.textContent = parts.join(' · ');
-    } else if (Array.isArray(item.variants) && item.variants.length > 1) {
-      meta.textContent = 'Multiple options selected';
-    } else {
-      meta.textContent = `Qty: ${item.totalQuantity}`;
-    }
-    textWrap.appendChild(meta);
-
-    left.appendChild(textWrap);
-    container.appendChild(left);
-
-    // right column (price)
-    const right = document.createElement('div');
-    right.className = 'right';
-    right.style.minWidth = '120px';
-    right.style.textAlign = 'right';
-    const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
-    right.innerHTML = `<div style="font-weight:600">${formatPrice(valueFromTotals, currency)}</div>`;
-
-    // If multiple variants, insert toggle + hidden list inside left/textWrap (after meta)
-    if (Array.isArray(item.variants) && item.variants.length > 1) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'checkout-variants-toggle';
-      btn.setAttribute('aria-expanded', 'false');
-      btn.innerHTML = `Show Choices <span class="arrow">▾</span>`;
-      // append after meta
-      textWrap.appendChild(btn);
-
-      const vContainer = document.createElement('div');
-      vContainer.className = 'checkout-variants-container';
-      // build variant rows
-      item.variants.forEach(v => {
-        const row = document.createElement('div');
-        row.className = 'checkout-variant-row';
-        const leftMeta = document.createElement('div');
-        leftMeta.className = 'checkout-variant-meta';
-        leftMeta.textContent = `${v.color ? 'Color: ' + v.color + (v.size ? ' · ' : '') : ''}${v.size ? 'Size: ' + v.size + ' · ' : ''}Qty: ${v.quantity}`;
-        const priceDiv = document.createElement('div');
-        priceDiv.className = 'checkout-variant-price';
-        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
-        priceDiv.textContent = formatPrice(variantLinePrice, currency);
-        row.appendChild(leftMeta);
-        row.appendChild(priceDiv);
-        vContainer.appendChild(row);
-      });
-
-      textWrap.appendChild(vContainer);
-
-      // toggle handler — accessible, animated
-      btn.addEventListener('click', () => {
-        const isOpen = vContainer.classList.toggle('open');
-        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        btn.querySelector('.arrow')?.classList.toggle('open', isOpen);
-        btn.firstChild && (btn.firstChild.nodeValue = isOpen ? 'Hide Choices ' : 'Show Choices ');
-      });
-    }
-
-    container.appendChild(right);
-    checkoutList.appendChild(container);
+          ${hasVariantMeta ? `
+            <button class="checkout-variants-toggle">View Choices</button>
+            <div class="checkout-variants-container">
+              ${item.variants.map(v => `
+                <div class="checkout-variant-row">
+                  <div class="checkout-variant-meta">
+                    ${v.color ? v.color + ' / ' : ''}${v.size ? v.size + ' x ' : ''}${v.quantity}
+                  </div>
+                </div>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    checkoutList.appendChild(div);
   });
 
-  // update subtotal display if you use orderSubtotal elsewhere
-  if (orderSubtotalEl) {
-    // compute subtotal from items and current currency
-    const subtotal = items.reduce((s, it) => {
-      const v = Number((it.totalPrices && (it.totalPrices[localStorage.getItem('currency') || 'NGN'] ?? null)) ?? 0);
-      return s + (isNaN(v) ? 0 : v);
-    }, 0);
-    orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, localStorage.getItem('currency') || 'NGN')}`;
-  }
+  // toggle dropdown open/close
+  checkoutList.addEventListener('click', e => {
+    const btn = e.target.closest('.checkout-variants-toggle');
+    if (!btn) return;
+    const container = btn.nextElementSibling;
+    const open = container.classList.toggle('open');
+    btn.textContent = open ? 'Hide Choices' : 'View Choices';
+  });
 }
+
+// run after DOM is ready
+document.addEventListener('DOMContentLoaded', renderCheckoutItems);
 
   
 /* -------------------- NORMALIZERS (quote/order) -------------------- */
@@ -837,19 +707,33 @@ function normalizeOrderItems(items){
 }
 
 /* -------------------- RENDER (keeps Fleur De Vie DOM & styles) -------------------- */
-function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
-  if(!orderItemsEl || !orderSubtotalEl) return;
+function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid = false) {
+  if (!orderItemsEl || !orderSubtotalEl) return;
   orderItemsEl.innerHTML = '';
-  if(!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
+
+  if (!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
     orderItemsEl.innerHTML = '<li class="small-note">No items</li>';
     orderSubtotalEl.textContent = `Subtotal: —`;
     computeAndUpdateCartCount();
     return;
   }
+
   let subtotal = 0;
-  quoteNormalized.items.forEach((item, idx) => {
-    const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
-    const fallbackFromVariants = Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0))), 0) : 0;
+
+  quoteNormalized.items.forEach((item) => {
+    const valueFromTotals =
+      Number((item.totalPrices && item.totalPrices[currency]) ?? 0) || 0;
+    const fallbackFromVariants = Array.isArray(item.variants)
+      ? item.variants.reduce(
+          (s, v) =>
+            s +
+            Number(
+              (v.linePrices && v.linePrices[currency]) ??
+                Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)
+            ),
+          0
+        )
+      : 0;
     const finalValue = valueFromTotals || fallbackFromVariants || 0;
     subtotal += finalValue;
 
@@ -864,7 +748,8 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
     headerWrapper.style.alignItems = 'center';
     headerWrapper.style.gap = '10px';
 
-    if(item.image){
+    // image
+    if (item.image) {
       const img = document.createElement('img');
       img.src = item.image;
       img.alt = item.name;
@@ -876,80 +761,121 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       headerWrapper.appendChild(img);
     }
 
+    // name + variant meta
     const textWrap = document.createElement('div');
     const titleDiv = document.createElement('div');
     titleDiv.className = 'title';
     titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
     textWrap.appendChild(titleDiv);
 
-    if(Array.isArray(item.variants) && item.variants.length > 1){
+    // handle single or multiple variants
+    if (Array.isArray(item.variants) && item.variants.length > 1) {
       const info = document.createElement('div');
       info.className = 'meta';
-      info.textContent = 'Multiple options selected';
+      info.textContent = 'Show Choices';
+      info.style.cursor = 'pointer';
       textWrap.appendChild(info);
     } else {
       const singleV = item.variants && item.variants[0];
-      if(singleV && (singleV.color || singleV.size)){
+      if (singleV && (singleV.color || singleV.size)) {
         const info = document.createElement('div');
         info.className = 'meta';
-        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
+        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${
+          singleV.color && singleV.size ? ' · ' : ''
+        }${singleV.size ? 'Size: ' + singleV.size : ''}`;
         textWrap.appendChild(info);
       }
     }
+
     headerWrapper.appendChild(textWrap);
     left.appendChild(headerWrapper);
 
-    // variants container (hidden by default)
-    if(Array.isArray(item.variants) && item.variants.length > 1){
+    // ---- Variants toggle for multiple options ----
+    if (Array.isArray(item.variants) && item.variants.length > 1) {
+      // ▼ arrow toggle
       const toggle = document.createElement('button');
       toggle.className = 'variant-toggle';
       toggle.type = 'button';
-      toggle.setAttribute('aria-expanded','false');
-      toggle.title = 'View variants';
-      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.title = 'View choices';
+      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+        viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+        d="M19 9l-7 7-7-7"/>
+      </svg>`;
       headerWrapper.appendChild(toggle);
 
+      // variants detail container (collapsed by default)
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
-      item.variants.forEach(v=>{
+      variantsContainer.style.display = 'none';
+      variantsContainer.style.marginTop = '8px';
+
+      item.variants.forEach((v) => {
         const row = document.createElement('div');
         row.className = 'variant-row';
-        const leftRow = document.createElement('div');
-        leftRow.style.display = 'flex';
-        leftRow.style.gap = '8px';
-        leftRow.style.alignItems = 'center';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '6px 0';
+        row.style.borderTop = '1px solid rgba(0,0,0,0.05)';
+
         const attrs = document.createElement('div');
         attrs.className = 'variant-attrs';
-        attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
-        leftRow.appendChild(attrs);
-        const rightPrice = document.createElement('div');
-        rightPrice.className = 'variant-price';
-        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
-        rightPrice.textContent = formatPrice(variantLinePrice, currency);
-        row.appendChild(leftRow);
-        row.appendChild(rightPrice);
+        attrs.textContent = `${
+          v.color ? `Color: ${v.color}` : ''
+        }${v.color && v.size ? ' · ' : ''}${
+          v.size ? `Size: ${v.size}` : ''
+        } · Qty: ${v.quantity}`;
+        attrs.style.fontSize = '0.92rem';
+        attrs.style.color = '#334d3a';
+
+        const priceDiv = document.createElement('div');
+        priceDiv.className = 'variant-price';
+        const variantLinePrice =
+          Number((v.linePrices && v.linePrices[currency]) ?? 0) ||
+          Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0);
+        priceDiv.textContent = formatPrice(variantLinePrice, currency);
+        priceDiv.style.fontWeight = '500';
+
+        row.appendChild(attrs);
+        row.appendChild(priceDiv);
         variantsContainer.appendChild(row);
       });
+
       left.appendChild(variantsContainer);
 
-      toggle.addEventListener('click', () => {
-        const isShown = variantsContainer.classList.toggle('show');
-        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
-      });
+      // toggle click: expands/collapses
+      const toggleVariants = () => {
+        const showing = variantsContainer.style.display === 'block';
+        variantsContainer.style.display = showing ? 'none' : 'block';
+        toggle.setAttribute('aria-expanded', showing ? 'false' : 'true');
+        toggle.querySelector('svg').style.transform = showing
+          ? 'rotate(0deg)'
+          : 'rotate(180deg)';
+      };
+
+      toggle.addEventListener('click', toggleVariants);
+      // clicking "Multiple options selected" also toggles
+      textWrap.querySelector('.meta').addEventListener('click', toggleVariants);
     }
 
+    // ---- Price on right ----
     const right = document.createElement('div');
     right.className = 'right';
     right.style.minWidth = '120px';
     right.style.textAlign = 'right';
-    right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
+    right.innerHTML = `<div style="font-weight:600">${formatPrice(
+      finalValue,
+      currency
+    )}</div>`;
 
     li.appendChild(left);
     li.appendChild(right);
     orderItemsEl.appendChild(li);
   });
 
-  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, selectedCurrency)}`;
+  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
   computeAndUpdateCartCount();
 }
 
@@ -1697,21 +1623,6 @@ try {
     activeInput = null;
   });
 })();
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const checkoutList = document.getElementById("checkoutList");
-  if (!checkoutList) return;
-
-  checkoutList.addEventListener("click", e => {
-    const btn = e.target.closest(".checkout-variants-toggle");
-    if (!btn) return;
-    const container = btn.nextElementSibling;
-    const open = container.classList.toggle("open");
-    btn.textContent = open ? "Hide choices" : "Show choices";
-  });
-});
 </script>
   
 
