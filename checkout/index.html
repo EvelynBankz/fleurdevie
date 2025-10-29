@@ -812,22 +812,34 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       header.appendChild(img);
     }
 
+    
     // Text wrapper
     const textWrap = document.createElement('div');
     textWrap.style.minWidth = '0';
-
+    
     const titleDiv = document.createElement('div');
     titleDiv.className = 'title';
     titleDiv.textContent = item.name;
     textWrap.appendChild(titleDiv);
-
+    
     const metaDiv = document.createElement('div');
     metaDiv.className = 'meta';
-    metaDiv.textContent = `${item.totalQuantity} item(s)`;
+    
+    // For single variant, show color/size info inline
+    if(item.variants.length === 1){
+      const v = item.variants[0];
+      const parts = [];
+      if(v.color) parts.push(`Color: ${v.color}`);
+      if(v.size) parts.push(`Size: ${v.size}`);
+      if(parts.length) metaDiv.textContent = parts.join(' · ') + ` ×${v.quantity}`;
+      else metaDiv.textContent = `${item.totalQuantity} item(s)`;
+    } else {
+      // Multiple variants — just show total items
+      metaDiv.textContent = `${item.totalQuantity} item(s)`;
+    }
+    
     textWrap.appendChild(metaDiv);
 
-    header.appendChild(textWrap);
-    left.appendChild(header);
 
     // ---------- VARIANTS ----------
     if(Array.isArray(item.variants) && item.variants.length > 1){
