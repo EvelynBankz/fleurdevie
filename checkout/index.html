@@ -842,15 +842,15 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
     //   headerWrapper.appendChild(toggle);
 
     // variants container (hidden by default)
-    if (Array.isArray(item.variants) && item.variants.length > 0) {
-    const toggle = document.createElement('button');
-    toggle.className = 'variant-toggle';
-    toggle.type = 'button';
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.title = 'View variants';
-    toggle.textContent = 'Show Choices'; // replaced icon with plain text
-    headerWrapper.appendChild(toggle);
-    }
+        if (Array.isArray(item.variants) && item.variants.length > 0) {
+        const toggle = document.createElement('button');
+        toggle.className = 'variant-toggle';
+        toggle.type = 'button';
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.title = 'View variants';
+        toggle.textContent = 'Show Choices'; // replaced icon with plain text
+        headerWrapper.appendChild(toggle);
+        }
 
 
 
