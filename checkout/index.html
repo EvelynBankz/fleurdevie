@@ -798,6 +798,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       variantsContainer.style.marginTop = '8px';
 
       // ✅ FIX: populate variant rows safely
+      console.log('VARIANTS DATA →', item.variants);
       item.variants.forEach((variant) => {
         const row = document.createElement('div');
         row.className = 'variant-row';
