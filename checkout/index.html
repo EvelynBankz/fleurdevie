@@ -756,94 +756,95 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
     title.textContent = `${item.name} (x${item.totalQuantity})`;
     textWrap.appendChild(title);
 
-    // ---------- META ----------
-    if (Array.isArray(item.variants) && item.variants.length > 1) {
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.textContent = 'Multiple options selected';
-      textWrap.appendChild(meta);
-    } else {
-      const v = item.variants?.[0];
-      if (v && (v.color || v.size)) {
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        meta.textContent = `${v.color ? 'Color: ' + v.color : ''}${
-          v.color && v.size ? ' · ' : ''
-        }${v.size ? 'Size: ' + v.size : ''}`;
-        textWrap.appendChild(meta);
-      }
-    }
+ // ---------- META & VARIANTS DROPDOWN ----------
+if (Array.isArray(item.variants) && item.variants.length > 1) {
+  // top summary text
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  meta.textContent = 'Multiple options selected';
+  textWrap.appendChild(meta);
 
-    topRow.appendChild(textWrap);
-    left.appendChild(topRow);
+  // "Show Choices" button
+  const btn = document.createElement('button');
+  btn.textContent = 'Show Choices';
+  btn.className = 'variant-toggle-btn';
+  btn.style.marginTop = '6px';
+  btn.style.fontSize = '0.9rem';
+  btn.style.fontWeight = '600';
+  btn.style.background = 'transparent';
+  btn.style.border = '1px dashed rgba(0,0,0,0.3)';
+  btn.style.padding = '4px 10px';
+  btn.style.borderRadius = '6px';
+  btn.style.cursor = 'pointer';
+  btn.style.color = '#334d3a';
+  btn.style.display = 'inline-block';
 
-    // ---------- SHOW CHOICES BUTTON ----------
-    if (Array.isArray(item.variants) && item.variants.length > 1) {
-      const btn = document.createElement('button');
-      btn.textContent = 'Show Choices';
-      btn.className = 'variant-toggle-btn';
-      btn.style.marginTop = '6px';
-      btn.style.fontSize = '0.9rem';
-      btn.style.fontWeight = '600';
-      btn.style.background = 'transparent';
-      btn.style.border = '1px dashed rgba(0,0,0,0.3)';
-      btn.style.padding = '4px 10px';
-      btn.style.borderRadius = '6px';
-      btn.style.cursor = 'pointer';
-      btn.style.color = '#334d3a';
+  // container for dropdown
+  const variantsContainer = document.createElement('div');
+  variantsContainer.className = 'variants-container';
+  variantsContainer.style.display = 'none';
+  variantsContainer.style.marginTop = '8px';
+  variantsContainer.style.borderTop = '1px solid rgba(0,0,0,0.05)';
+  variantsContainer.style.paddingTop = '6px';
 
-      const variantsContainer = document.createElement('div');
-      variantsContainer.className = 'variants-container';
-      variantsContainer.style.display = 'none';
-      variantsContainer.style.marginTop = '8px';
+  // populate variant rows
+  console.log('VARIANTS DATA →', item.variants);
+  item.variants.forEach(variant => {
+    const row = document.createElement('div');
+    row.className = 'variant-row';
+    row.style.display = 'flex';
+    row.style.justifyContent = 'space-between';
+    row.style.alignItems = 'center';
+    row.style.padding = '6px 0';
+    row.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
 
-      // ✅ FIX: populate variant rows safely
-      console.log('VARIANTS DATA →', item.variants);
-      item.variants.forEach((variant) => {
-        const row = document.createElement('div');
-        row.className = 'variant-row';
-        row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
-        row.style.alignItems = 'center';
-        row.style.padding = '6px 0';
-        row.style.borderTop = '1px solid rgba(0,0,0,0.05)';
+    const attrs = document.createElement('div');
+    attrs.className = 'variant-attrs';
+    const color = variant.color || variant.Color || '';
+    const size = variant.size || variant.Size || '';
+    const qty = variant.quantity || variant.Quantity || 1;
+    attrs.textContent = `${color ? 'Color: ' + color : ''}${
+      color && size ? ' · ' : ''
+    }${size ? 'Size: ' + size : ''}${
+      color || size ? ' · ' : ''
+    }Qty: ${qty}`;
+    attrs.style.fontSize = '0.9rem';
+    attrs.style.color = '#334d3a';
 
-        const attrs = document.createElement('div');
-        attrs.className = 'variant-attrs';
-        const color = variant.color || variant.Color || '';
-        const size = variant.size || variant.Size || '';
-        const qty = variant.quantity || variant.Quantity || 1;
-        attrs.textContent = `${color ? 'Color: ' + color : ''}${
-          color && size ? ' · ' : ''
-        }${size ? 'Size: ' + size : ''}${
-          color || size ? ' · ' : ''
-        }Qty: ${qty}`;
-        attrs.style.fontSize = '0.9rem';
-        attrs.style.color = '#334d3a';
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'variant-price';
+    const linePrice =
+      Number((variant.linePrices && variant.linePrices[currency]) ?? 0) ||
+      Number(variant.unitPrices?.[currency] || 0) * Number(qty || 0);
+    priceDiv.textContent = formatPrice(linePrice, currency);
+    priceDiv.style.fontWeight = '500';
 
-        const priceDiv = document.createElement('div');
-        priceDiv.className = 'variant-price';
-        const linePrice =
-          Number((variant.linePrices && variant.linePrices[currency]) ?? 0) ||
-          Number(variant.unitPrices?.[currency] || 0) * Number(qty || 0);
-        priceDiv.textContent = formatPrice(linePrice, currency);
-        priceDiv.style.fontWeight = '500';
+    row.appendChild(attrs);
+    row.appendChild(priceDiv);
+    variantsContainer.appendChild(row);
+  });
 
-        row.appendChild(attrs);
-        row.appendChild(priceDiv);
-        variantsContainer.appendChild(row);
-      });
+  // toggle handler
+  btn.addEventListener('click', () => {
+    const isVisible = variantsContainer.style.display === 'block';
+    variantsContainer.style.display = isVisible ? 'none' : 'block';
+    btn.textContent = isVisible ? 'Show Choices' : 'Hide Choices';
+  });
 
-      // Toggle function
-      btn.addEventListener('click', () => {
-        const isVisible = variantsContainer.style.display === 'block';
-        variantsContainer.style.display = isVisible ? 'none' : 'block';
-        btn.textContent = isVisible ? 'Show Choices' : 'Hide Choices';
-      });
-
-      textWrap.appendChild(btn);
-      textWrap.appendChild(variantsContainer);
-    }
+  // append to layout
+  textWrap.appendChild(btn);
+  textWrap.appendChild(variantsContainer);
+} else {
+  const v = item.variants?.[0];
+  if (v && (v.color || v.size)) {
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = `${v.color ? 'Color: ' + v.color : ''}${
+      v.color && v.size ? ' · ' : ''
+    }${v.size ? 'Size: ' + v.size : ''}`;
+    textWrap.appendChild(meta);
+  }
+}
 
     // ---------- RIGHT ----------
     const right = document.createElement('div');
