@@ -707,11 +707,10 @@ function normalizeOrderItems(items){
 }
 
 /* -------------------- RENDER (keeps Fleur De Vie DOM & styles) -------------------- */
-function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid = false) {
-  if (!orderItemsEl || !orderSubtotalEl) return;
+function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
+  if(!orderItemsEl || !orderSubtotalEl) return;
   orderItemsEl.innerHTML = '';
-
-  if (!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
+  if(!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
     orderItemsEl.innerHTML = '<li class="small-note">No items</li>';
     orderSubtotalEl.textContent = `Subtotal: —`;
     computeAndUpdateCartCount();
@@ -720,147 +719,124 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
 
   let subtotal = 0;
 
-  quoteNormalized.items.forEach((item) => {
-    const itemTotal =
-      Number((item.totalPrices && item.totalPrices[currency]) ?? 0) || 0;
-
-    subtotal += itemTotal;
+  quoteNormalized.items.forEach((item, idx) => {
+    const value = (item.totalPrices && (item.totalPrices[currency] ?? 0)) || 0;
+    subtotal += value;
 
     const li = document.createElement('li');
     li.className = 'order-item';
+    li.dataset.idx = String(idx);
 
-    // ---------- LEFT ----------
-    const left = document.createElement('div');
-    left.className = 'left';
+    // Image HTML
+    const imageHtml = item.image ? `<img src="${item.image}" alt="${item.name}" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,0,0,0.06)">` : '';
 
-    const topRow = document.createElement('div');
-    topRow.style.display = 'flex';
-    topRow.style.alignItems = 'center';
-    topRow.style.gap = '10px';
-
-    if (item.image) {
-      const img = document.createElement('img');
-      img.src = item.image;
-      img.alt = item.name;
-      img.style.width = '56px';
-      img.style.height = '56px';
-      img.style.objectFit = 'cover';
-      img.style.borderRadius = '6px';
-      img.style.border = '1px solid rgba(0,0,0,0.06)';
-      topRow.appendChild(img);
-    }
+    // Left side
+    const leftDiv = document.createElement('div');
+    leftDiv.className = 'left';
+    leftDiv.style.display = 'flex';
+    leftDiv.style.alignItems = 'center';
+    leftDiv.style.gap = '10px';
+    leftDiv.innerHTML = imageHtml;
 
     const textWrap = document.createElement('div');
-    const title = document.createElement('div');
-    title.className = 'title';
-    title.textContent = `${item.name} (x${item.totalQuantity})`;
-    textWrap.appendChild(title);
+    textWrap.style.minWidth = '0';
 
- // ---------- META & VARIANTS DROPDOWN ----------
-if (Array.isArray(item.variants) && item.variants.length > 1) {
-  // top summary text
-  const meta = document.createElement('div');
-  meta.className = 'meta';
-  meta.textContent = 'Multiple options selected';
-  textWrap.appendChild(meta);
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'title';
+    titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
+    textWrap.appendChild(titleDiv);
 
-  // "Show Choices" button
-  const btn = document.createElement('button');
-  btn.textContent = 'Show Choices';
-  btn.className = 'variant-toggle-btn';
-  btn.style.marginTop = '6px';
-  btn.style.fontSize = '0.9rem';
-  btn.style.fontWeight = '600';
-  btn.style.background = 'transparent';
-  btn.style.border = '1px dashed rgba(0,0,0,0.3)';
-  btn.style.padding = '4px 10px';
-  btn.style.borderRadius = '6px';
-  btn.style.cursor = 'pointer';
-  btn.style.color = '#334d3a';
-  btn.style.display = 'inline-block';
+    // Meta for multiple variants or single variant
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = 'Multiple options selected';
+      textWrap.appendChild(meta);
 
-  // container for dropdown
-  const variantsContainer = document.createElement('div');
-  variantsContainer.className = 'variants-container';
-  variantsContainer.style.display = 'none';
-  variantsContainer.style.marginTop = '8px';
-  variantsContainer.style.borderTop = '1px solid rgba(0,0,0,0.05)';
-  variantsContainer.style.paddingTop = '6px';
+      // Show Choices button
+      const btn = document.createElement('button');
+      btn.className = 'show-variants-btn';
+      btn.dataset.idx = String(idx);
+      btn.textContent = 'Show Choices ▾';
+      btn.style.marginTop = '6px';
+      btn.style.fontSize = '0.9rem';
+      btn.style.fontWeight = '600';
+      btn.style.background = 'transparent';
+      btn.style.border = '1px dashed rgba(0,0,0,0.3)';
+      btn.style.padding = '4px 10px';
+      btn.style.borderRadius = '6px';
+      btn.style.cursor = 'pointer';
+      btn.style.color = '#334d3a';
+      textWrap.appendChild(btn);
 
-  // populate variant rows
-  console.log('VARIANTS DATA →', item.variants);
-  item.variants.forEach(variant => {
-    const row = document.createElement('div');
-    row.className = 'variant-row';
-    row.style.display = 'flex';
-    row.style.justifyContent = 'space-between';
-    row.style.alignItems = 'center';
-    row.style.padding = '6px 0';
-    row.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+      // Variants container (hidden)
+      const variantsContainer = document.createElement('div');
+      variantsContainer.className = 'variants-container';
+      variantsContainer.dataset.forIdx = String(idx);
+      variantsContainer.style.display = 'none';
+      variantsContainer.style.flexDirection = 'column';
+      variantsContainer.style.marginTop = '8px';
 
-    const attrs = document.createElement('div');
-    attrs.className = 'variant-attrs';
-    const color = variant.color || variant.Color || '';
-    const size = variant.size || variant.Size || '';
-    const qty = variant.quantity || variant.Quantity || 1;
-    attrs.textContent = `${color ? 'Color: ' + color : ''}${
-      color && size ? ' · ' : ''
-    }${size ? 'Size: ' + size : ''}${
-      color || size ? ' · ' : ''
-    }Qty: ${qty}`;
-    attrs.style.fontSize = '0.9rem';
-    attrs.style.color = '#334d3a';
+      item.variants.forEach(v => {
+        const row = document.createElement('div');
+        row.className = 'variant-line';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.padding = '6px 0';
+        row.style.borderTop = '1px solid rgba(0,0,0,0.05)';
 
-    const priceDiv = document.createElement('div');
-    priceDiv.className = 'variant-price';
-    const linePrice =
-      Number((variant.linePrices && variant.linePrices[currency]) ?? 0) ||
-      Number(variant.unitPrices?.[currency] || 0) * Number(qty || 0);
-    priceDiv.textContent = formatPrice(linePrice, currency);
-    priceDiv.style.fontWeight = '500';
+        const labelParts = [];
+        if(v.color) labelParts.push(`Color: ${v.color}`);
+        if(v.size) labelParts.push(`Size: ${v.size}`);
+        const label = labelParts.length ? `${labelParts.join(' · ')} · Qty: ${v.quantity}` : `Qty: ${v.quantity}`;
 
-    row.appendChild(attrs);
-    row.appendChild(priceDiv);
-    variantsContainer.appendChild(row);
+        const linePrice = (v.linePrices && (v.linePrices[currency] ?? 0)) || (Number(v.unitPrices?.[currency]||0) * Number(v.quantity||0));
+
+        row.innerHTML = `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</div>
+                         <div style="min-width:110px;text-align:right;color:#556b59">${formatPrice(linePrice, currency)}</div>`;
+
+        variantsContainer.appendChild(row);
+      });
+
+      li.appendChild(textWrap);
+      li.appendChild(variantsContainer);
+
+      // Button click toggle
+      btn.addEventListener('click', () => {
+        const isVisible = variantsContainer.style.display === 'flex';
+        variantsContainer.style.display = isVisible ? 'none' : 'flex';
+        btn.textContent = isVisible ? 'Show Choices ▾' : 'Hide Choices ▴';
+      });
+
+    } else {
+      // Single variant meta
+      const singleV = item.variants && item.variants[0];
+      if(singleV && (singleV.color || singleV.size)){
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
+        textWrap.appendChild(meta);
+      }
+      li.appendChild(textWrap);
+    }
+
+    leftDiv.appendChild(textWrap);
+    li.appendChild(leftDiv);
+
+    // Right side price
+    const rightDiv = document.createElement('div');
+    rightDiv.className = 'right';
+    rightDiv.style.minWidth = '120px';
+    rightDiv.style.textAlign = 'right';
+    rightDiv.innerHTML = `<div style="font-weight:600">${formatPrice(value, currency)}</div>`;
+    li.appendChild(rightDiv);
+
+    orderItemsEl.appendChild(li);
   });
 
-  // toggle handler
-  btn.addEventListener('click', () => {
-    const isVisible = variantsContainer.style.display === 'block';
-    variantsContainer.style.display = isVisible ? 'none' : 'block';
-    btn.textContent = isVisible ? 'Show Choices' : 'Hide Choices';
-  });
-
-  // append to layout
-  textWrap.appendChild(btn);
-  textWrap.appendChild(variantsContainer);
-} else {
-  const v = item.variants?.[0];
-  if (v && (v.color || v.size)) {
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.textContent = `${v.color ? 'Color: ' + v.color : ''}${
-      v.color && v.size ? ' · ' : ''
-    }${v.size ? 'Size: ' + v.size : ''}`;
-    textWrap.appendChild(meta);
-  }
+  orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
+  computeAndUpdateCartCount();
 }
-
-    // ---------- RIGHT ----------
-//     const right = document.createElement('div');
-//     right.className = 'right';
-//     right.style.minWidth = '120px';
-//     right.style.textAlign = 'right';
-//     right.innerHTML = `<div style="font-weight:600">${formatPrice(itemTotal, currency)}</div>`;
-
-//     li.appendChild(left);
-//     li.appendChild(right);
-//     orderItemsEl.appendChild(li);
-//   });
-
-//   orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
-//   computeAndUpdateCartCount();
-// }
 
 
 /* -------------------- FILL BILLING -------------------- */
