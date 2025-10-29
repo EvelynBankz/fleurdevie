@@ -215,73 +215,56 @@
   }
 
 /* ---------- Checkout Variants Dropdown ---------- */
-/* ===== Checkout variants (animated dropdown) ===== */
 .checkout-variants-toggle {
   background: transparent;
-  border: none;
+  border: 1px solid var(--fleur-green, #1a3c34);
   color: var(--fleur-green, #1a3c34);
   font-family: "Playfair Display", serif;
   font-size: 0.95rem;
-  padding: 6px 0;
+  padding: 6px 14px;
   border-radius: 6px;
-  margin-top: 8px;
+  margin-top: 6px;
   cursor: pointer;
-  transition: color 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  transition: all 0.25s ease;
 }
-.checkout-variants-toggle .arrow {
-  display:inline-block;
-  transition: transform .28s ease;
-  font-size: 12px;
+.checkout-variants-toggle:hover {
+  background: var(--fleur-green, #1a3c34);
+  color: #fff;
 }
-
-/* container uses max-height to animate */
 .checkout-variants-container {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height .32s cubic-bezier(.2,.9,.2,1), opacity .22s ease, padding .22s ease;
+  transition: all 0.35s ease;
   margin-top: 0;
-  padding-left: 0;
 }
-
-/* open state */
 .checkout-variants-container.open {
+  max-height: 400px;
   opacity: 1;
-  max-height: 520px; /* plenty for multiple variants */
   margin-top: 8px;
-  padding-left: 8px;
 }
-
-/* rotate arrow when open */
-.checkout-variants-toggle[aria-expanded="true"] .arrow {
-  transform: rotate(180deg);
-}
-
-/* each variant row */
 .checkout-variant-row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  padding:8px 10px;
-  margin-bottom:6px;
-  border-radius:8px;
-  background: rgba(26,60,52,0.03);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(26, 60, 52, 0.05);
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 8px;
 }
-
-/* left meta + right price */
-.checkout-variant-meta { font-family:"Playfair Display", serif; font-size:0.92rem; color:var(--fleur-green,#1a3c34); }
-.checkout-variant-price { font-weight:600; min-width:90px; text-align:right; }
-
-/* small screens adjustments */
-@media (max-width:768px){
-  .checkout-variants-toggle { font-size:0.85rem; padding:4px 0; }
-  .checkout-variant-meta { font-size:0.85rem; }
-  .checkout-variant-row { padding:8px 6px; }
-  .checkout-variant-price { min-width:70px; font-size:0.85rem; }
+.checkout-variant-meta {
+  font-family: "Playfair Display", serif;
+  font-size: 0.9rem;
+  color: var(--fleur-green, #1a3c34);
+}
+@media (max-width: 768px) {
+  .checkout-variants-toggle {
+    font-size: 0.85rem;
+    padding: 2px 6px;
+  }
+  .checkout-variant-meta {
+    font-size: 0.85rem;
+  }
 }
 
   </style>
@@ -343,6 +326,7 @@
             <option value="GBP">GBP</option>
           </select>
         </div>
+        <div id="checkoutList"></div> <!-- ✅ ADD THIS -->
         <ul id="orderItems" aria-live="polite"></ul>
         <div class="subtotal" id="orderSubtotal"></div>
         <div class="note">You will be redirected to payment after clicking Proceed to Payment.</div>
@@ -1713,6 +1697,21 @@ try {
     activeInput = null;
   });
 })();
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const checkoutList = document.getElementById("checkoutList");
+  if (!checkoutList) return;
+
+  checkoutList.addEventListener("click", e => {
+    const btn = e.target.closest(".checkout-variants-toggle");
+    if (!btn) return;
+    const container = btn.nextElementSibling;
+    const open = container.classList.toggle("open");
+    btn.textContent = open ? "Hide choices" : "Show choices";
+  });
+});
 </script>
   
 
