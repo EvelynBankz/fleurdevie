@@ -812,38 +812,38 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       header.appendChild(img);
     }
 
-    
     // Text wrapper
     const textWrap = document.createElement('div');
     textWrap.style.minWidth = '0';
-    
+
     const titleDiv = document.createElement('div');
     titleDiv.className = 'title';
     titleDiv.textContent = item.name;
     textWrap.appendChild(titleDiv);
-    
+
     const metaDiv = document.createElement('div');
     metaDiv.className = 'meta';
-    
-    // For single variant, show color/size info inline
-    if(item.variants.length === 1){
-      const v = item.variants[0];
+
+    const variants = Array.isArray(item.variants) ? item.variants : [];
+
+    // Single variant info
+    if(variants.length === 1){
+      const v = variants[0];
       const parts = [];
       if(v.color) parts.push(`Color: ${v.color}`);
       if(v.size) parts.push(`Size: ${v.size}`);
-      if(parts.length) metaDiv.textContent = parts.join(' · ') + ` ×${v.quantity}`;
-      else metaDiv.textContent = `${item.totalQuantity} item(s)`;
+      metaDiv.textContent = parts.length ? `${parts.join(' · ')} ×${v.quantity}` : `${item.totalQuantity} item(s)`;
     } else {
-      // Multiple variants — just show total items
+      // Multiple variants — just show total quantity
       metaDiv.textContent = `${item.totalQuantity} item(s)`;
     }
-    
-    textWrap.appendChild(metaDiv);
 
+    textWrap.appendChild(metaDiv);
+    header.appendChild(textWrap);
+    left.appendChild(header);
 
     // ---------- VARIANTS ----------
-    if(Array.isArray(item.variants) && item.variants.length > 1){
-      // Show Choices button
+    if(variants.length > 1){
       const showVariantsBtn = document.createElement('button');
       showVariantsBtn.className = 'show-variants-btn';
       showVariantsBtn.type = 'button';
@@ -855,7 +855,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       variantsContainer.dataset.forIdx = String(idx);
       variantsContainer.style.display = 'none';
 
-      item.variants.forEach(v => {
+      variants.forEach(v => {
         const line = document.createElement('div');
         line.className = 'variant-line';
 
@@ -889,13 +889,14 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
 
     li.appendChild(left);
     li.appendChild(right);
-
     orderItemsEl.appendChild(li);
   });
 
   orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, currency)}`;
   computeAndUpdateCartCount();
 }
+
+
 
 /* -------------------- FILL BILLING -------------------- */
 function fillBillingFields(data){
