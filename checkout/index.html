@@ -215,79 +215,73 @@
   }
 
 /* ---------- Checkout Variants Dropdown ---------- */
-.checkout-item {
-  display: flex;
-  gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-
-.checkout-thumb {
-  width: 72px;
-  height: 72px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.05);
-}
-
-.checkout-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.checkout-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.checkout-price {
-  font-size: 0.875rem;
-  margin-top: 2px;
-}
-
+/* ===== Checkout variants (animated dropdown) ===== */
 .checkout-variants-toggle {
-  margin-top: 8px;
-  font-size: 0.8125rem;
-  color: var(--accent-strong, #b66e41);
   background: transparent;
   border: none;
+  color: var(--fleur-green, #1a3c34);
+  font-family: "Playfair Display", serif;
+  font-size: 0.95rem;
+  padding: 6px 0;
+  border-radius: 6px;
+  margin-top: 8px;
   cursor: pointer;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.checkout-variants-toggle .arrow {
+  display:inline-block;
+  transition: transform .28s ease;
+  font-size: 12px;
 }
 
+/* container uses max-height to animate */
 .checkout-variants-container {
-  display: none;
-  margin-top: 6px;
-  padding-left: 4px;
-  border-left: 2px solid rgba(0,0,0,0.08);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height .32s cubic-bezier(.2,.9,.2,1), opacity .22s ease, padding .22s ease;
+  margin-top: 0;
+  padding-left: 0;
 }
 
+/* open state */
 .checkout-variants-container.open {
-  display: block;
+  opacity: 1;
+  max-height: 520px; /* plenty for multiple variants */
+  margin-top: 8px;
+  padding-left: 8px;
 }
 
+/* rotate arrow when open */
+.checkout-variants-toggle[aria-expanded="true"] .arrow {
+  transform: rotate(180deg);
+}
+
+/* each variant row */
 .checkout-variant-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8125rem;
-  margin-bottom: 4px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:8px 10px;
+  margin-bottom:6px;
+  border-radius:8px;
+  background: rgba(26,60,52,0.03);
 }
 
-@media (max-width: 768px) {
-  .checkout-item {
-    align-items: flex-start;
-  }
-  .checkout-thumb {
-    width: 60px;
-    height: 60px;
-  }
-  .checkout-name {
-    font-size: 0.9rem;
-  }
-  .checkout-price {
-    font-size: 0.8125rem;
-  }
+/* left meta + right price */
+.checkout-variant-meta { font-family:"Playfair Display", serif; font-size:0.92rem; color:var(--fleur-green,#1a3c34); }
+.checkout-variant-price { font-weight:600; min-width:90px; text-align:right; }
+
+/* small screens adjustments */
+@media (max-width:768px){
+  .checkout-variants-toggle { font-size:0.85rem; padding:4px 0; }
+  .checkout-variant-meta { font-size:0.85rem; }
+  .checkout-variant-row { padding:8px 6px; }
+  .checkout-variant-price { min-width:70px; font-size:0.85rem; }
 }
 
   </style>
@@ -657,7 +651,8 @@ async function buildQuoteFromCart(){
 
 /* ✅ Add this AFTER buildQuoteFromCart() closes */
 async function renderCheckoutItems() {
-  const checkoutList = document.getElementById('checkoutList');
+  // support both possible container IDs
+  const checkoutList = document.getElementById('checkoutList') || document.getElementById('orderItems');
   if (!checkoutList) return;
 
   const { items } = await buildQuoteFromCart();
@@ -666,55 +661,124 @@ async function renderCheckoutItems() {
 
   items.forEach(item => {
     const hasVariantMeta =
-      item.variants.length > 1 ||
-      item.variants.some(v => v.color || v.size);
+      Array.isArray(item.variants) && (item.variants.length > 1 || item.variants.some(v => v.color || v.size));
 
-    const div = document.createElement('div');
-    div.className = 'checkout-item';
+    const container = document.createElement('li');
+    container.className = 'order-item'; // keep same container class for your list
 
-    div.innerHTML = `
-      <div class="checkout-item-inner" data-id="${item.productId}">
-        <img src="${item.image}" alt="${item.name}" class="checkout-thumb">
+    // left column markup
+    const left = document.createElement('div');
+    left.className = 'left';
+    left.style.display = 'flex';
+    left.style.gap = '12px';
+    left.style.alignItems = 'flex-start';
 
-        <div class="checkout-details">
-          <h3 class="checkout-name">${escapeHtml(item.name)}</h3>
-          <div class="checkout-price">${formatPrice(item.totalPrices[currency], currency)}</div>
+    if (item.image) {
+      const img = document.createElement('img');
+      img.src = item.image;
+      img.alt = item.name;
+      img.style.width = '56px';
+      img.style.height = '56px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '6px';
+      img.style.border = '1px solid rgba(0,0,0,0.06)';
+      left.appendChild(img);
+    }
 
-          ${hasVariantMeta ? `
-            <button class="checkout-variants-toggle">Show Choices</button>
-            <div class="checkout-variants-container">
-              ${item.variants.map(v => `
-                <div class="checkout-variant-row">
-                  <div class="checkout-variant-meta">
-                    ${v.color ? 'Color: ' + v.color + ' · ' : ''}${v.size ? 'Size: ' + v.size + ' · ' : ''}Qty: ${v.quantity}
-                  </div>
-                  <div class="checkout-variant-price">${formatPrice(v.linePrices[currency], currency)}</div>
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-        </div>
-      </div>
-    `;
+    const textWrap = document.createElement('div');
+    textWrap.style.flex = '1';
 
-    checkoutList.appendChild(div);
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = `${item.name} (x${item.totalQuantity})`;
+    title.style.fontWeight = '600';
+    textWrap.appendChild(title);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.style.marginTop = '6px';
+    meta.style.fontSize = '0.95rem';
+    meta.style.color = '#334d3a';
+
+    // single-variant meta or multi-variant fallback text
+    if (Array.isArray(item.variants) && item.variants.length === 1) {
+      const sv = item.variants[0];
+      const parts = [];
+      if (sv.color) parts.push(`Color: ${sv.color}`);
+      if (sv.size) parts.push(`Size: ${sv.size}`);
+      parts.push(`Qty: ${sv.quantity}`);
+      meta.textContent = parts.join(' · ');
+    } else if (Array.isArray(item.variants) && item.variants.length > 1) {
+      meta.textContent = 'Multiple options selected';
+    } else {
+      meta.textContent = `Qty: ${item.totalQuantity}`;
+    }
+    textWrap.appendChild(meta);
+
+    left.appendChild(textWrap);
+    container.appendChild(left);
+
+    // right column (price)
+    const right = document.createElement('div');
+    right.className = 'right';
+    right.style.minWidth = '120px';
+    right.style.textAlign = 'right';
+    const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
+    right.innerHTML = `<div style="font-weight:600">${formatPrice(valueFromTotals, currency)}</div>`;
+
+    // If multiple variants, insert toggle + hidden list inside left/textWrap (after meta)
+    if (Array.isArray(item.variants) && item.variants.length > 1) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'checkout-variants-toggle';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = `Show Choices <span class="arrow">▾</span>`;
+      // append after meta
+      textWrap.appendChild(btn);
+
+      const vContainer = document.createElement('div');
+      vContainer.className = 'checkout-variants-container';
+      // build variant rows
+      item.variants.forEach(v => {
+        const row = document.createElement('div');
+        row.className = 'checkout-variant-row';
+        const leftMeta = document.createElement('div');
+        leftMeta.className = 'checkout-variant-meta';
+        leftMeta.textContent = `${v.color ? 'Color: ' + v.color + (v.size ? ' · ' : '') : ''}${v.size ? 'Size: ' + v.size + ' · ' : ''}Qty: ${v.quantity}`;
+        const priceDiv = document.createElement('div');
+        priceDiv.className = 'checkout-variant-price';
+        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
+        priceDiv.textContent = formatPrice(variantLinePrice, currency);
+        row.appendChild(leftMeta);
+        row.appendChild(priceDiv);
+        vContainer.appendChild(row);
+      });
+
+      textWrap.appendChild(vContainer);
+
+      // toggle handler — accessible, animated
+      btn.addEventListener('click', () => {
+        const isOpen = vContainer.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        btn.querySelector('.arrow')?.classList.toggle('open', isOpen);
+        btn.firstChild && (btn.firstChild.nodeValue = isOpen ? 'Hide Choices ' : 'Show Choices ');
+      });
+    }
+
+    container.appendChild(right);
+    checkoutList.appendChild(container);
   });
 
-  // collapsed by default
-  checkoutList.querySelectorAll('.checkout-variants-container').forEach(el => el.classList.remove('open'));
-
-  // toggle open/close
-  checkoutList.addEventListener('click', e => {
-    const btn = e.target.closest('.checkout-variants-toggle');
-    if (!btn) return;
-    const container = btn.nextElementSibling;
-    const open = container.classList.toggle('open');
-    btn.textContent = open ? 'Hide Choices' : 'Show Choices';
-  });
+  // update subtotal display if you use orderSubtotal elsewhere
+  if (orderSubtotalEl) {
+    // compute subtotal from items and current currency
+    const subtotal = items.reduce((s, it) => {
+      const v = Number((it.totalPrices && (it.totalPrices[localStorage.getItem('currency') || 'NGN'] ?? null)) ?? 0);
+      return s + (isNaN(v) ? 0 : v);
+    }, 0);
+    orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, localStorage.getItem('currency') || 'NGN')}`;
+  }
 }
-
-document.addEventListener('DOMContentLoaded', renderCheckoutItems);
-
 
   
 /* -------------------- NORMALIZERS (quote/order) -------------------- */
