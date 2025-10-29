@@ -721,34 +721,23 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
   let subtotal = 0;
 
   quoteNormalized.items.forEach((item) => {
-    const valueFromTotals =
+    const itemTotal =
       Number((item.totalPrices && item.totalPrices[currency]) ?? 0) || 0;
-    const fallbackFromVariants = Array.isArray(item.variants)
-      ? item.variants.reduce(
-          (s, v) =>
-            s +
-            Number(
-              (v.linePrices && v.linePrices[currency]) ??
-                Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)
-            ),
-          0
-        )
-      : 0;
-    const finalValue = valueFromTotals || fallbackFromVariants || 0;
-    subtotal += finalValue;
+
+    subtotal += itemTotal;
 
     const li = document.createElement('li');
     li.className = 'order-item';
 
+    // ---------- LEFT ----------
     const left = document.createElement('div');
     left.className = 'left';
 
-    const headerWrapper = document.createElement('div');
-    headerWrapper.style.display = 'flex';
-    headerWrapper.style.alignItems = 'center';
-    headerWrapper.style.gap = '10px';
+    const topRow = document.createElement('div');
+    topRow.style.display = 'flex';
+    topRow.style.alignItems = 'center';
+    topRow.style.gap = '10px';
 
-    // image
     if (item.image) {
       const img = document.createElement('img');
       img.src = item.image;
@@ -758,60 +747,58 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       img.style.objectFit = 'cover';
       img.style.borderRadius = '6px';
       img.style.border = '1px solid rgba(0,0,0,0.06)';
-      headerWrapper.appendChild(img);
+      topRow.appendChild(img);
     }
 
-    // name + meta
     const textWrap = document.createElement('div');
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'title';
-    titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
-    textWrap.appendChild(titleDiv);
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = `${item.name} (x${item.totalQuantity})`;
+    textWrap.appendChild(title);
 
+    // ---------- META ----------
     if (Array.isArray(item.variants) && item.variants.length > 1) {
-      const info = document.createElement('div');
-      info.className = 'meta';
-      info.textContent = 'Multiple options selected';
-      textWrap.appendChild(info);
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = 'Multiple options selected';
+      textWrap.appendChild(meta);
     } else {
-      const singleV = item.variants && item.variants[0];
-      if (singleV && (singleV.color || singleV.size)) {
-        const info = document.createElement('div');
-        info.className = 'meta';
-        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${
-          singleV.color && singleV.size ? ' · ' : ''
-        }${singleV.size ? 'Size: ' + singleV.size : ''}`;
-        textWrap.appendChild(info);
+      const v = item.variants?.[0];
+      if (v && (v.color || v.size)) {
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = `${v.color ? 'Color: ' + v.color : ''}${
+          v.color && v.size ? ' · ' : ''
+        }${v.size ? 'Size: ' + v.size : ''}`;
+        textWrap.appendChild(meta);
       }
     }
 
-    headerWrapper.appendChild(textWrap);
-    left.appendChild(headerWrapper);
+    topRow.appendChild(textWrap);
+    left.appendChild(topRow);
 
-    // ---- Variants toggle (Show Choices button) ----
+    // ---------- SHOW CHOICES BUTTON ----------
     if (Array.isArray(item.variants) && item.variants.length > 1) {
       const btn = document.createElement('button');
-      btn.type = 'button';
       btn.textContent = 'Show Choices';
       btn.className = 'variant-toggle-btn';
       btn.style.marginTop = '6px';
       btn.style.fontSize = '0.9rem';
       btn.style.fontWeight = '600';
       btn.style.background = 'transparent';
-      btn.style.border = '1px dashed rgba(0,0,0,0.2)';
+      btn.style.border = '1px dashed rgba(0,0,0,0.3)';
       btn.style.padding = '4px 10px';
       btn.style.borderRadius = '6px';
       btn.style.cursor = 'pointer';
       btn.style.color = '#334d3a';
-      textWrap.appendChild(btn);
 
-      // variants list (hidden by default)
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
       variantsContainer.style.display = 'none';
       variantsContainer.style.marginTop = '8px';
 
-      item.variants.forEach((v) => {
+      // ✅ FIX: populate variant rows safely
+      item.variants.forEach((variant) => {
         const row = document.createElement('div');
         row.className = 'variant-row';
         row.style.display = 'flex';
@@ -822,20 +809,23 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
 
         const attrs = document.createElement('div');
         attrs.className = 'variant-attrs';
-        attrs.textContent = `${
-          v.color ? `Color: ${v.color}` : ''
-        }${v.color && v.size ? ' · ' : ''}${
-          v.size ? `Size: ${v.size}` : ''
-        } · Qty: ${v.quantity}`;
-        attrs.style.fontSize = '0.92rem';
+        const color = variant.color || variant.Color || '';
+        const size = variant.size || variant.Size || '';
+        const qty = variant.quantity || variant.Quantity || 1;
+        attrs.textContent = `${color ? 'Color: ' + color : ''}${
+          color && size ? ' · ' : ''
+        }${size ? 'Size: ' + size : ''}${
+          color || size ? ' · ' : ''
+        }Qty: ${qty}`;
+        attrs.style.fontSize = '0.9rem';
         attrs.style.color = '#334d3a';
 
         const priceDiv = document.createElement('div');
         priceDiv.className = 'variant-price';
-        const variantLinePrice =
-          Number((v.linePrices && v.linePrices[currency]) ?? 0) ||
-          Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0);
-        priceDiv.textContent = formatPrice(variantLinePrice, currency);
+        const linePrice =
+          Number((variant.linePrices && variant.linePrices[currency]) ?? 0) ||
+          Number(variant.unitPrices?.[currency] || 0) * Number(qty || 0);
+        priceDiv.textContent = formatPrice(linePrice, currency);
         priceDiv.style.fontWeight = '500';
 
         row.appendChild(attrs);
@@ -843,22 +833,23 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
         variantsContainer.appendChild(row);
       });
 
-      textWrap.appendChild(variantsContainer);
-
-      // toggle function
+      // Toggle function
       btn.addEventListener('click', () => {
-        const showing = variantsContainer.style.display === 'block';
-        variantsContainer.style.display = showing ? 'none' : 'block';
-        btn.textContent = showing ? 'Show Choices' : 'Hide Choices';
+        const isVisible = variantsContainer.style.display === 'block';
+        variantsContainer.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? 'Show Choices' : 'Hide Choices';
       });
+
+      textWrap.appendChild(btn);
+      textWrap.appendChild(variantsContainer);
     }
 
-    // ---- Price ----
+    // ---------- RIGHT ----------
     const right = document.createElement('div');
     right.className = 'right';
     right.style.minWidth = '120px';
     right.style.textAlign = 'right';
-    right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
+    right.innerHTML = `<div style="font-weight:600">${formatPrice(itemTotal, currency)}</div>`;
 
     li.appendChild(left);
     li.appendChild(right);
