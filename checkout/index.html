@@ -672,7 +672,7 @@ async function renderCheckoutItems() {
               ${item.variants.map(v => `
                 <div class="checkout-variant-row">
                   <div class="checkout-variant-meta">
-                    ${v.color ? v.color + ' / ' : ''}${v.size ? v.size + ' x ' : ''}${v.quantity}
+                    ${[v.color, v.size].filter(Boolean).join(' / ')} ×${v.quantity}
                   </div>
                 </div>`).join('')}
             </div>
@@ -852,7 +852,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
         leftRow.style.alignItems = 'center';
         const attrs = document.createElement('div');
         attrs.className = 'variant-attrs';
-        attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
+        attrs.innerHTML = `${[v.color, v.size].filter(Boolean).join(' / ')} <span style="color:#556b59">×${v.quantity}</span>`;
         leftRow.appendChild(attrs);
         const rightPrice = document.createElement('div');
         rightPrice.className = 'variant-price';
