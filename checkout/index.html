@@ -877,41 +877,45 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
 
           // append each variant line (color/size/qty + price)
           item.variants.forEach(v => {
-            const row = document.createElement('div');
-            row.className = 'variant-row';
-            row.style.display = 'flex';
-            row.style.justifyContent = 'space-between';
-            row.style.alignItems = 'center';
-            row.style.gap = '12px';
-
-            const leftRow = document.createElement('div');
-            leftRow.style.display = 'flex';
-            leftRow.style.gap = '8px';
-            leftRow.style.alignItems = 'center';
-
-            const attrs = document.createElement('div');
-            attrs.className = 'variant-attrs';
-            const parts = [];
-  
-            // support both Serac-style (color/size) and Fleur-style (attributes or variantValues)
-            let color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color;
-            let size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size;
-            let qty = v.quantity || v.qty || v?.quantitySelected || 1;
-            
-            if (color) parts.push(`Color: ${color}`);
-            if (size) parts.push(`Size: ${size}`);
-            const joined = parts.join(' · ');
-            attrs.innerHTML = `${joined}${joined ? ' · ' : ''}<span style="color:#556b59">qty: ${qty}</span>`;
-            leftRow.appendChild(attrs);
-            
-            const rightPrice = document.createElement('div');
-            rightPrice.className = 'variant-price';
-            const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)));
-            rightPrice.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
-            
-            row.appendChild(leftRow);
-            row.appendChild(rightPrice);
-            variantsContainer.appendChild(row);
+          const row = document.createElement('div');
+          row.className = 'variant-row';
+          row.style.display = 'flex';
+          row.style.justifyContent = 'space-between';
+          row.style.alignItems = 'center';
+          row.style.gap = '12px';
+        
+          const leftRow = document.createElement('div');
+          leftRow.style.display = 'flex';
+          leftRow.style.gap = '8px';
+          leftRow.style.alignItems = 'center';
+        
+          const attrs = document.createElement('div');
+          attrs.className = 'variant-attrs';
+        
+          // support both Serac-style (color/size) and Fleur-style (attributes or variantValues)
+          const parts = [];
+          const color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color;
+          const size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size;
+          const qty = v.quantity || v.qty || v?.quantitySelected || 1;
+        
+          if (color) parts.push(`Color: ${color}`);
+          if (size) parts.push(`Size: ${size}`);
+          const joined = parts.join(' · ');
+          attrs.innerHTML = `${joined}${joined ? ' · ' : ''}<span style="color:#556b59">qty: ${qty}</span>`;
+          leftRow.appendChild(attrs);
+        
+          const priceEl = document.createElement('div');
+          priceEl.className = 'variant-price';
+          const variantLinePrice = Number(
+            (v.linePrices && (v.linePrices[currency] ?? null)) ??
+            (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0))
+          );
+          priceEl.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
+        
+          row.appendChild(leftRow);
+          row.appendChild(priceEl);
+          variantsContainer.appendChild(row);
+        });
 
 
           //   const rightPrice = document.createElement('div');
