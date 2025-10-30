@@ -113,21 +113,35 @@
     .variant-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
     .variants-container{max-height:0;overflow:hidden;transition:max-height .28s ease,padding .28s ease;padding-left:12px;border-left:2px solid rgba(17,46,31,0.08);margin-top:8px}
     .variants-container.show{max-height:500px;padding-top:8px;padding-bottom:8px}
-    .variant-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.06)}
-    .variant-attrs{font-size:0.95rem;color:#334d3a}
-    .variant-price{font-weight:600;min-width:110px;text-align:right}
-
-    .variant-row {flex-wrap: nowrap;align-items: center;}
-
-    .variant-attrs, .variant-price {white-space: nowrap;}
-
-    .variants-container,
     .variant-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 8px;
+      border-bottom: 1px dashed rgba(0,0,0,0.06);
       width: 100%;
       box-sizing: border-box;
     }
-
-
+    
+    .variant-attrs,
+    .variant-price {
+      white-space: nowrap;
+    }
+    
+    .variant-attrs {
+      font-size: 0.95rem;
+      color: #334d3a;
+      flex: 1;
+    }
+    
+    .variant-price {
+      font-weight: 600;
+      text-align: right;
+      flex-shrink: 0;
+      min-width: auto;
+      padding-left: 8px;
+    }
 
     .subtotal{font-weight:700;text-align:right;margin-top:12px}
     .note{font-size:0.9rem;color:#666;margin-top:8px}
@@ -299,27 +313,25 @@
   .order-item .title {
   font-size: 14px;
 }
-
   .variant-row {
     width: 100%;
     justify-content: space-between;
-    gap: 12px;
-    padding-right: 4px; /* adds breathing space at the edge */
+    padding-right: 10px;
   }
-
-
   .variant-attrs {
     flex: 1;
+    font-size: 0.9rem;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   .variant-price {
     flex-shrink: 0;
+    font-size: 0.9rem;
+    min-width: 70px;
     text-align: right;
-    min-width: 70px; /* prevents overlap */
   }
 }
+
     
 </style>
 </head>
