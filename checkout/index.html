@@ -856,30 +856,55 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
       variantsContainer.style.display = 'none';
-      item.variants.forEach(v=>{
-        const row = document.createElement('div');
-        row.className = 'variant-row';
-        const leftRow = document.createElement('div');
-        leftRow.style.display = 'flex';
-        leftRow.style.gap = '8px';
-        leftRow.style.alignItems = 'center';
-        const attrs = document.createElement('div');
-        attrs.className = 'variant-attrs';
-        // Serac-style variant line
-        const parts = [];
-        if (v.color) parts.push(v.color);
-        if (v.size) parts.push(v.size);
-        attrs.innerHTML = `${parts.join(' · ')} <span style="color:#556b59">×${v.quantity}</span>`;
-        leftRow.appendChild(attrs);
-        const rightPrice = document.createElement('div');
-        rightPrice.className = 'variant-price';
-        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
-        rightPrice.textContent = formatPrice(variantLinePrice, currency);
-        row.appendChild(leftRow);
-        row.appendChild(rightPrice);
-        variantsContainer.appendChild(row);
-      });
-      left.appendChild(variantsContainer);
+         item.variants.forEach(v => {
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+          
+            const leftRow = document.createElement('div');
+            leftRow.className = 'variant-left';
+            leftRow.innerHTML = `
+              <div class="variant-attrs">${[v.color, v.size].filter(Boolean).join(' · ')} <span class="variant-qty">×${v.quantity}</span></div>
+            `;
+          
+            const rightPrice = document.createElement('div');
+            rightPrice.className = 'variant-price';
+            const variantLinePrice = Number(
+              (v.linePrices && (v.linePrices[currency] ?? null)) ??
+              (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0))
+            );
+            rightPrice.textContent = formatPrice(variantLinePrice, currency);
+          
+            row.appendChild(leftRow);
+            row.appendChild(rightPrice);
+            variantsContainer.appendChild(row);
+          });
+ 
+
+      
+      // item.variants.forEach(v=>{
+      //   const row = document.createElement('div');
+      //   row.className = 'variant-row';
+      //   const leftRow = document.createElement('div');
+      //   leftRow.style.display = 'flex';
+      //   leftRow.style.gap = '8px';
+      //   leftRow.style.alignItems = 'center';
+      //   const attrs = document.createElement('div');
+      //   attrs.className = 'variant-attrs';
+      //   // Serac-style variant line
+      //   const parts = [];
+      //   if (v.color) parts.push(v.color);
+      //   if (v.size) parts.push(v.size);
+      //   attrs.innerHTML = `${parts.join(' · ')} <span style="color:#556b59">×${v.quantity}</span>`;
+      //   leftRow.appendChild(attrs);
+      //   const rightPrice = document.createElement('div');
+      //   rightPrice.className = 'variant-price';
+      //   const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
+      //   rightPrice.textContent = formatPrice(variantLinePrice, currency);
+      //   row.appendChild(leftRow);
+      //   row.appendChild(rightPrice);
+      //   variantsContainer.appendChild(row);
+      // });
+      // left.appendChild(variantsContainer);
 
       toggle.addEventListener('click', () => {
         const isShown = variantsContainer.classList.toggle('show');
