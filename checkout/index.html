@@ -841,7 +841,6 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       toggle.className = 'variant-toggle';
       toggle.type = 'button';
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.title = 'View variants';
       toggle.textContent = 'Show Choices';
       toggle.style.display = 'block';
       toggle.style.marginTop = '6px';
@@ -850,32 +849,26 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       toggle.style.background = 'none';
       toggle.style.border = 'none';
       toggle.style.cursor = 'pointer';
-      toggle.style.textDecoration = 'underline';
       textWrap.appendChild(toggle);
     
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
       variantsContainer.style.display = 'none';
       variantsContainer.style.flexDirection = 'column';
-      variantsContainer.style.gap = '4px';
-      variantsContainer.style.marginTop = '6px';
+      variantsContainer.style.gap = '6px';
+      variantsContainer.style.marginTop = '8px';
     
+      // keep your logic intact, just formatting
       item.variants.forEach(v => {
         const row = document.createElement('div');
         row.className = 'variant-row';
         row.style.display = 'flex';
         row.style.justifyContent = 'space-between';
         row.style.alignItems = 'center';
-        row.style.padding = '6px 8px';
-        row.style.border = '1px solid rgba(0,0,0,0.05)';
-        row.style.borderRadius = '6px';
-        row.style.background = '#fafafa';
     
         const leftRow = document.createElement('div');
         leftRow.className = 'variant-left';
-        leftRow.innerHTML = `
-          <div class="variant-attrs">${[v.color, v.size].filter(Boolean).join(' · ')} <span class="variant-qty" style="color:#556b59">×${v.quantity}</span></div>
-        `;
+        leftRow.textContent = `${[v.color, v.size].filter(Boolean).join(' · ')} ×${v.quantity}`;
     
         const rightPrice = document.createElement('div');
         rightPrice.className = 'variant-price';
@@ -890,14 +883,13 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
         variantsContainer.appendChild(row);
       });
     
-      // ✅ Reattach container so it actually shows
       left.appendChild(variantsContainer);
     
       toggle.addEventListener('click', () => {
         const isShown = variantsContainer.style.display === 'none';
         variantsContainer.style.display = isShown ? 'flex' : 'none';
-        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
         toggle.textContent = isShown ? 'Hide Choices' : 'Show Choices';
+        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
       });
     }
 
