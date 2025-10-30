@@ -943,7 +943,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       info.textContent = 'Multiple options selected';
       textWrap.appendChild(info);
 
-      // Toggle button directly under the label
+      // --- Toggle directly under "Multiple options selected"
       const toggle = document.createElement('button');
       toggle.className = 'variant-toggle';
       toggle.type = 'button';
@@ -958,12 +958,13 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       toggle.style.cursor = 'pointer';
       textWrap.appendChild(toggle);
 
-      // Variants container
+      // --- Variants container
       const variantsContainer = document.createElement('div');
       variantsContainer.className = 'variants-container';
       item.variants.forEach(v=>{
         const row = document.createElement('div');
         row.className = 'variant-row';
+
         const leftRow = document.createElement('div');
         leftRow.style.display = 'flex';
         leftRow.style.gap = '8px';
@@ -981,10 +982,12 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
         rightPrice.className = 'variant-price';
         const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
         rightPrice.textContent = formatPrice(variantLinePrice, currency);
+
         row.appendChild(leftRow);
         row.appendChild(rightPrice);
         variantsContainer.appendChild(row);
       });
+
       variantsContainer.style.display = 'none';
       left.appendChild(variantsContainer);
 
@@ -992,8 +995,9 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
         const isShown = variantsContainer.style.display === 'block';
         variantsContainer.style.display = isShown ? 'none' : 'block';
         toggle.textContent = isShown ? 'Show Choices' : 'Hide Choices';
-        toggle.setAttribute('aria-expanded', !isShown ? 'true' : 'false');
+        toggle.setAttribute('aria-expanded', isShown ? 'false' : 'true');
       });
+
     } else {
       const singleV = item.variants && item.variants[0];
       if(singleV && (singleV.color || singleV.size)){
@@ -1024,6 +1028,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
   orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, selectedCurrency)}`;
   computeAndUpdateCartCount();
 }
+
 
   
 /* -------------------- FILL BILLING -------------------- */
