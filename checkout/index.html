@@ -78,140 +78,152 @@
     .hero-text h1 { font-family:"Playfair Display", serif; font-size:clamp(36px,5vw,64px); margin-bottom:12px; }
     .hero-text p { font-size:clamp(16px,2vw,24px); max-width:700px; }
 
-    /* checkout grid */
-    section.checkout{padding:60px 20px}
-    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:28px}
-    .checkout-form,.order-summary{border-radius:12px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,0.2)}
-    .checkout-form{background:#F5E6CC}
-    .order-summary{background:#F5E6CC}
-    h2{font-family:"Playfair Display",serif;margin-bottom:12px;font-size:20px}
-    label{display:block;margin-bottom:6px;font-weight:500}
-    input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #112e1f;margin-bottom:12px;font-family:inherit}
-    textarea{min-height:80px;resize:vertical}
-    .currency-selector{text-align:right;margin-bottom:12px}
-    .checkout-btn{display:block;width:100%;background:#112e1f;color:#F5E6CC;padding:14px;border-radius:6px;border:none;font-weight:700;cursor:pointer}
-    .checkout-btn:hover{background:#0a1d14}
+    <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fleur De Vie — Checkout</title>
 
-    /* order summary */
-    .order-summary ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
-    .order-item{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:10px;border-radius:8px;background:#F5E6CC; box-shadow:0 4px 10px rgba(0,0,0,0.2)}
-    .order-item .left{flex:1 1 70%}
-    .order-item .right{flex:0 0 150px;text-align:right}
-    .order-item .title{font-weight:600}
-    .order-item .meta{font-size:0.95rem;color:#334d3a;margin-top:6px}
+<style>
+  /* Global box-sizing and helpers */
+  *, *::before, *::after { box-sizing: border-box; }
+  html,body{height:100%;margin:0;font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  a{color:inherit}
 
-    .order-item {flex-wrap: nowrap;}
-  
-    .order-item .left { min-width: 0;}
-  
-    .order-item .right { white-space: nowrap; flex-shrink: 0;}
+  /* checkout grid */
+  section.checkout{padding:60px 20px}
+  .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:28px;align-items:start}
+  .checkout-form,.order-summary{border-radius:12px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,0.12);background:#F5E6CC}
+  h2{font-family:"Playfair Display",serif;margin-bottom:12px;font-size:20px}
+  label{display:block;margin-bottom:6px;font-weight:500}
+  input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #112e1f;margin-bottom:12px;font-family:inherit}
+  textarea{min-height:80px;resize:vertical}
+  .currency-selector{text-align:right;margin-bottom:12px}
+  .checkout-btn{display:block;width:100%;background:#112e1f;color:#F5E6CC;padding:14px;border-radius:6px;border:none;font-weight:700;cursor:pointer}
+  .checkout-btn:hover{background:#0a1d14}
 
+  /* order summary - list container */
+  .order-summary ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
 
-    /* variant toggle */
-    .variant-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;border:1px solid #112e1f;background:#FFD6BA;color:#112e1f;cursor:pointer;padding:0;margin-left:8px}
-    .variant-toggle svg{width:14px;height:14px;transition:transform .25s ease}
-    .variant-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
-    .variants-container {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .28s ease, padding .28s ease;
-      margin-top: 8px;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px 0; /* equal padding on both sides */
-      border-top: 1px dashed rgba(17,46,31,0.08);
-      border-bottom: 1px dashed rgba(17,46,31,0.08);
-      border-left: none;
-      border-right: none;
-      display: block;
-    }
+  /* order item */
+  .order-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    justify-content:space-between;
+    padding:12px;
+    border-radius:8px;
+    background:#F5E6CC;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    width:100%;
+  }
 
+  /* Left column inside the card: make it a column so header and variants align nicely */
+  .order-item .left{
+    flex:1 1 auto;
+    min-width:0;                /* important to allow ellipsis on children */
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
 
-    .variants-container.show{max-height:500px;padding-top:8px;padding-bottom:8px}
-    
-    .variant-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 6px 8px;
-      border-bottom: 1px dashed rgba(0,0,0,0.06);
-      width: 100%;
-      box-sizing: border-box;
-    }
-    
-    .variant-attrs,
-    .variant-price {
-      white-space: nowrap;
-    }
-    
-    .variant-attrs {
-      font-size: 0.95rem;
-      color: #334d3a;
-      flex: 1;
-    }
-    
-    .variant-price {
-      font-weight: 600;
-      text-align: right;
-      flex-shrink: 0;
-      min-width: auto;
-      padding-left: 8px;
-    }
+  /* Right column (total price for the product) */
+  .order-item .right{
+    flex:0 0 140px;             /* fixed-ish column for the total price */
+    text-align:right;
+    align-self:flex-start;
+    white-space:nowrap;
+  }
 
-    .subtotal{font-weight:700;text-align:right;margin-top:12px}
-    .note{font-size:0.9rem;color:#666;margin-top:8px}
+  .order-item .title{font-weight:600}
+  .order-item .meta{font-size:0.95rem;color:#334d3a;margin-top:0}
 
-    /* FOOTER */
-    footer { text-align:center; padding:20px; background:transparent; color:#112e1f; margin-top:60px; }
+  /* small adjustments so image + header align */
+  .order-item img{display:block}
 
-    /* Hide mobile cart by default (desktop) */
-    .mobile-cart {
-      display: none;
-    }  
-    
-    /* responsive */
-    @media(max-width:900px){.container{grid-template-columns:1fr}}
+  /* ---------- Variants area (full-width within the left column) ---------- */
 
-    @media (max-width:900px) {
-      .header-right {
-        position: absolute;
-        top: 68px;
-        right: 0;
-        background: rgba(17,46,31,0.95);
-        flex-direction: column;
-        width: 200px;
-        padding: 20px;
-        display: none;
-        border-radius: 0 0 0 10px;
-        z-index: 1100;
-      }
-    
-      .header-right.open {
-        display: flex !important;
-        flex-direction: column;
-        gap: 12px;
-      }
-    
-      .hamburger {
-        display: block;
-      }
+  /* Variant toggle (button) — styled as a normal button */
+  .variant-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    height:34px;
+    border-radius:8px;
+    border:1px solid var(--fleur-green,#1a3c34);
+    background:transparent;
+    color:var(--fleur-green,#1a3c34);
+    cursor:pointer;
+    padding:6px 10px;
+    font-size:0.92rem;
+    gap:8px;
+  }
+  .variant-toggle svg{width:14px;height:14px;transition:transform .25s ease}
+  .variant-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
 
-  
-      .brand-logo{height:clamp(40px,15vw,80px)}
-      .brand-title{font-size:clamp(16px,7vw,22px)}
-      .hero{height:40vh}
-      .mobile-cart { display:flex; align-items:center; margin-right:10px; }
-      .mobile-cart a { color:#FFD6BA; font-size:20px; position:relative; }
-      .mobile-cart .cart-count { position:absolute; top:-8px; right:-8px; }
-     }
-    
-    /* small blur loader & spinner (injected by script) */
-    .fdv-blur-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);background:rgba(0,0,0,0.45)}
-    .fdv-blur-spinner{width:54px;height:54px;border:6px solid rgba(255,255,255,0.15);border-top:6px solid rgba(255,255,255,0.95);border-radius:50%;animation:fdv-spin 1s linear infinite}
-    @keyframes fdv-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+  /* The variants container spans the full width of the card's content area (left column) */
+  .variants-container{
+    width:100%;
+    display:block;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .28s ease, padding .28s ease;
+    padding:0;
+    margin-top:6px;
+    border-top:1px dashed rgba(17,46,31,0.06);
+  }
+  .variants-container.show{
+    padding:8px 0;
+    max-height:1000px; /* large enough to show all items; overflow hidden prevents page overflow */
+  }
 
-    
+  /* Each variant row spans the full width inside variants-container */
+  .variant-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:8px;
+    border-radius:8px;
+    background: rgba(26,60,52,0.03);
+    margin-bottom:8px;
+  }
+
+  /* Variant text (left) and price (right) */
+  .variant-attrs{
+    font-size:0.95rem;
+    color:#334d3a;
+    flex:1 1 auto;           /* grow to fill space */
+    min-width:0;             /* allows text-overflow to work */
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;      /* keep it on a single line */
+  }
+  .variant-price{
+    font-weight:600;
+    margin-left:12px;
+    flex:0 0 auto;           /* do not shrink */
+    text-align:right;
+    white-space:nowrap;
+    min-width:70px;
+  }
+
+  /* subtotal & note */
+  .subtotal{font-weight:700;text-align:right;margin-top:12px}
+  .note{font-size:0.9rem;color:#666;margin-top:8px}
+
+  /* FOOTER */
+  footer { text-align:center; padding:20px; background:transparent; color:#112e1f; margin-top:60px; }
+
+  /* Hide mobile cart by default (desktop) */
+  .mobile-cart { display: none; }
+
+  /* small blur loader & spinner (injected by script) */
+  .fdv-blur-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);background:rgba(0,0,0,0.45)}
+  .fdv-blur-spinner{width:54px;height:54px;border:6px solid rgba(255,255,255,0.15);border-top:6px solid rgba(255,255,255,0.95);border-radius:50%;animation:fdv-spin 1s linear infinite}
+  @keyframes fdv-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
   /* ---------------- Floating Support Button + Tooltip ---------------- */
   #floatingSupportBtn {
     position: fixed;
@@ -229,7 +241,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px; /* enlarged icon */
+    font-size: 28px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   #floatingSupportBtn:hover {
@@ -263,120 +275,68 @@
     50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);}
   }
 
-/* ---------- Checkout Variants Dropdown ---------- */
-.checkout-variants-toggle {
-  background: transparent;
-  border: 1px solid var(--fleur-green, #1a3c34);
-  color: var(--fleur-green, #1a3c34);
-  font-family: "Playfair Display", serif;
-  font-size: 0.95rem;
-  padding: 6px 14px;
-  border-radius: 6px;
-  margin-top: 6px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.checkout-variants-toggle:hover {
-  background: var(--fleur-green, #1a3c34);
-  color: #fff;
-}
-
-/* Container for the variant list */
-.checkout-variants-container {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 0.35s ease;
-  margin-top: 0;
-}
-
-/* When open */
-.checkout-variants-container.open {
-  max-height: 400px;
-  opacity: 1;
-  margin-top: 8px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0;
-}
-
-
-/* Each variant row */
-.checkout-variant-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(26, 60, 52, 0.05); /* soft transparent green tint */
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  border-radius: 8px;
-}
-
-/* Variant text */
-.checkout-variant-meta {
-  font-family: "Playfair Display", serif;
-  font-size: 0.9rem;
-  color: var(--fleur-green, #1a3c34);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
+  /* ---------- Checkout Variants Dropdown (alternative component styling) ---------- */
   .checkout-variants-toggle {
-    font-size: 0.85rem;
-    padding: 5px 12px;
+    background: transparent;
+    border: 1px solid var(--fleur-green, #1a3c34);
+    color: var(--fleur-green, #1a3c34);
+    font-family: "Playfair Display", serif;
+    font-size: 0.95rem;
+    padding: 6px 14px;
+    border-radius: 6px;
+    margin-top: 6px;
+    cursor: pointer;
+    transition: all 0.25s ease;
   }
-  .checkout-variant-meta {
-    font-size: 0.85rem;
+  .checkout-variants-toggle:hover { background: var(--fleur-green, #1a3c34); color:#fff; }
+  .checkout-variants-container { max-height: 0; overflow: hidden; opacity: 0; transition: all .35s ease; margin-top:0; width:100%; box-sizing:border-box; }
+  .checkout-variants-container.open { max-height: 400px; opacity:1; margin-top:8px; padding:8px 0; }
+
+  .checkout-variant-row { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; margin-bottom:6px; border-radius:8px; background:rgba(26,60,52,0.03); }
+  .checkout-variant-meta { font-family:"Playfair Display", serif; font-size:0.9rem; color:var(--fleur-green,#1a3c34); }
+
+  /* Responsive adjustments */
+  @media (max-width: 900px) {
+    .container{grid-template-columns:1fr; padding:0 12px}
+    .mobile-cart { display:flex; align-items:center; margin-right:10px; }
+    .mobile-cart a { color:#FFD6BA; font-size:20px; position:relative; }
+    .mobile-cart .cart-count { position:absolute; top:-8px; right:-8px; }
+
+    .order-item{ padding:10px; gap:10px; }
+    .order-item .right { flex:0 0 120px; font-size:0.95rem; }
+    .order-item .title { font-size:15px; }
+
+    /* Keep variant rows single-line on mobile; shrink fonts slightly */
+    .variant-attrs{ font-size:0.92rem; }
+    .variant-price{ font-size:0.92rem; min-width:60px; }
+
+    /* ensure the variant container has edge padding and doesn't overflow */
+    .variants-container, .variants-container.show { padding-left:0; padding-right:0; }
+    .variant-row { padding-left:6px; padding-right:6px; }
   }
 
-  .order-item .title {
-  font-size: 14px;
-}
-  .variant-row {
-    width: 100%;
-    justify-content: space-between;
-    padding-right: 10px;
+  @media (max-width: 420px) {
+    .order-item .right { flex:0 0 100px; font-size:0.9rem; }
+    .variant-attrs { font-size:0.88rem; }
+    .variant-price { font-size:0.88rem; min-width:56px; }
   }
-  .variant-attrs {
-    flex: 1;
-    font-size: 0.9rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .variant-price {
-    flex-shrink: 0;
-    font-size: 0.9rem;
-    min-width: 70px;
-    text-align: right;
-  }
-}
 
-  .order-item .variants-container {
-  padding-left: 0;
-  padding-right: 0;
-  width: 100%;
-}
-
-    
 </style>
 </head>
 <body>
-  <header class="site-header">
+  <header class="site-header" style="padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px">
     <div style="display:flex;align-items:center;gap:14px">
-      <img src="../asset/logo.png" alt="Fleur De Vie Logo" class="brand-logo">
-      <div class="brand-title">Fleur De Vie</div>
+      <img src="../asset/logo.png" alt="Fleur De Vie Logo" class="brand-logo" style="height:56px;object-fit:contain">
+      <div class="brand-title" style="font-weight:700;font-size:18px">Fleur De Vie</div>
     </div>
 
     <div class="mobile-cart">
-    <a href="../cart.html"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile">0</span></a>
-  </div>
+      <a href="../cart.html" style="color:inherit;text-decoration:none"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile" style="display:inline-block;margin-left:8px">0</span></a>
+    </div>
     
     <!-- Hamburger -->
-    <button class="hamburger" id="hamburger-btn">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="header-right" id="nav-menu">
+    <button class="hamburger" id="hamburger-btn" style="display:none;border:none;background:transparent">☰</button>
+    <nav class="header-right" id="nav-menu" style="display:none">
       <a href="../index.html">Home</a>
       <a href="../about.html">About</a>
       <a href="../shop.html">Shop</a>
@@ -386,7 +346,7 @@
     </nav>
   </header>
 
-  <section class="hero"><div class="hero-text"><h1>Checkout</h1></div></section>
+  <section class="hero"><div class="hero-text" style="padding:18px"><h1 style="margin:0">Checkout</h1></div></section>
 
   <section class="checkout">
     <div class="container">
@@ -426,10 +386,10 @@
     </div>
   </section>
 
-    <!-- Floating support button -->
-<button id="floatingSupportBtn" aria-label="Support">
-  <i class="fas fa-headset"></i>
-</button>
+  <!-- Floating support button -->
+  <button id="floatingSupportBtn" aria-label="Support">
+    <i class="fas fa-headset"></i>
+  </button>
 
   <footer><p>© 2025 Fleur De Vie</p></footer>
 
