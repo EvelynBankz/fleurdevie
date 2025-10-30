@@ -769,126 +769,6 @@ function normalizeOrderItems(items){
 }
 
 /* -------------------- RENDER (keeps Fleur De Vie DOM & styles) -------------------- */
-// function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
-//   if(!orderItemsEl || !orderSubtotalEl) return;
-//   orderItemsEl.innerHTML = '';
-//   if(!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
-//     orderItemsEl.innerHTML = '<li class="small-note">No items</li>';
-//     orderSubtotalEl.textContent = `Subtotal: —`;
-//     computeAndUpdateCartCount();
-//     return;
-//   }
-//   let subtotal = 0;
-//   quoteNormalized.items.forEach((item, idx) => {
-//     const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
-//     const fallbackFromVariants = Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0))), 0) : 0;
-//     const finalValue = valueFromTotals || fallbackFromVariants || 0;
-//     subtotal += finalValue;
-
-//     const li = document.createElement('li');
-//     li.className = 'order-item';
-
-//     const left = document.createElement('div');
-//     left.className = 'left';
-
-//     const headerWrapper = document.createElement('div');
-//     headerWrapper.style.display = 'flex';
-//     headerWrapper.style.alignItems = 'center';
-//     headerWrapper.style.gap = '10px';
-
-//     if(item.image){
-//       const img = document.createElement('img');
-//       img.src = item.image;
-//       img.alt = item.name;
-//       img.style.width = '56px';
-//       img.style.height = '56px';
-//       img.style.objectFit = 'cover';
-//       img.style.borderRadius = '6px';
-//       img.style.border = '1px solid rgba(0,0,0,0.06)';
-//       headerWrapper.appendChild(img);
-//     }
-
-//     const textWrap = document.createElement('div');
-//     const titleDiv = document.createElement('div');
-//     titleDiv.className = 'title';
-//     titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
-//     textWrap.appendChild(titleDiv);
-
-//     if(Array.isArray(item.variants) && item.variants.length > 1){
-//       const info = document.createElement('div');
-//       info.className = 'meta';
-//       info.textContent = 'Multiple options selected';
-//       textWrap.appendChild(info);
-//     } else {
-//       const singleV = item.variants && item.variants[0];
-//       if(singleV && (singleV.color || singleV.size)){
-//         const info = document.createElement('div');
-//         info.className = 'meta';
-//         info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
-//         textWrap.appendChild(info);
-//       }
-//     }
-//     headerWrapper.appendChild(textWrap);
-//     left.appendChild(headerWrapper);
-
-//     // variants container (hidden by default)
-//     if(Array.isArray(item.variants) && item.variants.length > 1){
-//       const toggle = document.createElement('button');
-//       toggle.className = 'variant-toggle';
-//       toggle.type = 'button';
-//       toggle.setAttribute('aria-expanded','false');
-//       toggle.title = 'View variants';
-//       toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
-//       headerWrapper.appendChild(toggle);
-
-//       const variantsContainer = document.createElement('div');
-//       variantsContainer.className = 'variants-container';
-//       item.variants.forEach(v=>{
-//         const row = document.createElement('div');
-//         row.className = 'variant-row';
-//         const leftRow = document.createElement('div');
-//         leftRow.style.display = 'flex';
-//         leftRow.style.gap = '8px';
-//         leftRow.style.alignItems = 'center';
-//         const attrs = document.createElement('div');
-//         attrs.className = 'variant-attrs';
-//         const parts = [];
-//         if (v.color) parts.push(v.color);
-//         if (v.size) parts.push(v.size);
-//         attrs.innerHTML = `${parts.join(' · ')} <span style="color:#556b59">×${v.quantity}</span>`;
-//         leftRow.appendChild(attrs);
-
-//         const rightPrice = document.createElement('div');
-//         rightPrice.className = 'variant-price';
-//         const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
-//         rightPrice.textContent = formatPrice(variantLinePrice, currency);
-//         row.appendChild(leftRow);
-//         row.appendChild(rightPrice);
-//         variantsContainer.appendChild(row);
-//       });
-//       left.appendChild(variantsContainer);
-
-//       toggle.addEventListener('click', () => {
-//         const isShown = variantsContainer.classList.toggle('show');
-//         toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
-//       });
-//     }
-
-//     const right = document.createElement('div');
-//     right.className = 'right';
-//     right.style.minWidth = '150px';
-//     right.style.textAlign = 'right';
-//     right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
-
-//     li.appendChild(left);
-//     li.appendChild(right);
-//     orderItemsEl.appendChild(li);
-//   });
-
-//   orderSubtotalEl.textContent = `Subtotal: ${formatPrice(subtotal, selectedCurrency)}`;
-//   computeAndUpdateCartCount();
-// }
-
 function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
   if(!orderItemsEl || !orderSubtotalEl) return;
   orderItemsEl.innerHTML = '';
@@ -898,13 +778,10 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
     computeAndUpdateCartCount();
     return;
   }
-
   let subtotal = 0;
   quoteNormalized.items.forEach((item, idx) => {
     const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
-    const fallbackFromVariants = Array.isArray(item.variants)
-      ? item.variants.reduce((s,v)=> s + Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0))), 0)
-      : 0;
+    const fallbackFromVariants = Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0))), 0) : 0;
     const finalValue = valueFromTotals || fallbackFromVariants || 0;
     subtotal += finalValue;
 
@@ -942,81 +819,60 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
       info.className = 'meta';
       info.textContent = 'Multiple options selected';
       textWrap.appendChild(info);
-
-      // --- Toggle directly under "Multiple options selected"
-      const toggle = document.createElement('button');
-      toggle.className = 'variant-toggle';
-      toggle.type = 'button';
-      toggle.setAttribute('aria-expanded','false');
-      toggle.textContent = 'Show Choices';
-      toggle.style.display = 'block';
-      toggle.style.marginTop = '4px';
-      toggle.style.fontSize = '13px';
-      toggle.style.color = '#556b59';
-      toggle.style.background = 'none';
-      toggle.style.border = 'none';
-      toggle.style.cursor = 'pointer';
-      textWrap.appendChild(toggle);
-
-      // --- Variants container
-      const variantsContainer = document.createElement('div');
-      variantsContainer.className = 'variants-container';
-      item.variants.forEach(v=>{
-        const row = document.createElement('div');
-        row.className = 'variant-row';
-
-        const leftRow = document.createElement('div');
-        leftRow.style.display = 'flex';
-        leftRow.style.gap = '8px';
-        leftRow.style.alignItems = 'center';
-
-        const attrs = document.createElement('div');
-        attrs.className = 'variant-attrs';
-        const parts = [];
-        if (v.color) parts.push(v.color);
-        if (v.size) parts.push(v.size);
-        attrs.innerHTML = `${parts.join(' · ')} <span style="color:#556b59">×${v.quantity}</span>`;
-        leftRow.appendChild(attrs);
-
-        const rightPrice = document.createElement('div');
-        rightPrice.className = 'variant-price';
-        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
-        rightPrice.textContent = formatPrice(variantLinePrice, currency);
-
-        row.appendChild(leftRow);
-        row.appendChild(rightPrice);
-        variantsContainer.appendChild(row);
-      });
-
-      variantsContainer.style.display = 'none';
-      left.appendChild(variantsContainer);
-
-      toggle.addEventListener('click', () => {
-        const isShown = variantsContainer.style.display === 'block';
-        variantsContainer.style.display = isShown ? 'none' : 'block';
-        toggle.textContent = isShown ? 'Show Choices' : 'Hide Choices';
-        toggle.setAttribute('aria-expanded', isShown ? 'false' : 'true');
-      });
-
     } else {
       const singleV = item.variants && item.variants[0];
       if(singleV && (singleV.color || singleV.size)){
         const info = document.createElement('div');
         info.className = 'meta';
-        const parts = [];
-        if (singleV.color) parts.push(singleV.color);
-        if (singleV.size) parts.push(singleV.size);
-        info.innerHTML = `${parts.join(' · ')} <span style="color:#556b59">×${singleV.quantity}</span>`;
+        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
         textWrap.appendChild(info);
       }
     }
-
     headerWrapper.appendChild(textWrap);
     left.appendChild(headerWrapper);
 
+    // variants container (hidden by default)
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const toggle = document.createElement('button');
+      toggle.className = 'variant-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded','false');
+      toggle.title = 'View variants';
+      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
+      headerWrapper.appendChild(toggle);
+
+      const variantsContainer = document.createElement('div');
+      variantsContainer.className = 'variants-container';
+      item.variants.forEach(v=>{
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        const leftRow = document.createElement('div');
+        leftRow.style.display = 'flex';
+        leftRow.style.gap = '8px';
+        leftRow.style.alignItems = 'center';
+        const attrs = document.createElement('div');
+        attrs.className = 'variant-attrs';
+        attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
+        leftRow.appendChild(attrs);
+        const rightPrice = document.createElement('div');
+        rightPrice.className = 'variant-price';
+        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
+        rightPrice.textContent = formatPrice(variantLinePrice, currency);
+        row.appendChild(leftRow);
+        row.appendChild(rightPrice);
+        variantsContainer.appendChild(row);
+      });
+      left.appendChild(variantsContainer);
+
+      toggle.addEventListener('click', () => {
+        const isShown = variantsContainer.classList.toggle('show');
+        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+      });
+    }
+
     const right = document.createElement('div');
     right.className = 'right';
-    right.style.minWidth = '150px';
+    right.style.minWidth = '120px';
     right.style.textAlign = 'right';
     right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
 
@@ -1029,8 +885,6 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
   computeAndUpdateCartCount();
 }
 
-
-  
 /* -------------------- FILL BILLING -------------------- */
 function fillBillingFields(data){
   if(nameInput) nameInput.value = data.name || data.customer || '';
