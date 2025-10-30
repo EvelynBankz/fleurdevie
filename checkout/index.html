@@ -111,7 +111,17 @@
     .variant-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;border:1px solid #112e1f;background:#FFD6BA;color:#112e1f;cursor:pointer;padding:0;margin-left:8px}
     .variant-toggle svg{width:14px;height:14px;transition:transform .25s ease}
     .variant-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
-    .variants-container{max-height:0;overflow:hidden;transition:max-height .28s ease,padding .28s ease;padding-left:12px;border-left:2px solid rgba(17,46,31,0.08);margin-top:8px}
+    .variants-container {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .28s ease, padding .28s ease;
+      margin-top: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0; /* remove inner indent */
+      border: none; /* remove border that narrows width */
+    }
+
     .variants-container.show{max-height:500px;padding-top:8px;padding-bottom:8px}
     .variant-row {
       display: flex;
@@ -277,10 +287,14 @@
 
 /* When open */
 .checkout-variants-container.open {
-  max-height: 400px; /* enough for multiple variants */
+  max-height: 400px;
   opacity: 1;
   margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
 }
+
 
 /* Each variant row */
 .checkout-variant-row {
