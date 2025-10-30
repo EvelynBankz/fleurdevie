@@ -892,11 +892,27 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
             const attrs = document.createElement('div');
             attrs.className = 'variant-attrs';
             const parts = [];
-            if (v.color) parts.push(`Color: ${v.color}`);
-            if (v.size) parts.push(`Size: ${v.size}`);
+  
+            // support both Serac-style (color/size) and Fleur-style (attributes or variantValues)
+            let color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color;
+            let size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size;
+            let qty = v.quantity || v.qty || v?.quantitySelected || 1;
+            
+            if (color) parts.push(`Color: ${color}`);
+            if (size) parts.push(`Size: ${size}`);
             const joined = parts.join(' · ');
-            attrs.innerHTML = `${joined}${joined ? ' · ' : ''}<span style="color:#556b59">qty: ${v.quantity}</span>`;
+            attrs.innerHTML = `${joined}${joined ? ' · ' : ''}<span style="color:#556b59">qty: ${qty}</span>`;
             leftRow.appendChild(attrs);
+            
+            const rightPrice = document.createElement('div');
+            rightPrice.className = 'variant-price';
+            const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)));
+            rightPrice.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
+            
+            row.appendChild(leftRow);
+            row.appendChild(rightPrice);
+            variantsContainer.appendChild(row);
+
 
             const rightPrice = document.createElement('div');
             rightPrice.className = 'variant-price';
