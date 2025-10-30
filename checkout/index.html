@@ -118,11 +118,17 @@
       margin-top: 8px;
       width: 100%;
       box-sizing: border-box;
-      padding: 0; /* remove inner indent */
-      border: none; /* remove border that narrows width */
+      padding: 8px 0; /* equal padding on both sides */
+      border-top: 1px dashed rgba(17,46,31,0.08);
+      border-bottom: 1px dashed rgba(17,46,31,0.08);
+      border-left: none;
+      border-right: none;
+      display: block;
     }
 
+
     .variants-container.show{max-height:500px;padding-top:8px;padding-bottom:8px}
+    
     .variant-row {
       display: flex;
       justify-content: space-between;
