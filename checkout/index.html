@@ -814,192 +814,64 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=fa
     titleDiv.textContent = `${item.name} (x${item.totalQuantity})`;
     textWrap.appendChild(titleDiv);
 
-      if (Array.isArray(item.variants) && item.variants.length > 0) {
-        const toggle = document.createElement('button');
-        toggle.className = 'variant-toggle';
-        toggle.type = 'button';
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.title = 'View variants';
-        toggle.textContent = 'Show Choices'; // replaced icon with plain text
-        headerWrapper.appendChild(toggle);
-      
-        // variants container (hidden by default)
-        const variantsContainer = document.createElement('div');
-        variantsContainer.className = 'variants-container';
-        variantsContainer.style.display = 'none'; // hidden by default
-      
-        item.variants.forEach(v => {
-          const row = document.createElement('div');
-          row.className = 'variant-row';
-          row.style.display = 'flex';
-          row.style.justifyContent = 'space-between';
-          row.style.alignItems = 'center';
-      
-          // ----- Left side: variant combo + quantity -----
-          const left = document.createElement('span');
-          left.className = 'variant-combo';
-          const comboParts = [];
-          if (v.color) comboParts.push(v.color);
-          if (v.size) comboParts.push(v.size);
-          const comboText = comboParts.join('/') || ''; // e.g., "Red/Medium"
-          left.textContent = `${comboText} ×${v.quantity}`;
-      
-          // ----- Right side: price -----
-          const right = document.createElement('span');
-          right.className = 'variant-price';
-          const variantLinePrice = Number(
-            (v.linePrices && (v.linePrices[currency] ?? null)) ??
-            (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0))
-          );
-          right.textContent = formatPrice(variantLinePrice, currency);
-      
-          // Add both sides to the row
-          row.appendChild(left);
-          row.appendChild(right);
-          variantsContainer.appendChild(row);
-        });
-      
-        // Append the whole variant section under product details
-        left.appendChild(variantsContainer);
-      
-        // --- ✅ Handle toggle click (now inside same scope) ---
-        toggle.addEventListener('click', () => {
-          const isShown = variantsContainer.style.display === 'block';
-          variantsContainer.style.display = isShown ? 'none' : 'block';
-          toggle.textContent = isShown ? 'Show Choices' : 'Hide Choices';
-          toggle.setAttribute('aria-expanded', !isShown);
-        });
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const info = document.createElement('div');
+      info.className = 'meta';
+      info.textContent = 'Multiple options selected';
+      textWrap.appendChild(info);
+    } else {
+      const singleV = item.variants && item.variants[0];
+      if(singleV && (singleV.color || singleV.size)){
+        const info = document.createElement('div');
+        info.className = 'meta';
+        info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
+        textWrap.appendChild(info);
       }
-    
+    }
+    headerWrapper.appendChild(textWrap);
+    left.appendChild(headerWrapper);
 
-    // if(Array.isArray(item.variants) && item.variants.length > 0){
-    //   const info = document.createElement('div');
-    //   info.className = 'meta';
-    //   info.textContent = 'Multiple options selected';
-    //   textWrap.appendChild(info);
-    // } else {
-    //   const singleV = item.variants && item.variants[0];
-    //   if(singleV && (singleV.color || singleV.size)){
-    //     const info = document.createElement('div');
-    //     info.className = 'meta';
-    //     info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
-    //     textWrap.appendChild(info);
-    //   }
-    // }
-    // headerWrapper.appendChild(textWrap);
-    // left.appendChild(headerWrapper);
+    // variants container (hidden by default)
+    if(Array.isArray(item.variants) && item.variants.length > 1){
+      const toggle = document.createElement('button');
+      toggle.className = 'variant-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded','false');
+      toggle.title = 'View variants';
+      toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
+      headerWrapper.appendChild(toggle);
 
-    // // variants container (hidden by default)
-    // // if(Array.isArray(item.variants) && item.variants.length > 1){
-    // //   const toggle = document.createElement('button');
-    // //   toggle.className = 'variant-toggle';
-    // //   toggle.type = 'button';
-    // //   toggle.setAttribute('aria-expanded','false');
-    // //   toggle.title = 'View variants';
-    // //   toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
-    // //   headerWrapper.appendChild(toggle);
+      const variantsContainer = document.createElement('div');
+      variantsContainer.className = 'variants-container';
+      item.variants.forEach(v=>{
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        const leftRow = document.createElement('div');
+        leftRow.style.display = 'flex';
+        leftRow.style.gap = '8px';
+        leftRow.style.alignItems = 'center';
+        const attrs = document.createElement('div');
+        attrs.className = 'variant-attrs';
+        attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
+        leftRow.appendChild(attrs);
+        const rightPrice = document.createElement('div');
+        rightPrice.className = 'variant-price';
+        const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
+        rightPrice.textContent = formatPrice(variantLinePrice, currency);
+        row.appendChild(leftRow);
+        row.appendChild(rightPrice);
+        variantsContainer.appendChild(row);
+      });
+      left.appendChild(variantsContainer);
 
-    // // variants container (hidden by default)
-    //     if (Array.isArray(item.variants) && item.variants.length > 0) {
-    //     const toggle = document.createElement('button');
-    //     toggle.className = 'variant-toggle';
-    //     toggle.type = 'button';
-    //     toggle.setAttribute('aria-expanded', 'false');
-    //     toggle.title = 'View variants';
-    //     toggle.textContent = 'Show Choices'; // replaced icon with plain text
-    //     headerWrapper.appendChild(toggle);
-    //     }
-
-
-
-    
-    // // variants container (hidden by default)
-    // const variantsContainer = document.createElement('div');
-    // variantsContainer.className = 'variants-container';
-    // variantsContainer.style.display = 'none'; // hidden by default
-    
-    
-    // item.variants.forEach(v => {
-    // const row = document.createElement('div');
-    // row.className = 'variant-row';
-    // row.style.display = 'flex';
-    // row.style.justifyContent = 'space-between';
-    // row.style.alignItems = 'center';
-    
-    // // ----- Left side: variant combo + quantity -----
-    // const left = document.createElement('span');
-    // left.className = 'variant-combo';
-    // const comboParts = [];
-    // if (v.color) comboParts.push(v.color);
-    // if (v.size) comboParts.push(v.size);
-    // const comboText = comboParts.join('/') || ''; // e.g., "Red/Medium"
-    // left.textContent = `${comboText} ×${v.quantity}`;
-    
-    // // ----- Right side: price -----
-    // const right = document.createElement('span');
-    // right.className = 'variant-price';
-    // const variantLinePrice = Number(
-    // (v.linePrices && (v.linePrices[currency] ?? null)) ??
-    // (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0))
-    // );
-    // right.textContent = formatPrice(variantLinePrice, currency);
-    
-    // // Add both sides to the row
-    // row.appendChild(left);
-    // row.appendChild(right);
-    // variantsContainer.appendChild(row);
-    // });
-    
-    // // Append the whole variant section under product details
-    // left.appendChild(variantsContainer);
-
-
-    // // --- Handle toggle click ---
-    // toggle.addEventListener('click', () => {
-    // const isShown = variantsContainer.style.display === 'block';
-    // variantsContainer.style.display = isShown ? 'none' : 'block';
-    // toggle.textContent = isShown ? 'Show Choices' : 'Hide Choices';
-    // toggle.setAttribute('aria-expanded', !isShown);
-    // });
-    
-    // Show/hide on toggle
-    // toggle.addEventListener('click', () => {
-    // const isShown = variantsContainer.classList.toggle('show');
-    // toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
-    // });
-
-    //   const variantsContainer = document.createElement('div');
-    //   variantsContainer.className = 'variants-container';
-    //   item.variants.forEach(v=>{
-    //     const row = document.createElement('div');
-    //     row.className = 'variant-row';
-    //     const leftRow = document.createElement('div');
-    //     leftRow.style.display = 'flex';
-    //     leftRow.style.gap = '8px';
-    //     leftRow.style.alignItems = 'center';
-    //     const attrs = document.createElement('div');
-    //     attrs.className = 'variant-attrs';
-    //     attrs.innerHTML = `${v.color ? `Color: ${v.color}` : ''}${v.color && v.size ? ' · ' : ''}${v.size ? `Size: ${v.size}` : ''} <span style="color:#556b59"> · qty: ${v.quantity}</span>`;
-    //     leftRow.appendChild(attrs);
-    //     const rightPrice = document.createElement('div');
-    //     rightPrice.className = 'variant-price';
-    //     const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency]||0)*Number(v.quantity||0)));
-    //     rightPrice.textContent = formatPrice(variantLinePrice, currency);
-    //     row.appendChild(leftRow);
-    //     row.appendChild(rightPrice);
-    //     variantsContainer.appendChild(row);
-    //   });
-    //   left.appendChild(variantsContainer);
-
-    //   toggle.addEventListener('click', () => {
-    //     const isShown = variantsContainer.classList.toggle('show');
-    //     toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
-    //   });
-    // }
+      toggle.addEventListener('click', () => {
+        const isShown = variantsContainer.classList.toggle('show');
+        toggle.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+      });
+    }
 
     const right = document.createElement('div');
     right.className = 'right';
-    right.style.marginLeft = 'auto'; // pushes price to the far right
     right.style.minWidth = '120px';
     right.style.textAlign = 'right';
     right.innerHTML = `<div style="font-weight:600">${formatPrice(finalValue, currency)}</div>`;
