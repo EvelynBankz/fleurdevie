@@ -914,15 +914,15 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
             variantsContainer.appendChild(row);
 
 
-            const rightPrice = document.createElement('div');
-            rightPrice.className = 'variant-price';
-            const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)));
-            rightPrice.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
+          //   const rightPrice = document.createElement('div');
+          //   rightPrice.className = 'variant-price';
+          //   const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)));
+          //   rightPrice.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
 
-            row.appendChild(leftRow);
-            row.appendChild(rightPrice);
-            variantsContainer.appendChild(row);
-          });
+          //   row.appendChild(leftRow);
+          //   row.appendChild(rightPrice);
+          //   variantsContainer.appendChild(row);
+          // });
 
           // attach toggle behavior
           toggle.addEventListener('click', () => {
