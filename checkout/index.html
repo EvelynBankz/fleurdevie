@@ -294,13 +294,23 @@
 }
 
   .variant-row {
-    font-size: 13px;
-    gap: 6px;
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+    padding-right: 4px; /* adds breathing space at the edge */
   }
 
-  .variant-attrs,
+
+  .variant-attrs {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .variant-price {
-    font-size: 13px;
+    flex-shrink: 0;
+    text-align: right;
+    min-width: 70px; /* prevents overlap */
   }
 }
     
