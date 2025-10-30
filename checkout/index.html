@@ -7,11 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* (Your original Fleur De Vie styles preserved exactly) */
+    /* (kept your Fleur styling verbatim) */
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: "Montserrat", sans-serif; background: #F5E6CC; color:#112e1f; line-height:1.6; }
     a { text-decoration:none; color:inherit; }
-
     .site-header {
       background: rgba(17,46,31,0.9);
       backdrop-filter: blur(2px);
@@ -45,13 +44,11 @@
     .hamburger.open span:nth-child(1){ transform:rotate(45deg); top:10px; }
     .hamburger.open span:nth-child(2){ opacity:0; }
     .hamburger.open span:nth-child(3){ transform:rotate(-45deg); top:10px; }
-
     .hero { position: relative; height:90vh; display:flex; justify-content:center; align-items:center; text-align:center; margin-top:0; overflow:hidden; }
     .hero::after { content:""; position:absolute; inset:0; background:url('../asset/bg18.jpg') center/cover no-repeat; transform:scale(1.1); z-index:-1; border-radius:12px; box-shadow: inset 0 0 0 2000px rgba(17,46,31,0.3); }
-    .hero-text { position:relative; display:inline-block; color:#FFD6BA;  margin-bottom:12px; animation: shimmer 3s infinite linear; }
+    .hero-text { position:relative; display:inline-block; color:#FFD6BA;  margin-bottom:12px; }
     .hero-text h1 { font-family:"Playfair Display", serif; font-size:clamp(36px,5vw,64px); margin-bottom:12px; }
     .hero-text p { font-size:clamp(16px,2vw,24px); max-width:700px; }
-
     section.checkout{padding:60px 20px}
     .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:28px}
     .checkout-form,.order-summary{border-radius:12px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,0.2)}
@@ -70,9 +67,7 @@
     .order-item .right{flex:0 0 150px;text-align:right}
     .order-item .title{font-weight:600}
     .order-item .meta{font-size:0.95rem;color:#334d3a;margin-top:6px}
-    .variant-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;border:1px solid #112e1f;background:#FFD6BA;color:#112e1f;cursor:pointer;padding:0;margin-left:8px}
-    .variant-toggle svg{width:14px;height:14px;transition:transform .25s ease}
-    .variant-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+    .variant-toggle{display:inline-flex;align-items:center;justify-content:center;width:auto;height:32px;border-radius:6px;border:1px solid #112e1f;background:transparent;color:#556b59;cursor:pointer;padding:6px 10px;margin-top:6px}
     .variants-container{max-height:0;overflow:hidden;transition:max-height .28s ease,padding .28s ease;padding-left:12px;border-left:2px solid rgba(17,46,31,0.08);margin-top:8px}
     .variants-container.show{max-height:500px;padding-top:8px;padding-bottom:8px}
     .variant-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.06)}
@@ -84,18 +79,7 @@
     .mobile-cart { display: none; }
     @media(max-width:900px){.container{grid-template-columns:1fr}}
     @media (max-width:900px) {
-      .header-right {
-        position: absolute;
-        top: 68px;
-        right: 0;
-        background: rgba(17,46,31,0.95);
-        flex-direction: column;
-        width: 200px;
-        padding: 20px;
-        display: none;
-        border-radius: 0 0 0 10px;
-        z-index: 1100;
-      }
+      .header-right { position: absolute; top: 68px; right: 0; background: rgba(17,46,31,0.95); flex-direction: column; width: 200px; padding: 20px; display: none; border-radius: 0 0 0 10px; z-index: 1100; }
       .header-right.open { display: flex !important; flex-direction: column; gap: 12px; }
       .hamburger { display: block; }
       .brand-logo{height:clamp(40px,15vw,80px)}
@@ -108,8 +92,7 @@
     .fdv-blur-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);background:rgba(0,0,0,0.45)}
     .fdv-blur-spinner{width:54px;height:54px;border:6px solid rgba(255,255,255,0.15);border-top:6px solid rgba(255,255,255,0.95);border-radius:50%;animation:fdv-spin 1s linear infinite}
     @keyframes fdv-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-
-    /* Floating support button preserved */
+    /* Floating support button */
     #floatingSupportBtn {
       position: fixed;
       right: 22px;
@@ -129,40 +112,9 @@
       font-size: 28px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    #floatingSupportBtn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 36px rgba(212,245,105,0.8);
-      animation: glowPulse 1.5s infinite ease-in-out;
-    }
-    #floatingSupportBtn::after {
-      content: "Support";
-      position: absolute;
-      bottom: 70px;
-      left: 50%;
-      transform: translateX(-50%) translateY(0);
-      background: #112e1f;
-      color: #FFD6BA;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
+    #floatingSupportBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(212,245,105,0.8); }
+    #floatingSupportBtn::after { content: "Support"; position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(0); background: #112e1f; color: #FFD6BA; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s ease; }
     #floatingSupportBtn:hover::after { opacity: 1; transform: translateX(-50%) translateY(-6px); }
-    @keyframes glowPulse { 0%,100%{ box-shadow:0 8px 30px rgba(212,245,105,1);} 50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);} }
-
-    /* Checkout variants (kept same) */
-    .checkout-variants-toggle { background: transparent; border: 1px solid var(--fleur-green, #1a3c34); color: var(--fleur-green, #1a3c34); font-family: "Playfair Display", serif; font-size: 0.95rem; padding: 6px 14px; border-radius: 6px; margin-top: 6px; cursor: pointer; transition: all 0.25s ease; }
-    .checkout-variants-toggle:hover { background: var(--fleur-green, #1a3c34); color: #fff; }
-    .checkout-variants-container { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.35s ease; margin-top: 0; }
-    .checkout-variants-container.open { max-height: 400px; opacity: 1; margin-top: 8px; }
-    .checkout-variant-row { display: flex; align-items: center; justify-content: space-between; background: rgba(26, 60, 52, 0.05); padding: 8px 12px; margin-bottom: 6px; border-radius: 8px; }
-    .checkout-variant-meta { font-family: "Playfair Display", serif; font-size: 0.9rem; color: var(--fleur-green, #1a3c34); }
-    @media (max-width: 768px) { .checkout-variants-toggle { font-size: 0.85rem; padding: 5px 12px; } .checkout-variant-meta { font-size: 0.85rem; } }
-
   </style>
 </head>
 <body>
@@ -176,7 +128,7 @@
       <a href="../cart.html"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile">0</span></a>
     </div>
 
-    <button class="hamburger" id="hamburger-btn">
+    <button class="hamburger" id="hamburger-btn" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
 
@@ -190,7 +142,12 @@
     </nav>
   </header>
 
-  <section class="hero"><div class="hero-text"><h1>Checkout</h1><p id="heroP" style="display:none"></p></div></section>
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Checkout</h1>
+      <p id="heroP">Review your items and proceed to payment.</p>
+    </div>
+  </section>
 
   <section class="checkout">
     <div class="container">
@@ -235,14 +192,13 @@
     <i class="fas fa-headset"></i>
   </button>
 
-  <footer><p>© <span id="year">2025</span> Fleur De Vie</p></footer>
+  <footer><p>© <span id="year"></span> Fleur De Vie</p></footer>
 
   <!-- Flutterwave -->
   <script src="https://checkout.flutterwave.com/v3.js"></script>
 
-  <!-- Upgraded Fleur De Vie checkout script (module) -->
+  <!-- FIREBASE + Checkout Script (Serac logic, Fleur names/IDs preserved, no show-details, no mobile input script) -->
   <script type="module">
-  /* -------------------- FIREBASE IMPORTS -------------------- */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
   import {
     getFirestore, doc, getDoc, collection, addDoc, updateDoc, serverTimestamp, query, where, getDocs, setDoc
@@ -260,34 +216,29 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  /* -------------------- BLUR LOADER (no-flash; preserved UX from FDV + Serac improvements) -------------------- */
+  /* -------------------- BLUR LOADER -------------------- */
   (function installBlurLoader() {
     try {
       const overlay = document.createElement('div');
       overlay.className = 'fdv-blur-overlay';
       overlay.id = 'fdv-blur-overlay';
       overlay.setAttribute('aria-hidden','true');
-
       const spinner = document.createElement('div');
       spinner.className = 'fdv-blur-spinner';
-
       const label = document.createElement('div');
       label.textContent = 'Loading...';
       label.style.color = '#fff';
       label.style.marginTop = '10px';
       label.style.fontSize = '13px';
       label.style.fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto';
-
       const wrap = document.createElement('div');
       wrap.style.display = 'flex';
       wrap.style.flexDirection = 'column';
       wrap.style.alignItems = 'center';
       wrap.appendChild(spinner);
       wrap.appendChild(label);
-
       overlay.appendChild(wrap);
       document.documentElement.appendChild(overlay);
-
       const main = document.querySelector('main') || document.querySelector('body');
       if(main) main.style.opacity = '0';
     } catch(e){}
@@ -346,9 +297,9 @@
     if(!msg){ el.style.display='none'; el.textContent=''; } else { el.style.display='block'; el.textContent = msg; window.scrollTo({top:0, behavior:'smooth'}); }
   }
 
-  /* -------------------- DOM & STATE -------------------- */
-  const STORAGE_KEY = 'cart';             // preserved from FDV
-  const CURRENCY_KEY = 'currency';        // preserved
+  /* -------------------- DOM & STATE (Fleur keys preserved) -------------------- */
+  const STORAGE_KEY = 'cart';
+  const CURRENCY_KEY = 'currency';
   const cartCountElem = document.getElementById('cartCount');
   const cartCountMobileElem = document.getElementById('cartCountMobile');
   const orderItemsEl = document.getElementById('orderItems');
@@ -361,11 +312,12 @@
   const phoneInput = document.getElementById('phone');
   const addressInput = document.getElementById('address');
   const hero = document.querySelector('.hero');
+  const heroH1 = document.querySelector('.hero-text h1');
   const heroP = document.getElementById('heroP');
 
   let productCache = {};
   let selectedCurrency = localStorage.getItem(CURRENCY_KEY) || 'NGN';
-  let rawCart = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
+  let cart = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
   const urlParams = new URLSearchParams(window.location.search);
   const quoteId = urlParams.get('quoteId') || null;
   const orderId = urlParams.get('orderId') || null;
@@ -375,15 +327,11 @@
   let quote = null;
   let isPaidOrder = false;
 
-  /* flags to prevent duplicate renders (fix flicker) */
-  let paidUIRenderedFor = null;
-  let paidRenderInProgress = false;
+  /* -------------------- CART UTIL -------------------- */
+  function totalQtyFromCartArray(arr) { try { return (arr || []).reduce((s, i) => s + Number(i.quantity || 0), 0); } catch(e){ return 0; } }
+  function totalQtyFromQuoteNormalized(q) { try { return (q && Array.isArray(q.items)) ? q.items.reduce((s,i)=>s + Number(i.totalQuantity||0),0) : 0; } catch(e){ return 0; }
 
-  /* -------------------- CART HELPERS -------------------- */
-  function totalQtyFromCartArray(arr) { try { return (arr || []).reduce((s, i) => s + Number(i.quantity || 0), 0); } catch (e) { return 0; } }
-  function totalQtyFromQuoteNormalized(q) { try { return (q && Array.isArray(q.items)) ? q.items.reduce((s, i) => s + Number(i.totalQuantity || 0), 0) : 0; } catch (e) { return 0; } }
-
-  /* FIXED & CONSISTENT mergeCartItems (from Serac) */
+  /* FIXED mergeCartItems (Serac logic) */
   function mergeCartItems(cartArr) {
     const merged = [];
     (cartArr || []).forEach(item => {
@@ -397,8 +345,8 @@
 
   function computeAndUpdateCartCount(){
     try {
-      const rawCartLocal = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
-      const mergedCart = mergeCartItems(rawCartLocal);
+      const rawCart = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
+      const mergedCart = mergeCartItems(rawCart);
       const cartQty = totalQtyFromCartArray(mergedCart);
 
       const isUnpaidQuoteView = (!isPaidOrder && quote && Array.isArray(quote.items) && quote.items.length > 0 && !quote._isOrder && !quote._paidFlag);
@@ -408,15 +356,13 @@
         const quoteQty = totalQtyFromQuoteNormalized(quote);
         if (quoteId) displayCount = Number(quoteQty || 0) + Number(cartQty || 0);
         else displayCount = cartQty;
-      } else {
-        displayCount = cartQty;
       }
 
       if (cartCountElem) cartCountElem.textContent = String(displayCount || 0);
       if (cartCountMobileElem) cartCountMobileElem.textContent = String(displayCount || 0);
     } catch(e){
-      if(cartCountElem) cartCountElem.textContent = '0';
-      if(cartCountMobileElem) cartCountMobileElem.textContent = '0';
+      if (cartCountElem) cartCountElem.textContent = '0';
+      if (cartCountMobileElem) cartCountMobileElem.textContent = '0';
     }
   }
 
@@ -429,7 +375,6 @@
       if (paid && paid.verified) syncPaidQuoteUI().catch(() => { });
     }
   });
-
   document.addEventListener('DOMContentLoaded', computeAndUpdateCartCount);
 
   /* -------------------- PRODUCT HELPERS -------------------- */
@@ -437,24 +382,20 @@
     try {
       if(productCache[productId]) return productCache[productId];
       const snap = await getDoc(doc(db, "brands", "fleurdevie", "products", productId));
-      if(snap && snap.exists()){
-        productCache[productId] = snap.data();
-        return productCache[productId];
-      }
+      if(snap.exists()){ productCache[productId] = snap.data(); return productCache[productId]; }
     } catch(e){ console.warn("fetchProductData failed", e); }
     return null;
   }
 
   async function buildQuoteFromCart(){
-    rawCart = mergeCartItems(rawCart || []);
+    cart = mergeCartItems(cart || []);
     const byProduct = new Map();
-    rawCart.forEach(r=> { if(!byProduct.has(r.id)) byProduct.set(r.id, []); byProduct.get(r.id).push(r); });
+    cart.forEach(r=> { if(!byProduct.has(r.id)) byProduct.set(r.id, []); byProduct.get(r.id).push(r); });
     const ids = Array.from(byProduct.keys());
     const pdPromises = ids.map(id => fetchProductData(id).then(d=>[id,d]));
     const pd = await Promise.all(pdPromises);
     const productsMap = Object.fromEntries(pd.map(([id,doc])=>[id,doc]));
     const items = [];
-
     for(const id of ids){
       const rows = byProduct.get(id) || [];
       const productDoc = productsMap[id] || null;
@@ -478,7 +419,79 @@
     return { items };
   }
 
-  /* -------------------- RENDER (uses FDV DOM & styling; improved logic from Serac integrated) -------------------- */
+  /* -------------------- NORMALIZERS (kept Fleur versions) -------------------- */
+  function normalizeQuoteItems(rawQuote){
+    const arr = Array.isArray(rawQuote.items) ? rawQuote.items : [];
+    const items = arr.map(ci => {
+      if(Array.isArray(ci.variants) && ci.variants.length){
+        const variants = ci.variants.map(v => {
+          const qty = Number(v.qty || v.quantity || 0);
+          const unitPrices = {
+            NGN: Number(v.priceNGN ?? v.price ?? 0),
+            USD: Number(v.priceUSD ?? 0),
+            EUR: Number(v.priceEUR ?? 0),
+            GBP: Number(v.priceGBP ?? 0)
+          };
+          return {
+            id: v.id || ci.id || '',
+            color: v.color||'',
+            size: v.size||'',
+            quantity: qty,
+            unitPrices,
+            linePrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty }
+          };
+        });
+        return {
+          productId: ci.id || '',
+          name: ci.name || '',
+          image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
+          totalQuantity: variants.reduce((s,a)=>s+(a.quantity||0),0),
+          totalPrices: {
+            NGN: variants.reduce((s,a)=>s+(a.linePrices.NGN||0),0),
+            USD: variants.reduce((s,a)=>s+(a.linePrices.USD||0),0),
+            EUR: variants.reduce((s,a)=>s+(a.linePrices.EUR||0),0),
+            GBP: variants.reduce((s,a)=>s+(a.linePrices.GBP||0),0)
+          },
+          variants,
+          description: ci.desc || ci.description || ''
+        };
+      } else {
+        const qty = Number(ci.qty || ci.quantity || 1);
+        const unitPrices = { NGN: Number(ci.priceNGN ?? ci.price ?? 0), USD: Number(ci.priceUSD ?? 0), EUR: Number(ci.priceEUR ?? 0), GBP: Number(ci.priceGBP ?? 0) };
+        return {
+          productId: ci.id || '',
+          name: ci.name || '',
+          image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
+          totalQuantity: qty,
+          totalPrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty },
+          variants: [{ id:ci.id||'', color:'', size:'', quantity: qty, unitPrices, linePrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty } }],
+          description: ci.desc || ci.description || ''
+        };
+      }
+    });
+    const normalized = { items };
+    normalized._isOrder = false;
+    normalized._paidFlag = (rawQuote && (rawQuote.status || '').toLowerCase() === 'paid') || false;
+    return normalized;
+  }
+
+  function normalizeOrderItems(items){
+    const normalized = (items||[]).map(it => ({
+      productId: it.id || '',
+      name: it.name || it.productName || '',
+      image: (it.image && it.image !== '../asset/placeholder.jpg') ? it.image : null,
+      totalQuantity: Number(it.qty || it.quantity || it.totalQuantity) || 1,
+      description: it.desc || it.description || '',
+      totalPrices: it.totalPrices || it.linePrices || {},
+      variants: it.variants || []
+    }));
+    const result = { items: normalized };
+    result._isOrder = true;
+    result._paidFlag = true;
+    return result;
+  }
+
+  /* -------------------- RENDER (Fleur UI, Serac flow) -------------------- */
   function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
     if(!orderItemsEl || !orderSubtotalEl) return;
     orderItemsEl.innerHTML = '';
@@ -541,22 +554,17 @@
           textWrap.appendChild(info);
         }
       }
+
       headerWrapper.appendChild(textWrap);
       left.appendChild(headerWrapper);
 
+      // variants container (only if >1) — toggle UI kept but "show details" not present
       if (Array.isArray(item.variants) && item.variants.length > 1) {
         const toggle = document.createElement('button');
         toggle.className = 'variant-toggle';
         toggle.type = 'button';
         toggle.setAttribute('aria-expanded', 'false');
         toggle.textContent = 'Show Choices';
-        toggle.style.display = 'block';
-        toggle.style.marginTop = '6px';
-        toggle.style.fontSize = '13px';
-        toggle.style.color = '#556b59';
-        toggle.style.background = 'none';
-        toggle.style.border = 'none';
-        toggle.style.cursor = 'pointer';
         textWrap.appendChild(toggle);
 
         const variantsContainer = document.createElement('div');
@@ -623,7 +631,7 @@
     if(addressInput) addressInput.value = data.address || data.shippingAddress || '';
   }
 
-  /* -------------------- UI CONFIG (cart / quote unpaid / paid) -------------------- */
+  /* -------------------- UI CONFIG -------------------- */
   function configureCheckoutUI(type, opts = {}){
     try {
       const disableCurrency = (val) => {
@@ -653,7 +661,6 @@
         disableCurrency(true);
         setBillingDisabled(true);
         if(payBtn) { payBtn.textContent = 'Paid ✅'; payBtn.disabled = true; payBtn.classList.add('paid-state'); }
-
         if(opts.trackingRef){
           const container = document.querySelector('.hero-text') || document.querySelector('.hero');
           if(container){
@@ -684,136 +691,7 @@
     } catch(e){ console.warn('configureCheckoutUI error', e); }
   }
 
-  /* -------------------- BUILD NORMALIZED FROM FS DOC -------------------- */
-  function buildNormalizedFromFirestoreDoc(docData){
-    const itemsRaw = Array.isArray(docData.items) ? docData.items : [];
-    const normalizedItems = itemsRaw.map(raw => {
-      const qty = Number(raw.qty ?? raw.quantity ?? raw.totalQuantity ?? 0) || 0;
-      const unitPrices = {
-        NGN: Number(raw.priceNGN ?? raw.price ?? 0),
-        USD: Number(raw.priceUSD ?? 0),
-        EUR: Number(raw.priceEUR ?? 0),
-        GBP: Number(raw.priceGBP ?? 0)
-      };
-      const linePrices = {
-        NGN: unitPrices.NGN * qty,
-        USD: unitPrices.USD * qty,
-        EUR: unitPrices.EUR * qty,
-        GBP: unitPrices.GBP * qty
-      };
-      return {
-        productId: raw.productId || raw.id || '',
-        name: raw.name || raw.productName || raw.title || '',
-        image: (raw.image && raw.image !== '../asset/placeholder.jpg') ? raw.image : null,
-        totalQuantity: qty,
-        totalPrices: linePrices,
-        variants: [{ id: raw.id || '', color: raw.color || '', size: raw.size || '', quantity: qty, unitPrices, linePrices }],
-        description: raw.description || raw.desc || ''
-      };
-    });
-    return { items: normalizedItems, _isOrder: true, _paidFlag: true };
-  }
-
-  /* -------------------- RENDER PAID UI FROM DOC (guarded) -------------------- */
-  function renderPaidUIFromDoc(docData){
-    try {
-      const docKey = (docData && (docData.orderId || docData.trackingRef || docData.id)) || (quoteId || orderId) || 'paid';
-      if(paidUIRenderedFor && paidUIRenderedFor === docKey) return;
-      if(paidRenderInProgress) return;
-      paidRenderInProgress = true;
-
-      const paidQuoteInfoLocal = safeParseJSON(localStorage.getItem('paidQuoteInfo'), null);
-      const docCurrency = (docData && docData.currency) ? String(docData.currency).toUpperCase() : (paidQuoteInfoLocal && paidQuoteInfoLocal.currency ? String(paidQuoteInfoLocal.currency).toUpperCase() : selectedCurrency);
-      selectedCurrency = docCurrency || selectedCurrency;
-      if(currencySelect && currencyWrapper){
-        try { currencySelect.value = selectedCurrency; } catch(e){}
-        try { currencySelect.disabled = true; currencyWrapper.style.opacity = 0.6; currencyWrapper.style.pointerEvents = 'none'; } catch(e){}
-      }
-
-      const normalized = buildNormalizedFromFirestoreDoc(docData);
-      quote = normalized;
-      quote._isOrder = true;
-      quote._paidFlag = true;
-      isPaidOrder = true;
-
-      renderOrderFromQuoteNormalized(normalized, selectedCurrency, true);
-
-      fillBillingFields({
-        name: docData.name || docData.customer || docData.customerName || '',
-        email: docData.email || docData.customerEmail || '',
-        phone: docData.phone || docData.phoneNumber || docData.customerPhone || '',
-        address: docData.address || docData.shippingAddress || docData.shipping || docData.addressLine || ''
-      });
-
-      if(payBtn){ payBtn.textContent = 'Paid ✅'; payBtn.disabled = true; payBtn.classList.add('paid-state'); }
-
-      configureCheckoutUI(orderId ? 'order-paid' : 'quote-paid', { trackingRef: docData.trackingRef || docData.orderId || docData.trackingRef });
-
-      try {
-        localStorage.setItem('paidQuoteInfo', JSON.stringify({
-          quoteId: docData.id || null,
-          currency: selectedCurrency,
-          billing: { name: docData.name || docData.customer || '', email: docData.email || '', phone: docData.phone || docData.phoneNumber || '', address: docData.address || docData.shippingAddress || '' },
-          trackingRef: docData.trackingRef || docData.orderId || null,
-          verified: true
-        }));
-      } catch(e){}
-
-      paidUIRenderedFor = docKey;
-      paidRenderInProgress = false;
-      computeAndUpdateCartCount();
-    } catch(e){
-      paidRenderInProgress = false;
-      console.error('renderPaidUIFromDoc failed', e);
-    }
-  }
-
-  /* -------------------- SYNC PAID QUOTE ON LOAD (improved) -------------------- */
-  async function syncPaidQuoteUI(){
-    const paidQuoteInfo = safeParseJSON(localStorage.getItem('paidQuoteInfo'), null);
-    if(!paidQuoteInfo) { removeBlurLoaderAndReveal(); return; }
-
-    renderPaidUIFromDoc({
-      id: paidQuoteInfo.quoteId,
-      trackingRef: paidQuoteInfo.trackingRef,
-      currency: paidQuoteInfo.currency,
-      name: paidQuoteInfo.billing?.name,
-      email: paidQuoteInfo.billing?.email,
-      phone: paidQuoteInfo.billing?.phone,
-      address: paidQuoteInfo.billing?.address,
-      items: []
-    });
-    configureCheckoutUI(quoteId ? 'quote-paid' : 'order-paid', { trackingRef: paidQuoteInfo.trackingRef });
-
-    try {
-      if(paidQuoteInfo.quoteId){
-        try {
-          const ordersColl = collection(db, "brands", "fleurdevie", "orders");
-          const q = query(ordersColl, where("source", "==", `quote:${paidQuoteInfo.quoteId}`), where("status", "in", ["paid", "Paid", "PAID"]));
-          const snap = await getDocs(q);
-          if(snap && !snap.empty){
-            const oDoc = snap.docs[0].data(); oDoc.id = snap.docs[0].id;
-            renderPaidUIFromDoc(oDoc);
-            removeBlurLoaderAndReveal();
-            return;
-          }
-        } catch(err){ console.warn('order lookup by source failed', err); }
-
-        try {
-          const qSnap = await getDoc(doc(db, "brands", "fleurdevie", "quotes", paidQuoteInfo.quoteId));
-          if(qSnap && qSnap.exists()){
-            const qData = qSnap.data(); qData.id = qSnap.id;
-            renderPaidUIFromDoc(qData);
-            removeBlurLoaderAndReveal();
-            return;
-          }
-        } catch(e){ console.error('syncPaidQuoteUI quote read failed', e); removeBlurLoaderAndReveal(); showError('Unable to verify quote details. Contact support.'); return; }
-      }
-      removeBlurLoaderAndReveal();
-    } catch(e){ console.error('syncPaidQuoteUI failed', e); removeBlurLoaderAndReveal(); }
-  }
-
-  /* -------------------- ORDER SAVE -------------------- */
+  /* -------------------- ORDER REFERENCE & PERSIST -------------------- */
   function generateOrderReference(email, orderId, txRef){
     const rand = () => Math.random().toString(36).substring(2,6).toUpperCase();
     const now = new Date();
@@ -866,7 +744,7 @@
     }
   }
 
-  /* -------------------- PAYMENT (Flutterwave) -------------------- */
+  /* -------------------- PAYMENT (Flutterwave, Serac flow) -------------------- */
   const FLW_PUBLIC_KEY = "FLWPUBK_TEST-07eb9d2da345c08dc4d54278c3bc86f7-X";
   const SERVERLESS_VERIFY = `${window.location.origin}/api/verify`;
 
@@ -981,7 +859,7 @@
       amount: Number(subtotal),
       currency: selectedCurrency,
       customer: { email: baseOrder.email, phonenumber: baseOrder.phone, name: baseOrder.name },
-      customizations: { title: "Fleur De Vie", description: "Order Payment", logo: "../logo.png" },
+      customizations: { title: "Fleur De Vie", description: "Order Payment", logo: "../asset/logo.png" },
 
       callback: async function(data){
         if(paymentCallbackHandled) return;
@@ -1019,7 +897,7 @@
     try { FlutterwaveCheckout(fwConfig); }
     catch(err){ showSpinner(false); if(payBtn){ payBtn.disabled = false; payBtn.dataset.processing = '0'; } console.error('Flutterwave failed', err); showError('Payment gateway unavailable. Try again later.'); }
 
-    // Poll fallback verification (Serac-style)
+    // Poll fallback verification
     let attempts = 0; const maxAttempts = 6;
     const poll = setInterval(async ()=>{
       if(paymentCallbackHandled) return clearInterval(poll);
@@ -1035,7 +913,7 @@
     }, 3000);
   }
 
-  /* -------------------- LOAD CHECKOUT DATA: order -> quote -> cart -------------------- */
+  /* -------------------- LOAD CHECKOUT DATA (order -> quote -> cart) -------------------- */
   async function loadCheckoutData(){
     selectedCurrency = localStorage.getItem(CURRENCY_KEY) || selectedCurrency || 'NGN';
     if(currencySelect) currencySelect.value = selectedCurrency;
@@ -1085,7 +963,6 @@
           }
         } catch(e){ console.warn('Order lookup by source failed', e); }
 
-        // fetch quote doc
         let qSnap = null;
         try {
           qSnap = await getDoc(doc(db, "brands", "fleurdevie", "quotes", quoteId));
@@ -1097,7 +974,6 @@
           return;
         }
         if(!qSnap || !qSnap.exists()){ showSpinner(false); removeBlurLoaderAndReveal(); showError('Quote not found.'); return; }
-
         activeQuoteRaw = qSnap.data(); activeQuoteRaw.id = qSnap.id;
         const qStatus = (activeQuoteRaw.status || '').toLowerCase();
 
@@ -1132,64 +1008,9 @@
           }
         }
 
-        // unpaid quote
         if(activeQuoteRaw.customer && nameInput) nameInput.value = activeQuoteRaw.customer;
         if(activeQuoteRaw.email && emailInput) emailInput.value = activeQuoteRaw.email;
-        quote = (function normalizeQuoteItems(rawQuote){
-          const arr = Array.isArray(rawQuote.items) ? rawQuote.items : [];
-          const items = arr.map(ci => {
-            if(Array.isArray(ci.variants) && ci.variants.length){
-              const variants = ci.variants.map(v => {
-                const qty = Number(v.qty || v.quantity || 0);
-                const unitPrices = {
-                  NGN: Number(v.priceNGN ?? v.price ?? 0),
-                  USD: Number(v.priceUSD ?? 0),
-                  EUR: Number(v.priceEUR ?? 0),
-                  GBP: Number(v.priceGBP ?? 0)
-                };
-                return {
-                  id: v.id || ci.id || '',
-                  color: v.color||'',
-                  size: v.size||'',
-                  quantity: qty,
-                  unitPrices,
-                  linePrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty }
-                };
-              });
-              return {
-                productId: ci.id || '',
-                name: ci.name || '',
-                image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
-                totalQuantity: variants.reduce((s,a)=>s+(a.quantity||0),0),
-                totalPrices: {
-                  NGN: variants.reduce((s,a)=>s+(a.linePrices.NGN||0),0),
-                  USD: variants.reduce((s,a)=>s+(a.linePrices.USD||0),0),
-                  EUR: variants.reduce((s,a)=>s+(a.linePrices.EUR||0),0),
-                  GBP: variants.reduce((s,a)=>s+(a.linePrices.GBP||0),0)
-                },
-                variants,
-                description: ci.desc || ci.description || ''
-              };
-            } else {
-              const qty = Number(ci.qty || ci.quantity || 1);
-              const unitPrices = { NGN: Number(ci.priceNGN ?? ci.price ?? 0), USD: Number(ci.priceUSD ?? 0), EUR: Number(ci.priceEUR ?? 0), GBP: Number(ci.priceGBP ?? 0) };
-              return {
-                productId: ci.id || '',
-                name: ci.name || '',
-                image: (ci.image && ci.image !== '../asset/placeholder.jpg') ? ci.image : null,
-                totalQuantity: qty,
-                totalPrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty },
-                variants: [{ id:ci.id||'', color:'', size:'', quantity: qty, unitPrices, linePrices: { NGN: unitPrices.NGN*qty, USD: unitPrices.USD*qty, EUR: unitPrices.EUR*qty, GBP: unitPrices.GBP*qty } }],
-                description: ci.desc || ci.description || ''
-              };
-            }
-          });
-          const normalized = { items };
-          normalized._isOrder = false;
-          normalized._paidFlag = (rawQuote && (rawQuote.status || '').toLowerCase() === 'paid') || false;
-          return normalized;
-        })(activeQuoteRaw);
-
+        quote = normalizeQuoteItems(activeQuoteRaw);
         quote._isOrder = false;
         quote._paidFlag = (activeQuoteRaw.status || '').toLowerCase() === 'paid';
         renderOrderFromQuoteNormalized(quote, selectedCurrency, false);
@@ -1201,8 +1022,8 @@
       }
 
       // 3) Cart view (local)
-      rawCart = mergeCartItems(safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || []);
-      if(!rawCart.length){
+      cart = mergeCartItems(safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || []);
+      if(!cart.length){
         quote = { items: [] };
         renderOrderFromQuoteNormalized(quote, selectedCurrency, false);
         showSpinner(false);
@@ -1235,20 +1056,237 @@
     computeAndUpdateCartCount();
   }
 
-  /* -------------------- BINDINGS -------------------- */
+  /* -------------------- RENDER PAID UI (from doc) -------------------- */
+  let paidUIRenderedFor = null;
+  let paidRenderInProgress = false;
+  function buildNormalizedFromFirestoreDoc(docData){
+    const itemsRaw = Array.isArray(docData.items) ? docData.items : [];
+    const normalizedItems = itemsRaw.map(raw => {
+      const qty = Number(raw.qty ?? raw.quantity ?? raw.totalQuantity) || 0;
+      const unitPrices = {
+        NGN: Number(raw.priceNGN ?? raw.price ?? 0),
+        USD: Number(raw.priceUSD ?? 0),
+        EUR: Number(raw.priceEUR ?? 0),
+        GBP: Number(raw.priceGBP ?? 0)
+      };
+      const linePrices = {
+        NGN: unitPrices.NGN * qty,
+        USD: unitPrices.USD * qty,
+        EUR: unitPrices.EUR * qty,
+        GBP: unitPrices.GBP * qty
+      };
+      return {
+        productId: raw.productId || raw.id || '',
+        name: raw.name || raw.productName || raw.title || '',
+        image: (raw.image && raw.image !== '../asset/placeholder.jpg') ? raw.image : null,
+        totalQuantity: qty,
+        totalPrices: linePrices,
+        variants: [{ id: raw.id || '', color: raw.color || '', size: raw.size || '', quantity: qty, unitPrices, linePrices }],
+        description: raw.description || raw.desc || ''
+      };
+    });
+    return { items: normalizedItems, _isOrder: true, _paidFlag: true };
+  }
+
+  function renderPaidUIFromDoc(docData){
+    try {
+      const docKey = (docData && (docData.orderId || docData.trackingRef || docData.id)) || (quoteId || orderId) || 'paid';
+      if(paidUIRenderedFor && paidUIRenderedFor === docKey) return;
+      if(paidRenderInProgress) return;
+      paidRenderInProgress = true;
+
+      const paidQuoteInfoLocal = safeParseJSON(localStorage.getItem('paidQuoteInfo'), null);
+      const docCurrency = (docData && docData.currency) ? String(docData.currency).toUpperCase() : (paidQuoteInfoLocal && paidQuoteInfoLocal.currency ? String(paidQuoteInfoLocal.currency).toUpperCase() : selectedCurrency);
+      selectedCurrency = docCurrency || selectedCurrency;
+      if(currencySelect && currencyWrapper){
+        try { currencySelect.value = selectedCurrency; } catch(e){}
+        try { currencySelect.disabled = true; currencyWrapper.style.opacity = 0.6; currencyWrapper.style.pointerEvents = 'none'; } catch(e){}
+      }
+
+      const normalized = buildNormalizedFromFirestoreDoc(docData);
+      quote = normalized;
+      quote._isOrder = true;
+      quote._paidFlag = true;
+      isPaidOrder = true;
+
+      renderOrderFromQuoteNormalized(normalized, selectedCurrency, true);
+
+      fillBillingFields({
+        name: docData.name || docData.customer || docData.customerName || '',
+        email: docData.email || docData.customerEmail || '',
+        phone: docData.phone || docData.phoneNumber || docData.customerPhone || '',
+        address: docData.address || docData.shippingAddress || docData.shipping || docData.addressLine || ''
+      });
+
+      if(payBtn){ payBtn.textContent = 'Paid ✅'; payBtn.disabled = true; payBtn.classList.add('paid-state'); }
+
+      configureCheckoutUI(orderId ? 'order-paid' : 'quote-paid', { trackingRef: docData.trackingRef || docData.orderId || docData.trackingRef });
+
+      try {
+        localStorage.setItem('paidQuoteInfo', JSON.stringify({
+          quoteId: docData.id || null,
+          currency: selectedCurrency,
+          billing: { name: docData.name || docData.customer || '', email: docData.email || '', phone: docData.phone || docData.phoneNumber || '', address: docData.address || docData.shippingAddress || '' },
+          trackingRef: docData.trackingRef || docData.orderId || null,
+          verified: true
+        }));
+      } catch(e){}
+
+      paidUIRenderedFor = docKey;
+      paidRenderInProgress = false;
+      computeAndUpdateCartCount();
+    } catch(e){
+      paidRenderInProgress = false;
+      console.error('renderPaidUIFromDoc failed', e);
+    }
+  }
+
+  async function syncPaidQuoteUI(){
+    const paidQuoteInfo = safeParseJSON(localStorage.getItem('paidQuoteInfo'), null);
+    if(!paidQuoteInfo) { removeBlurLoaderAndReveal(); return; }
+
+    renderPaidUIFromDoc({
+      id: paidQuoteInfo.quoteId,
+      trackingRef: paidQuoteInfo.trackingRef,
+      currency: paidQuoteInfo.currency,
+      name: paidQuoteInfo.billing?.name,
+      email: paidQuoteInfo.billing?.email,
+      phone: paidQuoteInfo.billing?.phone,
+      address: paidQuoteInfo.billing?.address,
+      items: []
+    });
+    configureCheckoutUI(quoteId ? 'quote-paid' : 'order-paid', { trackingRef: paidQuoteInfo.trackingRef });
+
+    try {
+      if(paidQuoteInfo.quoteId){
+        try {
+          const ordersColl = collection(db, "brands", "fleurdevie", "orders");
+          const q = query(ordersColl, where("source", "==", `quote:${paidQuoteInfo.quoteId}`), where("status", "in", ["paid", "Paid", "PAID"]));
+          const snap = await getDocs(q);
+          if(snap && !snap.empty){
+            const oDoc = snap.docs[0].data(); oDoc.id = snap.docs[0].id;
+            renderPaidUIFromDoc(oDoc);
+            removeBlurLoaderAndReveal();
+            return;
+          }
+        } catch(err){ console.warn('order lookup by source failed', err); }
+
+        try {
+          const qSnap = await getDoc(doc(db, "brands", "fleurdevie", "quotes", paidQuoteInfo.quoteId));
+          if(qSnap && qSnap.exists()){
+            const qData = qSnap.data(); qData.id = qSnap.id;
+            renderPaidUIFromDoc(qData);
+            removeBlurLoaderAndReveal();
+            return;
+          }
+        } catch(e){
+          console.error('syncPaidQuoteUI quote read failed', e);
+          removeBlurLoaderAndReveal();
+          showError('Unable to verify quote details. Contact support.');
+          return;
+        }
+      }
+      removeBlurLoaderAndReveal();
+    } catch(e){ console.error('syncPaidQuoteUI failed', e); removeBlurLoaderAndReveal(); }
+  }
+
+  /* -------------------- BINDINGS + HEADER BEHAVIOR -------------------- */
   if(payBtn) payBtn.addEventListener('click', initiatePaymentFlow);
   if(currencySelect) currencySelect.addEventListener('change', ()=>{ selectedCurrency = currencySelect.value; localStorage.setItem(CURRENCY_KEY, selectedCurrency); if(quote) renderOrderFromQuoteNormalized(quote, selectedCurrency, isPaidOrder); });
 
-  window.addEventListener('scroll', () => {
-    const header = document.querySelector('.site-header');
-    if(!header) return;
-    if(window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled');
-  });
+  // header scroll show/hide (keeps your hamburger logic)
+  (function headerHeroBehavior(){
+    const headerEl = document.querySelector('.site-header');
+    const heroEl = document.querySelector('.hero');
+    const hamburger = document.getElementById('hamburger-btn');
+    if(!headerEl || !heroEl) return;
 
-  // hamburger
+    let lastY = window.scrollY || 0;
+    let hidden = false;
+    let heroHeight = Math.round(heroEl.getBoundingClientRect().height);
+
+    function isMenuOpen(){
+      return hamburger && hamburger.classList.contains('open');
+    }
+
+    function handleScroll(){
+      const y = window.scrollY || 0;
+      const menuOpen = isMenuOpen();
+
+      if(y > Math.max(50, heroHeight - 80)) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
+
+      if(menuOpen){
+        headerEl.style.top = '0';
+        headerEl.style.opacity = '1';
+        headerEl.style.pointerEvents = 'auto';
+        return;
+      }
+
+      if(y > heroHeight - 80){
+        if(y > lastY && !hidden){
+          headerEl.style.top = '-90px';
+          headerEl.style.opacity = '0';
+          headerEl.style.pointerEvents = 'none';
+          hidden = true;
+        } else if(y < lastY && hidden){
+          headerEl.style.top = '0';
+          headerEl.style.opacity = '1';
+          headerEl.style.pointerEvents = 'auto';
+          headerEl.classList.add('scrolled');
+          hidden = false;
+        }
+      } else {
+        headerEl.style.top = '0';
+        headerEl.style.opacity = '1';
+        headerEl.style.pointerEvents = 'auto';
+        headerEl.classList.remove('scrolled');
+        hidden = false;
+      }
+
+      lastY = y;
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', ()=>{ heroHeight = Math.round(heroEl.getBoundingClientRect().height); handleScroll(); }, { passive:true });
+    window.addEventListener('load', ()=>{ heroHeight = Math.round(heroEl.getBoundingClientRect().height); handleScroll(); });
+    if(hamburger){
+      hamburger.addEventListener('click', ()=>{ setTimeout(handleScroll, 200); });
+    }
+  })();
+
+  // mobile cart visibility
+  function handleMobileCart(){ 
+    const el = document.querySelector('.mobile-cart');
+    if(!el) return;
+    el.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+  }
+  window.addEventListener('resize', handleMobileCart);
+  handleMobileCart();
+
+  // hamburger toggle
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const navMenu = document.getElementById('nav-menu');
   if(hamburgerBtn) hamburgerBtn.addEventListener('click', ()=>{ hamburgerBtn.classList.toggle('open'); if(navMenu) navMenu.classList.toggle('open'); });
+
+  /* -------------------- storage listeners to keep UI updated -------------------- */
+  window.addEventListener('storage', async (e)=>{
+    if(e.key === STORAGE_KEY){
+      cart = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
+      cart = mergeCartItems(cart);
+      await loadCheckoutData();
+    }
+  });
+
+  /* support button mailto */
+  try {
+    const supportBtn = document.getElementById('floatingSupportBtn');
+    supportBtn?.addEventListener('click', () => {
+      window.location.href = 'mailto:yourstruly.fleurdevie@gmail.com?subject=Support%20Request';
+    });
+  } catch(e){}
+
+  /* footer year */
+  try { const yearEl = document.getElementById('year'); if(yearEl) yearEl.textContent = new Date().getFullYear(); } catch(e){}
 
   /* -------------------- INIT -------------------- */
   (async function init(){
@@ -1262,7 +1300,7 @@
     }
   })();
 
-  /* -------------------- suppress known noisy errors from FP/Flutterwave -------------------- */
+  /* suppress noisy errors */
   window.addEventListener('error', (e)=>{
     try {
       const msg = (e && e.message) ? e.message.toLowerCase() : '';
@@ -1274,100 +1312,6 @@
     } catch(err){}
   });
 
-  /* -------------------- storage listeners to keep UI updated -------------------- */
-  window.addEventListener('storage', async (e)=>{
-    if(e.key === STORAGE_KEY){
-      rawCart = safeParseJSON(localStorage.getItem(STORAGE_KEY), []) || [];
-      rawCart = mergeCartItems(rawCart);
-      await loadCheckoutData();
-    }
-  });
-
-  /* -------------------- support mailto -------------------- */
-  try {
-    const supportBtn = document.getElementById('floatingSupportBtn');
-    supportBtn?.addEventListener('click', () => {
-      window.location.href = 'mailto:yourstruly.fleurdevie@gmail.com?subject=Support%20Request';
-    });
-  } catch(e){}
-
-  /* ----------------- Footer Year ----------------- */
-  try { const yearEl = document.getElementById('year'); if(yearEl) yearEl.textContent = new Date().getFullYear(); } catch(e){}
   </script>
-
-  <script>
-  // --- 2️⃣ Global mobile-friendly styles ---
-  const style = document.createElement('style');
-  style.textContent = `
-    @media (max-width: 768px) {
-      input, textarea, select {
-        font-size: 16px !important;
-      }
-    }
-    html, body {
-      min-height: 100dvh;
-      scroll-behavior: smooth;
-    }
-    /* Smoothly hide sticky/fixed UI when keyboard opens */
-    .keyboard-open [data-sticky],
-    .keyboard-open footer,
-    .keyboard-open .sticky,
-    .keyboard-open .fixed-bottom,
-    .keyboard-open [class*="sticky"],
-    .keyboard-open [class*="fixed"] {
-      transform: translateY(120%);
-      transition: transform 0.3s ease;
-    }
-  `;
-  document.head.appendChild(style);
-
-  // --- 3️⃣ Keyboard open/close detection ---
-  let lastWindowHeight = window.innerHeight;
-  let lastScrollY = 0;
-
-  const onResize = () => {
-    const diff = lastWindowHeight - window.innerHeight;
-    if (diff > 150) {
-      // Keyboard opened
-      lastScrollY = window.scrollY;
-      document.body.classList.add('keyboard-open');
-    } else if (diff < -150) {
-      // Keyboard closed
-      document.body.classList.remove('keyboard-open');
-      // Restore scroll position
-      setTimeout(() => window.scrollTo({ top: lastScrollY, behavior: 'smooth' }), 200);
-    }
-    lastWindowHeight = window.innerHeight;
-  };
-
-  window.addEventListener('resize', onResize);
-  window.addEventListener('focusin', () => {
-    lastScrollY = window.scrollY;
-    document.body.classList.add('keyboard-open');
-  });
-  window.addEventListener('focusout', () => {
-    document.body.classList.remove('keyboard-open');
-    setTimeout(() => window.scrollTo({ top: lastScrollY, behavior: 'smooth' }), 200);
-  });
-
-  // --- 4️⃣ iOS Safari input-jump prevention ---
-  let activeInput = null;
-  document.addEventListener('focusin', e => {
-    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
-      activeInput = e.target;
-      setTimeout(() => {
-        const rect = activeInput.getBoundingClientRect();
-        if (rect.bottom > window.innerHeight - 100) {
-          activeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 300);
-    }
-  });
-  document.addEventListener('focusout', () => {
-    activeInput = null;
-  });
-})();
-</script>
-
 </body>
-</html>  
+</html>
