@@ -770,38 +770,42 @@ function normalizeOrderItems(items){
 
 /* -------------------- RENDER (keeps Fleur De Vie DOM & styles) -------------------- */
 /* -------------------- renderOrderFromQuoteNormalized (FleurDeVie - Serac-style variants) -------------------- */
-function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid = false) {
+function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
   try {
-    if (!orderItemsEl || !orderSubtotalEl) return;
+    if(!orderItemsEl || !orderSubtotalEl) return;
     orderItemsEl.innerHTML = '';
 
-    if (!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
+    if(!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
       orderItemsEl.innerHTML = '<li class="small-note">No items</li>';
       orderSubtotalEl.textContent = `Subtotal: —`;
       computeAndUpdateCartCount();
       return;
     }
 
+    // debug: print a single sample variant shape once (remove after inspecting)
+    if(quoteNormalized.items.length && Array.isArray(quoteNormalized.items[0].variants) && quoteNormalized.items[0].variants.length) {
+      console.debug('Fleur variant sample (first item):', quoteNormalized.items[0].variants[0]);
+    }
+
     let subtotal = 0;
 
     quoteNormalized.items.forEach((item, idx) => {
-      // compute item total (prefer item.totalPrices if present; otherwise sum variants)
+      // calculate value robustly
       const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
       const fallbackFromVariants = Array.isArray(item.variants)
         ? item.variants.reduce((s, v) => {
-            const line = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)));
-            return s + (isNaN(line) ? 0 : line);
+            const lp = Number((v.linePrices && (v.linePrices[currency] ?? null)) ??
+                       (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || v.qty || 0)));
+            return s + (isNaN(lp) ? 0 : lp);
           }, 0)
         : 0;
       const finalValue = valueFromTotals || fallbackFromVariants || 0;
       subtotal += finalValue;
 
-      // LI container
       const li = document.createElement('li');
       li.className = 'order-item';
-      li.dataset.idx = String(idx);
 
-      // LEFT (image + meta)
+      // LEFT (image + title + meta + variants)
       const left = document.createElement('div');
       left.className = 'left';
 
@@ -810,11 +814,10 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       headerWrapper.style.alignItems = 'center';
       headerWrapper.style.gap = '10px';
 
-      // product image (if available)
-      if (item.image) {
+      if(item.image){
         const img = document.createElement('img');
         img.src = item.image;
-        img.alt = item.name || 'Product';
+        img.alt = item.name || '';
         img.style.width = '56px';
         img.style.height = '56px';
         img.style.objectFit = 'cover';
@@ -823,134 +826,114 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
         headerWrapper.appendChild(img);
       }
 
-      // text wrapper (title + meta)
       const textWrap = document.createElement('div');
-      textWrap.style.minWidth = '0'; // prevents overflow
-
       const titleDiv = document.createElement('div');
       titleDiv.className = 'title';
-      titleDiv.textContent = `${item.name || 'Product'} (x${item.totalQuantity || 0})`;
+      titleDiv.textContent = `${item.name || 'Product'} (x${item.totalQuantity || (Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number(v.quantity||v.qty||0),0) : 0)})`;
       textWrap.appendChild(titleDiv);
 
-      if (Array.isArray(item.variants) && item.variants.length > 1) {
+      // show simple meta if single variant with attrs
+      if(Array.isArray(item.variants) && item.variants.length === 1){
+        const singleV = item.variants[0];
+        const colorSingle = singleV.color || singleV?.attributes?.Color || singleV?.variantValues?.Color || singleV?.variantValues?.color || singleV?.selectedOptions?.color || singleV?.selectedOptions?.Color;
+        const sizeSingle = singleV.size || singleV?.attributes?.Size || singleV?.variantValues?.Size || singleV?.variantValues?.size || singleV?.selectedOptions?.size || singleV?.selectedOptions?.Size;
+        const qtySingle = singleV.quantity || singleV.qty || singleV?.quantitySelected || 1;
+        if(colorSingle || sizeSingle){
+          const info = document.createElement('div');
+          info.className = 'meta';
+          info.style.marginTop = '6px';
+          const parts = [];
+          if(colorSingle) parts.push(`Color: ${colorSingle}`);
+          if(sizeSingle) parts.push(`Size: ${sizeSingle}`);
+          info.textContent = `${parts.join(' · ')} · qty: ${qtySingle}`;
+          textWrap.appendChild(info);
+        }
+      } else if (Array.isArray(item.variants) && item.variants.length > 1) {
         const info = document.createElement('div');
         info.className = 'meta';
         info.textContent = 'Multiple options selected';
         textWrap.appendChild(info);
-      } else {
-        const singleV = Array.isArray(item.variants) && item.variants[0];
-        if (singleV && (singleV.color || singleV.size)) {
-          const info = document.createElement('div');
-          info.className = 'meta';
-          info.textContent = `${singleV.color ? 'Color: ' + singleV.color : ''}${singleV.color && singleV.size ? ' · ' : ''}${singleV.size ? 'Size: ' + singleV.size : ''}`;
-          textWrap.appendChild(info);
-        }
       }
 
       headerWrapper.appendChild(textWrap);
       left.appendChild(headerWrapper);
 
-      // VARIANTS: show choices toggle + list (only when >1 variant OR variant attributes present)
-      if (Array.isArray(item.variants) && item.variants.length > 0) {
-        // determine if we need a toggle (multiple variants) or just show single variant inline
-        if (item.variants.length > 1) {
-          const toggle = document.createElement('button');
-          toggle.className = 'variant-toggle';
-          toggle.type = 'button';
-          toggle.setAttribute('aria-expanded', 'false');
-          toggle.title = 'View variants';
-          // use chevron svg like Serac
-          toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
-          toggle.style.marginTop = '6px';
-          toggle.style.background = 'none';
-          toggle.style.border = 'none';
-          toggle.style.cursor = 'pointer';
-          toggle.style.padding = '4px';
+      // variants list (if multiple)
+      if(Array.isArray(item.variants) && item.variants.length > 1){
+        // toggle button
+        const toggle = document.createElement('button');
+        toggle.className = 'variant-toggle';
+        toggle.type = 'button';
+        toggle.setAttribute('aria-expanded','false');
+        toggle.title = 'View variants';
+        toggle.style.marginTop = '6px';
+        toggle.style.display = 'inline-flex';
+        toggle.style.alignItems = 'center';
+        toggle.style.gap = '6px';
+        toggle.textContent = 'Show Choices ▾';
 
-          const variantsContainer = document.createElement('div');
-          variantsContainer.className = 'variants-container';
-          // styles left to your CSS; default is hidden until toggled
-          variantsContainer.style.display = 'none';
-          variantsContainer.style.flexDirection = 'column';
-          variantsContainer.style.gap = '6px';
-          variantsContainer.style.marginTop = '8px';
+        // container
+        const variantsContainer = document.createElement('div');
+        variantsContainer.className = 'variants-container';
+        variantsContainer.style.display = 'none';
+        variantsContainer.style.flexDirection = 'column';
+        variantsContainer.style.gap = '6px';
+        variantsContainer.style.marginTop = '8px';
 
-          // append each variant line (color/size/qty + price)
-          item.variants.forEach(v => {
+        // build rows
+        item.variants.forEach(v => {
           const row = document.createElement('div');
           row.className = 'variant-row';
           row.style.display = 'flex';
           row.style.justifyContent = 'space-between';
           row.style.alignItems = 'center';
           row.style.gap = '12px';
-        
+
           const leftRow = document.createElement('div');
           leftRow.style.display = 'flex';
           leftRow.style.gap = '8px';
           leftRow.style.alignItems = 'center';
-        
+
           const attrs = document.createElement('div');
           attrs.className = 'variant-attrs';
-        
-          // support both Serac-style (color/size) and Fleur-style (attributes or variantValues)
+
+          // robust extraction for Fleur/Serac shapes
+          const color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color || v?.selectedOptions?.color || v?.selectedOptions?.Color || v?.attrs?.color;
+          const size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size || v?.selectedOptions?.size || v?.selectedOptions?.Size || v?.attrs?.size;
+          const qty = v.quantity || v.qty || v?.quantitySelected || v?.qtySelected || 1;
+
           const parts = [];
-          const color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color;
-          const size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size;
-          const qty = v.quantity || v.qty || v?.quantitySelected || 1;
-        
-          if (color) parts.push(`Color: ${color}`);
-          if (size) parts.push(`Size: ${size}`);
+          if(color) parts.push(`Color: ${color}`);
+          if(size) parts.push(`Size: ${size}`);
           const joined = parts.join(' · ');
+
           attrs.innerHTML = `${joined}${joined ? ' · ' : ''}<span style="color:#556b59">qty: ${qty}</span>`;
           leftRow.appendChild(attrs);
-        
+
+          // price element (single declaration)
           const priceEl = document.createElement('div');
           priceEl.className = 'variant-price';
           const variantLinePrice = Number(
             (v.linePrices && (v.linePrices[currency] ?? null)) ??
-            (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0))
+            (Number(v.unitPrices?.[currency] || v.price || v?.prices?.[currency] || 0) * Number(v.quantity || v.qty || 1))
           );
           priceEl.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
-        
+
           row.appendChild(leftRow);
           row.appendChild(priceEl);
           variantsContainer.appendChild(row);
         });
 
+        // toggle behavior
+        toggle.addEventListener('click', () => {
+          const shown = variantsContainer.style.display === 'flex';
+          variantsContainer.style.display = shown ? 'none' : 'flex';
+          toggle.setAttribute('aria-expanded', shown ? 'false' : 'true');
+          toggle.textContent = shown ? 'Show Choices ▾' : 'Hide Choices ▴';
+        });
 
-          //   const rightPrice = document.createElement('div');
-          //   rightPrice.className = 'variant-price';
-          //   const variantLinePrice = Number((v.linePrices && (v.linePrices[currency] ?? null)) ?? (Number(v.unitPrices?.[currency] || 0) * Number(v.quantity || 0)));
-          //   rightPrice.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
-
-          //   row.appendChild(leftRow);
-          //   row.appendChild(rightPrice);
-          //   variantsContainer.appendChild(row);
-          // });
-
-          // attach toggle behavior
-          toggle.addEventListener('click', () => {
-            const isShown = variantsContainer.style.display === 'flex';
-            variantsContainer.style.display = isShown ? 'none' : 'flex';
-            toggle.setAttribute('aria-expanded', isShown ? 'false' : 'true');
-          });
-
-          left.appendChild(toggle);
-          left.appendChild(variantsContainer);
-        } else {
-          // single variant - show inline attributes under title if any
-          const singleV = item.variants[0];
-          if (singleV && (singleV.color || singleV.size)) {
-            const info = document.createElement('div');
-            info.className = 'meta';
-            info.style.marginTop = '6px';
-            const parts = [];
-            if (singleV.color) parts.push(`Color: ${singleV.color}`);
-            if (singleV.size) parts.push(`Size: ${singleV.size}`);
-            info.textContent = `${parts.join(' · ')} · qty: ${singleV.quantity}`;
-            left.appendChild(info);
-          }
-        }
+        left.appendChild(toggle);
+        left.appendChild(variantsContainer);
       }
 
       // RIGHT (price)
