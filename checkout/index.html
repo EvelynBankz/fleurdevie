@@ -100,6 +100,13 @@
     .order-item .title{font-weight:600}
     .order-item .meta{font-size:0.95rem;color:#334d3a;margin-top:6px}
 
+    .order-item {flex-wrap: nowrap;}
+  
+    .order-item .left { min-width: 0;}
+  
+    .order-item .right { white-space: nowrap; flex-shrink: 0;}
+
+
     /* variant toggle */
     .variant-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;border:1px solid #112e1f;background:#FFD6BA;color:#112e1f;cursor:pointer;padding:0;margin-left:8px}
     .variant-toggle svg{width:14px;height:14px;transition:transform .25s ease}
@@ -109,6 +116,11 @@
     .variant-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.06)}
     .variant-attrs{font-size:0.95rem;color:#334d3a}
     .variant-price{font-weight:600;min-width:110px;text-align:right}
+
+    .variant-row {flex-wrap: nowrap;align-items: center;}
+
+    .variant-attrs, .variant-price {white-space: nowrap;}
+
 
     .subtotal{font-weight:700;text-align:right;margin-top:12px}
     .note{font-size:0.9rem;color:#666;margin-top:8px}
@@ -276,8 +288,23 @@
   .checkout-variant-meta {
     font-size: 0.85rem;
   }
+
+  .order-item .title {
+  font-size: 14px;
 }
-  </style>
+
+  .variant-row {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .variant-attrs,
+  .variant-price {
+    font-size: 13px;
+  }
+}
+    
+</style>
 </head>
 <body>
   <header class="site-header">
