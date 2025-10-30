@@ -653,30 +653,69 @@ async function renderCheckoutItems() {
 
   items.forEach(item => {
     const hasVariantMeta =
-      item.variants.length > 1 ||
-      item.variants.some(v => v.color || v.size);
+      Array.isArray(item.variants) &&
+      (item.variants.length > 1 ||
+       item.variants.some(v =>
+         v.color || v.size ||
+         v?.attributes?.Color || v?.attributes?.Size ||
+         v?.variantValues?.Color || v?.variantValues?.Size ||
+         v?.selectedOptions?.color || v?.selectedOptions?.size
+       ));
 
     const div = document.createElement('div');
     div.className = 'checkout-item';
+
+    // build variant list safely
+    let variantsHtml = '';
+    if (hasVariantMeta) {
+      variantsHtml = `
+        <button class="checkout-variants-toggle">View Choices</button>
+        <div class="checkout-variants-container">
+          ${item.variants.map(v => {
+            const color =
+              v.color ||
+              v?.attributes?.Color ||
+              v?.variantValues?.Color ||
+              v?.variantValues?.color ||
+              v?.selectedOptions?.color ||
+              v?.selectedOptions?.Color ||
+              '';
+            const size =
+              v.size ||
+              v?.attributes?.Size ||
+              v?.variantValues?.Size ||
+              v?.variantValues?.size ||
+              v?.selectedOptions?.size ||
+              v?.selectedOptions?.Size ||
+              '';
+            const qty = v.quantity || v.qty || v.quantitySelected || 1;
+            const linePrice = Number(
+              (v.linePrices && (v.linePrices[currency] ?? null)) ??
+              (Number(v.unitPrices?.[currency] || v.price || 0) * qty)
+            );
+            return `
+              <div class="checkout-variant-row">
+                <div class="checkout-variant-meta">
+                  ${[color && `Color: ${color}`, size && `Size: ${size}`].filter(Boolean).join(' · ')}
+                  ${color || size ? ' · ' : ''}qty: ${qty}
+                </div>
+                <div class="checkout-variant-price">
+                  ${formatPrice(isNaN(linePrice) ? 0 : linePrice, currency)}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
     div.innerHTML = `
       <div class="checkout-item-inner" data-id="${item.productId}">
-        <img src="${item.image}" alt="${item.name}" class="checkout-thumb">
-
+        <img src="${item.image}" alt="${escapeHtml(item.name)}" class="checkout-thumb">
         <div class="checkout-details">
           <h3 class="checkout-name">${escapeHtml(item.name)}</h3>
           <div class="checkout-price">${formatPrice(item.totalPrices[currency], currency)}</div>
-
-          ${hasVariantMeta ? `
-            <button class="checkout-variants-toggle">View Choices</button>
-            <div class="checkout-variants-container">
-              ${item.variants.map(v => `
-                <div class="checkout-variant-row">
-                  <div class="checkout-variant-meta">
-                    ${v.color ? v.color + ' / ' : ''}${v.size ? v.size + ' x ' : ''}${v.quantity}
-                  </div>
-                </div>`).join('')}
-            </div>
-          ` : ''}
+          ${variantsHtml}
         </div>
       </div>
     `;
@@ -693,8 +732,8 @@ async function renderCheckoutItems() {
   });
 }
 
-// run after DOM is ready
 document.addEventListener('DOMContentLoaded', renderCheckoutItems);
+
 
   
 /* -------------------- NORMALIZERS (quote/order) -------------------- */
@@ -770,45 +809,43 @@ function normalizeOrderItems(items){
 
 /* -------------------- RENDER (keeps Fleur De Vie DOM & styles) -------------------- */
 /* -------------------- renderOrderFromQuoteNormalized (FleurDeVie - Serac-style variants) -------------------- */
-function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid = false) {
+function renderOrderFromQuoteNormalized(quoteNormalized, currency='NGN', paid=false){
   try {
-    if (!orderItemsEl || !orderSubtotalEl) return;
+    if(!orderItemsEl || !orderSubtotalEl) return;
     orderItemsEl.innerHTML = '';
 
-    if (!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
+    if(!quoteNormalized || !Array.isArray(quoteNormalized.items)) {
       orderItemsEl.innerHTML = '<li class="small-note">No items</li>';
       orderSubtotalEl.textContent = `Subtotal: —`;
       computeAndUpdateCartCount();
       return;
     }
 
-    // debug once
+    // quick sample log to verify shape (remove if noisy)
     if (quoteNormalized.items.length && Array.isArray(quoteNormalized.items[0].variants) && quoteNormalized.items[0].variants.length) {
-      console.debug('Fleur variant sample (first item):', quoteNormalized.items[0].variants[0]);
+      console.debug('Fleur variant sample (first item)', quoteNormalized.items[0].variants[0]);
     }
 
     let subtotal = 0;
 
     quoteNormalized.items.forEach((item) => {
-      // compute final price
+      // compute line value robustly
       const valueFromTotals = Number((item.totalPrices && (item.totalPrices[currency] ?? null)) ?? 0) || 0;
       const fallbackFromVariants = Array.isArray(item.variants)
-        ? item.variants.reduce((sum, v) => {
-            const lp = Number(
-              (v.linePrices && (v.linePrices[currency] ?? null)) ??
-              (Number(v.unitPrices?.[currency] || v.price || v?.prices?.[currency] || 0) *
-                Number(v.quantity || v.qty || 0))
-            );
-            return sum + (isNaN(lp) ? 0 : lp);
+        ? item.variants.reduce((s, v) => {
+            const qty = Number(v.quantity ?? v.qty ?? v.quantitySelected ?? 1);
+            const lp = Number((v.linePrices && (v.linePrices[currency] ?? null)) ??
+                      (Number(v.unitPrices?.[currency] ?? v.price ?? 0) * qty));
+            return s + (isNaN(lp) ? 0 : lp);
           }, 0)
         : 0;
       const finalValue = valueFromTotals || fallbackFromVariants || 0;
       subtotal += finalValue;
 
+      // build item DOM
       const li = document.createElement('li');
       li.className = 'order-item';
 
-      // LEFT (image + title + meta + variants)
       const left = document.createElement('div');
       left.className = 'left';
 
@@ -817,7 +854,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       headerWrapper.style.alignItems = 'center';
       headerWrapper.style.gap = '10px';
 
-      if (item.image) {
+      if(item.image){
         const img = document.createElement('img');
         img.src = item.image;
         img.alt = item.name || '';
@@ -832,28 +869,26 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       const textWrap = document.createElement('div');
       const titleDiv = document.createElement('div');
       titleDiv.className = 'title';
-      titleDiv.textContent = `${item.name || 'Product'} (x${
-        item.totalQuantity ||
-        (Array.isArray(item.variants)
-          ? item.variants.reduce((s, v) => s + Number(v.quantity || v.qty || 0), 0)
-          : 0)
-      })`;
+
+      // total quantity fallback
+      const totalQty = item.totalQuantity ?? (Array.isArray(item.variants) ? item.variants.reduce((s,v)=> s + Number(v.quantity ?? v.qty ?? 0),0) : 0);
+      titleDiv.textContent = `${item.name || 'Product'} (x${totalQty})`;
       textWrap.appendChild(titleDiv);
 
-      // meta info
-      if (Array.isArray(item.variants) && item.variants.length === 1) {
-        const v = item.variants[0];
-        const color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color || v?.selectedOptions?.color || v?.selectedOptions?.Color;
-        const size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size || v?.selectedOptions?.size || v?.selectedOptions?.Size;
-        const qty = v.quantity || v.qty || v?.quantitySelected || 1;
-        if (color || size) {
+      // show simple meta for single variant or "multiple options selected"
+      if(Array.isArray(item.variants) && item.variants.length === 1){
+        const singleV = item.variants[0];
+        const colorSingle = singleV.color || singleV?.attributes?.Color || singleV?.variantValues?.Color || singleV?.variantValues?.color || singleV?.selectedOptions?.color || singleV?.selectedOptions?.Color;
+        const sizeSingle = singleV.size || singleV?.attributes?.Size || singleV?.variantValues?.Size || singleV?.variantValues?.size || singleV?.selectedOptions?.size || singleV?.selectedOptions?.Size;
+        const qtySingle = singleV.quantity || singleV.qty || singleV.quantitySelected || 1;
+        if(colorSingle || sizeSingle){
           const info = document.createElement('div');
           info.className = 'meta';
           info.style.marginTop = '6px';
           const parts = [];
-          if (color) parts.push(`Color: ${color}`);
-          if (size) parts.push(`Size: ${size}`);
-          info.textContent = `${parts.join(' · ')} · qty: ${qty}`;
+          if(colorSingle) parts.push(`Color: ${colorSingle}`);
+          if(sizeSingle) parts.push(`Size: ${sizeSingle}`);
+          info.textContent = `${parts.join(' · ')} · qty: ${qtySingle}`;
           textWrap.appendChild(info);
         }
       } else if (Array.isArray(item.variants) && item.variants.length > 1) {
@@ -866,12 +901,13 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
       headerWrapper.appendChild(textWrap);
       left.appendChild(headerWrapper);
 
-      // multiple variants dropdown
-      if (Array.isArray(item.variants) && item.variants.length > 1) {
+      // variants list if multiple
+      if(Array.isArray(item.variants) && item.variants.length > 1){
+        // toggle
         const toggle = document.createElement('button');
         toggle.className = 'variant-toggle';
         toggle.type = 'button';
-        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-expanded','false');
         toggle.title = 'View variants';
         toggle.style.marginTop = '6px';
         toggle.style.display = 'inline-flex';
@@ -879,6 +915,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
         toggle.style.gap = '6px';
         toggle.textContent = 'Show Choices ▾';
 
+        // container
         const variantsContainer = document.createElement('div');
         variantsContainer.className = 'variants-container';
         variantsContainer.style.display = 'none';
@@ -886,7 +923,8 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
         variantsContainer.style.gap = '6px';
         variantsContainer.style.marginTop = '8px';
 
-        item.variants.forEach((v) => {
+        // rows
+        item.variants.forEach(v => {
           const row = document.createElement('div');
           row.className = 'variant-row';
           row.style.display = 'flex';
@@ -902,23 +940,25 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
           const attrs = document.createElement('div');
           attrs.className = 'variant-attrs';
 
+          // robust extraction (Fleur / Serac / other shapes)
           const color = v.color || v?.attributes?.Color || v?.variantValues?.Color || v?.variantValues?.color || v?.selectedOptions?.color || v?.selectedOptions?.Color || v?.attrs?.color;
           const size = v.size || v?.attributes?.Size || v?.variantValues?.Size || v?.variantValues?.size || v?.selectedOptions?.size || v?.selectedOptions?.Size || v?.attrs?.size;
           const qty = v.quantity || v.qty || v?.quantitySelected || v?.qtySelected || 1;
 
           const parts = [];
-          if (color) parts.push(`Color: ${color}`);
-          if (size) parts.push(`Size: ${size}`);
+          if(color) parts.push(`Color: ${color}`);
+          if(size) parts.push(`Size: ${size}`);
           const joined = parts.join(' · ');
 
           attrs.innerHTML = `${joined}${joined ? ' · ' : ''}<span style="color:#556b59">qty: ${qty}</span>`;
           leftRow.appendChild(attrs);
 
+          // price element (single declaration)
           const priceEl = document.createElement('div');
           priceEl.className = 'variant-price';
           const variantLinePrice = Number(
             (v.linePrices && (v.linePrices[currency] ?? null)) ??
-            (Number(v.unitPrices?.[currency] || v.price || v?.prices?.[currency] || 0) * Number(v.quantity || v.qty || 1))
+            (Number(v.unitPrices?.[currency] || v.price || v?.prices?.[currency] || 0) * Number(v.quantity || v.qty || qty))
           );
           priceEl.textContent = formatPrice(isNaN(variantLinePrice) ? 0 : variantLinePrice, currency);
 
@@ -927,6 +967,7 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
           variantsContainer.appendChild(row);
         });
 
+        // toggle behavior
         toggle.addEventListener('click', () => {
           const shown = variantsContainer.style.display === 'flex';
           variantsContainer.style.display = shown ? 'none' : 'flex';
@@ -934,11 +975,11 @@ function renderOrderFromQuoteNormalized(quoteNormalized, currency = 'NGN', paid 
           toggle.textContent = shown ? 'Show Choices ▾' : 'Hide Choices ▴';
         });
 
-        left.appendChild(toggle);
-        left.appendChild(variantsContainer);
+        left.appendChild(toggle);             // important: toggle first
+        left.appendChild(variantsContainer);  // then container
       }
 
-      // RIGHT (price)
+      // RIGHT (price summary)
       const right = document.createElement('div');
       right.className = 'right';
       right.style.minWidth = '120px';
