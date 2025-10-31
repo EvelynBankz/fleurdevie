@@ -238,21 +238,21 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
     overflow: visible;
   }
 
+  /* Peek sits BELOW the hero */
   .hero-peek {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
     width: 90%;
     height: 20px;
+    margin: 0 auto;
+    margin-top: -10px; /* slightly overlaps hero bottom for seamless blend */
     border-radius: 10px / 50%;
     z-index: 2;
-    box-shadow: 0 -6px 15px rgba(92, 64, 51, 0.15); /* soft cocoa shadow */
+    box-shadow: 0 -6px 15px rgba(92, 64, 51, 0.15); /* soft cocoa glow */
     animation: peekFloat 2s ease-in-out infinite alternate;
     overflow: hidden;
   }
 
-  /* Satin gloss layer with subtle shimmer */
+  /* Satin shimmer gloss */
   .hero-peek::after {
     content: "";
     position: absolute;
@@ -270,7 +270,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
     pointer-events: none;
   }
 
-  /* Fleur de Vie Dark Theme — warm cocoa fade with rose undertones */
+  /* Fleur de Vie dark & light themes */
   .hero-peek[data-theme="dark"] {
     background: linear-gradient(
       to top,
@@ -280,7 +280,6 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
     );
   }
 
-  /* Fleur de Vie Light Theme — soft champagne glow with blush highlight */
   .hero-peek[data-theme="light"] {
     background: linear-gradient(
       to top,
@@ -292,11 +291,11 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 
   @keyframes peekFloat {
     0% {
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
       opacity: 0.9;
     }
     100% {
-      transform: translateX(-50%) translateY(-4px);
+      transform: translateY(-4px);
       opacity: 1;
     }
   }
@@ -311,6 +310,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   }
 }
 </style>
+
 
   
 </head>
@@ -1698,33 +1698,41 @@ try {
 </script>
 
 <script>
-(function() {
-  const applyHeroPeek = () => {
-    const heroes = document.querySelectorAll('.hero');
-    heroes.forEach(hero => {
-      if (hero.querySelector('.hero-peek')) return;
+(function () {
+  const applyFleurHeroPeek = () => {
+    const heroes = document.querySelectorAll(".hero");
 
-      const peek = document.createElement('div');
-      peek.className = 'hero-peek';
+    heroes.forEach((hero) => {
+      // Remove any existing peek after hero
+      const next = hero.nextElementSibling;
+      if (next && next.classList.contains("hero-peek")) next.remove();
 
-      // Determine hero brightness (basic)
+      // Create the decorative peek element
+      const peek = document.createElement("div");
+      peek.className = "hero-peek";
+
+      // Determine background brightness of hero for theme
       const bg = window.getComputedStyle(hero).backgroundColor;
       let darkHero = true;
-      if (bg.startsWith('rgb')) {
+
+      if (bg && bg.startsWith("rgb")) {
         const rgb = bg.match(/\d+/g).map(Number);
-        const brightness = (rgb[0]*299 + rgb[1]*587 + rgb[2]*114) / 1000;
-        darkHero = brightness < 128; // simple threshold
+        const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+        darkHero = brightness < 128;
       }
 
-      peek.dataset.theme = darkHero ? 'dark' : 'light';
-      hero.appendChild(peek);
+      peek.dataset.theme = darkHero ? "dark" : "light";
+
+      // Insert peek directly *after* the hero element
+      hero.insertAdjacentElement("afterend", peek);
     });
   };
 
-  window.addEventListener('load', applyHeroPeek);
-  window.addEventListener('resize', applyHeroPeek);
+  window.addEventListener("load", applyFleurHeroPeek);
+  window.addEventListener("resize", applyFleurHeroPeek);
 })();
-</script>  
+</script>
+
 
 </body>
 </html>
