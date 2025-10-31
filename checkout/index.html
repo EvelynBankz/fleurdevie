@@ -232,28 +232,64 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 </style>
   
 <style>
+/* ===========================
+   HERO PEEK (FLEUR DE VIE STYLE)
+=========================== */
 .hero-peek {
   position: relative;
-  width: 90%;
-  height: 20px;
-  margin: -30px auto 40px; /* pull it closer to hero */
-  border-radius: 10px / 50%;
-  box-shadow: 0 -6px 15px rgba(0,0,0,0.15);
-  animation: peekFloat 2s ease-in-out infinite alternate;
-  z-index: 2;
+  z-index: 5;
+  width: 100%;
+  height: 80px;
+  transform: skewY(-3deg);
+  transform-origin: top left;
+  margin: -10px auto 40px;
+  border: none;
+  box-shadow: 0 -6px 25px rgba(17, 46, 31, 0.35);
+  background-size: 200% 200%;
+  animation: gradientMove 8s ease-in-out infinite alternate;
+  transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
 }
 
-.hero-peek[data-theme="dark"] {
-  background: linear-gradient(to top, rgba(182,110,65,0.3), transparent);
+/* LIGHT THEME */
+.light-theme .hero-peek {
+  background: linear-gradient(
+    120deg,
+    #112e1f 0%,     /* Deep dark green start */
+    #b9a56a 50%,    /* Soft green-gold midtone */
+    #f7f4e8 100%    /* Cream glow finish */
+  );
 }
 
-.hero-peek[data-theme="light"] {
-  background: linear-gradient(to top, rgba(255,235,200,0.35), transparent);
+/* DARK THEME */
+.dark-theme .hero-peek {
+  background: linear-gradient(
+    120deg,
+    #f7f4e8 0%,     /* Cream start for brightness */
+    #b9a56a 45%,    /* Golden midtone */
+    #112e1f 100%    /* Deep dark green end */
+  );
 }
 
-@keyframes peekFloat {
-  0% { transform: translateY(0); opacity: 0.85; }
-  100% { transform: translateY(-4px); opacity: 1; }
+/* GRADIENT MOVEMENT ANIMATION */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* OPTIONAL: SMOOTH RESPONSIVENESS */
+@media (max-width: 600px) {
+  .hero-peek {
+    height: 60px;
+    margin: -8px auto 30px;
+    transform: skewY(-2deg);
+    box-shadow: 0 -4px 20px rgba(17, 46, 31, 0.25);
+  }
 }
 </style>
 
