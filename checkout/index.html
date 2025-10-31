@@ -9,7 +9,7 @@
 <style>
 /* ===================== RESET & BASE ===================== */
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; overflow-x:hidden; } /* ✅ Prevent horizontal overflow */
+html, body { width:100%; overflow-x:hidden; } /* Prevent horizontal overflow */
 body { font-family: "Montserrat", sans-serif; background: #F5E6CC; color:#112e1f; line-height:1.6; }
 a { text-decoration:none; color:inherit; }
 
@@ -61,32 +61,10 @@ a { text-decoration:none; color:inherit; }
 
 /* ===================== CHECKOUT GRID ===================== */
 section.checkout { padding:60px 20px; }
-.container {
-  max-width:1100px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:1fr 1.6fr;
-  gap:28px;
-  align-items:start;
-  width:100%;
-  box-sizing:border-box;
-}
-.card {
-  border-radius: 16px;
-  background: var(--card-bg);
-  padding: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
-}
+.container { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1.6fr; gap:28px; align-items:start; width:100%; box-sizing:border-box; }
+.card {border-radius: 16px; background: var(--card-bg);padding: 22px;border: 1px solid rgba(255, 255, 255, 0.03);box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);}
 
-.checkout-form, .order-summary {
-  border-radius:12px;
-  padding:18px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  background:#F5E6CC;
-  width:100%;
-  box-sizing:border-box;
-}
+.checkout-form, .order-summary { border-radius:12px; padding:18px; box-shadow:0 4px 10px rgba(0,0,0,0.2); background:#F5E6CC; width:100%; box-sizing:border-box; }
 
 h2 { font-family:"Playfair Display", serif; margin-bottom:12px; font-size:20px; }
 label { display:block; margin-bottom:6px; font-weight:500; }
@@ -107,8 +85,9 @@ textarea { min-height:80px; resize:vertical; }
   border-radius:8px;
   background:#F5E6CC;
   box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  flex-wrap:wrap; /* ✅ Prevent overflow */
-  word-break:break-word;
+  /* keep inline structure: do not stack on mobile */
+  flex-wrap:nowrap;
+  word-break:normal;
 }
 .order-item .left { flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:8px; }
 .order-item .right { flex:0 0 150px; text-align:right; align-self:flex-start; }
@@ -117,7 +96,7 @@ textarea { min-height:80px; resize:vertical; }
 .order-item img { display:block; }
 .order-item .meta,.order-item .title{font-size:0.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 
-/* ===================== VARIANTS ===================== */
+/* ===================== VARIANTS (Fleur De Vie) ===================== */
 .variant-toggle { display:inline-flex; align-items:center; justify-content:center; height:34px; border-radius:8px; border:1px solid var(--fleur-green,#1a3c34); background:transparent; color:var(--fleur-green,#1a3c34); cursor:pointer; padding:6px 10px; font-size:0.92rem; gap:8px; }
 .variant-toggle svg { width:14px; height:14px; transition:transform .25s ease; }
 .variant-toggle[aria-expanded="true"] svg { transform:rotate(180deg); }
@@ -133,13 +112,14 @@ textarea { min-height:80px; resize:vertical; }
   border-radius:8px;
   background: rgba(26,60,52,0.03);
   margin-bottom:8px;
-  flex-wrap:wrap; /* ✅ Prevent overflow on mobile */
-  word-break:break-word;
+  /* keep inline structure: do not stack or change order */
+  flex-wrap:nowrap;
+  word-break:normal;
 }
 .variant-attrs { font-size:0.95rem; color:#334d3a; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .variant-price { font-weight:600; margin-left:12px; flex:0 0 auto; text-align:right; white-space:nowrap; min-width:70px; }
 
-/* ===================== CHECKOUT VARIANTS DROPDOWN ===================== */
+/* ===================== CHECKOUT VARIANTS DROPDOWN (Sérac style) ===================== */
 .checkout-variants-toggle { background: transparent; border: 1px solid var(--fleur-green, #1a3c34); color: var(--fleur-green, #1a3c34); font-family: "Playfair Display", serif; font-size: 0.95rem; padding: 6px 14px; border-radius: 6px; margin-top: 6px; cursor: pointer; transition: all 0.25s ease; }
 .checkout-variants-toggle:hover { background: var(--fleur-green, #1a3c34); color: #fff; }
 .checkout-variants-container { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.35s ease; margin-top: 0; }
@@ -154,7 +134,7 @@ textarea { min-height:80px; resize:vertical; }
 .fdv-blur-spinner { width:54px; height:54px; border:6px solid rgba(255,255,255,0.15); border-top:6px solid rgba(255,255,255,0.95); border-radius:50%; animation:fdv-spin 1s linear infinite; }
 @keyframes fdv-spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
-/* ===================== FOOTER ===================== */
+/* FOOTER */
 footer { text-align:center;padding:20px; background:transparent; color:#112e1f; margin-top:60px;}  
 
 /* ===================== FLOATING SUPPORT BUTTON ===================== */
@@ -165,6 +145,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 @keyframes glowPulse { 0%,100%{ box-shadow:0 8px 30px rgba(212,245,105,1);} 50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);} }
 
 /* ===================== RESPONSIVE ===================== */
+/* Keep layout same, only scale down fonts/paddings on small screens */
 @media (max-width: 900px) {
   .header-right { position:absolute; top:68px; right:0; background: rgba(17,46,31,0.95); flex-direction:column; width:200px; padding:20px; display:none; border-radius:0 0 0 10px; z-index:1100; }
   .header-right.open { display:flex !important; flex-direction:column; gap:12px; }
@@ -178,23 +159,47 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 
   section.checkout { padding:30px 16px; }
   .container { grid-template-columns: 1fr; padding:0; gap:28px; width:100%; }
-  .order-item { padding:10px; gap:10px; }
+  .order-item { padding:10px; gap:10px; /* keep inline */ }
   .order-item .right { flex:0 0 auto; font-size:0.95rem; }
+  .order-item .title { font-size:15px; }
+  .variant-attrs { font-size:0.92rem; }
+  .variant-price { font-size:0.92rem; min-width:60px; }
+  .variants-container, .variants-container.show { padding-left:0; padding-right:0; }
+  .variant-row { padding-left:6px; padding-right:6px; }
 }
 
 @media (max-width: 600px) {
+  .checkout-variants-toggle { font-size:0.85rem; padding:5px 12px; }
+  .checkout-variant-meta { font-size:0.85rem; }
+
+  /* ONLY scale down sizes — DO NOT change layout direction or stacking */
   section.checkout { padding:20px 10px; }
   .checkout-form, .order-summary { padding:14px; }
-  .order-item { flex-direction:column; align-items:flex-start; }
-  .variant-row { flex-direction:column; align-items:flex-start; }
-  input, textarea, select { font-size:0.95rem; }
+
+  /* Keep items inline as on desktop: reduce text sizes & control sizes */
+  .order-item { gap:8px; }
+  .order-item .left { gap:6px; }
+  .order-item .right { flex:0 0 auto; font-size:0.9rem; }
+  .order-item .title { font-size:14px; }
+  .order-item .meta { font-size:0.88rem; }
+
+  .variant-toggle { font-size:0.82rem; padding:5px 8px; height:auto; }
+  .variant-attrs { font-size:0.88rem; }
+  .variant-price { font-size:0.88rem; min-width:56px; margin-left:8px; }
+
+  .variant-row { gap:8px; padding:6px; }
+  .quantity-controls button { width:22px; height:22px; font-size:0.9rem; }
+
+  input, textarea, select { font-size:0.92rem; padding:8px; }
+  .checkout-btn { padding:12px; font-size:0.95rem; }
 }
 
 @media (max-width: 420px) {
-  .order-item .right { flex:0 0 auto; font-size:0.9rem; }
-  .variant-attrs { font-size:0.88rem; }
-  .variant-price { font-size:0.88rem; min-width:56px; }
+  .order-item .right { flex:0 0 auto; font-size:0.88rem; }
+  .variant-attrs { font-size:0.86rem; }
+  .variant-price { font-size:0.86rem; min-width:52px; }
 }
+
 
 </style>
 </head>
