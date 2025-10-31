@@ -233,7 +233,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   
 <style>
 /* ===========================
-   Fleur de Vie Hero Peek (Curved Style)
+   Fleur de Vie Hero Peek (Curved Style - Top to Bottom Gradient)
 =========================== */
 @media (min-width: 200px) {
   .hero {
@@ -243,7 +243,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 
   .hero-peek {
     position: absolute;
-    bottom: -18px; /* slightly overlaps the bottom of the hero */
+    bottom: 0; /* Touches bottom of hero image */
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
@@ -251,7 +251,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
     border-radius: 12px / 50%;
     z-index: 2;
     box-shadow: 0 -6px 25px rgba(17, 46, 31, 0.35);
-    background-size: 200% 200%;
+    background-size: 100% 200%;
     animation: gradientMove 8s ease-in-out infinite alternate;
     transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
   }
@@ -259,35 +259,36 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   /* LIGHT THEME */
   .hero-peek[data-theme="light"] {
     background: linear-gradient(
-      120deg,
-      #112e1f 0%,    /* Signature dark green start */
-      #b9a56a 55%,   /* Gentle gold-green blend */
-      #f7f4e8 100%   /* Soft cream glow finish */
+      to bottom,
+      #112e1f 0%,    /* Dark green start (top) */
+      #b9a56a 55%,   /* Green-gold middle */
+      #f7f4e8 100%   /* Cream glow bottom */
     );
   }
 
   /* DARK THEME */
   .hero-peek[data-theme="dark"] {
     background: linear-gradient(
-      120deg,
-      #f7f4e8 0%,    /* Cream start */
+      to bottom,
+      #f7f4e8 0%,    /* Cream start (top) */
       #b9a56a 45%,   /* Golden midtone */
-      #112e1f 100%   /* Deep dark green end */
+      #112e1f 100%   /* Deep dark green bottom */
     );
   }
 
   /* GRADIENT MOVEMENT ANIMATION */
   @keyframes gradientMove {
     0% {
-      background-position: 0% 50%;
+      background-position: 50% 0%;
       opacity: 0.9;
     }
     100% {
-      background-position: 100% 50%;
+      background-position: 50% 100%;
       opacity: 1;
     }
   }
 }
+
 
 </style>
 
