@@ -9,7 +9,7 @@
 <style>
 /* ===================== RESET & BASE ===================== */
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; overflow-x:hidden; } /* Prevent horizontal overflow */
+html, body { width:100%; max-width:100%; overflow-x:hidden; } /* Prevent horizontal overflow */
 body { font-family: "Montserrat", sans-serif; background: #F5E6CC; color:#112e1f; line-height:1.6; }
 a { text-decoration:none; color:inherit; }
 
@@ -64,7 +64,7 @@ section.checkout { padding:60px 20px; }
 .container { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1.6fr; gap:28px; align-items:start; width:100%; box-sizing:border-box; }
 .card {border-radius: 16px; background: var(--card-bg);padding: 22px;border: 1px solid rgba(255, 255, 255, 0.03);box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);}
 
-.checkout-form, .order-summary { border-radius:12px; padding:18px; box-shadow:0 4px 10px rgba(0,0,0,0.2); background:#F5E6CC; width:100%; box-sizing:border-box; }
+.checkout-form, .order-summary { border-radius:12px; padding:18px; box-shadow:0 4px 10px rgba(0,0,0,0.2); background:#F5E6CC; width:100%; box-sizing:border-box; overflow-x:hidden; }
 
 h2 { font-family:"Playfair Display", serif; margin-bottom:12px; font-size:20px; }
 label { display:block; margin-bottom:6px; font-weight:500; }
@@ -85,7 +85,7 @@ textarea { min-height:80px; resize:vertical; }
   border-radius:8px;
   background:#F5E6CC;
   box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  /* keep inline structure: do not stack on mobile */
+  /* preserve inline desktop structure — do not stack on mobile */
   flex-wrap:nowrap;
   word-break:normal;
 }
@@ -97,10 +97,14 @@ textarea { min-height:80px; resize:vertical; }
 .order-item .meta,.order-item .title{font-size:0.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 
 /* ===================== VARIANTS (Fleur De Vie) ===================== */
-.variant-toggle { display:inline-flex; align-items:center; justify-content:center; height:34px; border-radius:8px; border:1px solid var(--fleur-green,#1a3c34); background:transparent; color:var(--fleur-green,#1a3c34); cursor:pointer; padding:6px 10px; font-size:0.92rem; gap:8px; }
+.variant-toggle { display:inline-flex; align-items:center; justify-content:center; height:34px; border-radius:8px; border:1px solid var(--fleur-green,#1a3c34); background:transparent; color:var(--fleur-green,#1a3c34); cursor:pointer; padding:6px 10px; font-size:0.92rem; gap:8px; white-space:nowrap; }
 .variant-toggle svg { width:14px; height:14px; transition:transform .25s ease; }
 .variant-toggle[aria-expanded="true"] svg { transform:rotate(180deg); }
 
+/* Helper: allow placing a label inside variant-toggle for the "Multiple Options selected" text */
+.variant-toggle .multiple-options-label { display:inline-block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:middle; }
+
+/* Variant container & rows */
 .variants-container { width:100%; display:block; max-height:0; overflow:hidden; transition:max-height .28s ease, padding .28s ease; padding:0; margin-top:6px; border-top:1px dashed rgba(17,46,31,0.06); }
 .variants-container.show { padding:8px 0; max-height:1000px; }
 .variant-row {
@@ -112,7 +116,7 @@ textarea { min-height:80px; resize:vertical; }
   border-radius:8px;
   background: rgba(26,60,52,0.03);
   margin-bottom:8px;
-  /* keep inline structure: do not stack or change order */
+  /* preserve inline desktop structure — do not stack on mobile */
   flex-wrap:nowrap;
   word-break:normal;
 }
@@ -120,7 +124,7 @@ textarea { min-height:80px; resize:vertical; }
 .variant-price { font-weight:600; margin-left:12px; flex:0 0 auto; text-align:right; white-space:nowrap; min-width:70px; }
 
 /* ===================== CHECKOUT VARIANTS DROPDOWN (Sérac style) ===================== */
-.checkout-variants-toggle { background: transparent; border: 1px solid var(--fleur-green, #1a3c34); color: var(--fleur-green, #1a3c34); font-family: "Playfair Display", serif; font-size: 0.95rem; padding: 6px 14px; border-radius: 6px; margin-top: 6px; cursor: pointer; transition: all 0.25s ease; }
+.checkout-variants-toggle { background: transparent; border: 1px solid var(--fleur-green, #1a3c34); color: var(--fleur-green, #1a3c34); font-family: "Playfair Display", serif; font-size: 0.95rem; padding: 6px 14px; border-radius: 6px; margin-top: 6px; cursor: pointer; transition: all 0.25s ease; white-space:nowrap; }
 .checkout-variants-toggle:hover { background: var(--fleur-green, #1a3c34); color: #fff; }
 .checkout-variants-container { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.35s ease; margin-top: 0; }
 .checkout-variants-container.open { max-height: 400px; opacity: 1; margin-top: 8px; }
@@ -145,7 +149,6 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 @keyframes glowPulse { 0%,100%{ box-shadow:0 8px 30px rgba(212,245,105,1);} 50%{ box-shadow:0 12px 36px rgba(212,245,105,0.6);} }
 
 /* ===================== RESPONSIVE ===================== */
-/* Keep layout same, only scale down fonts/paddings on small screens */
 @media (max-width: 900px) {
   .header-right { position:absolute; top:68px; right:0; background: rgba(17,46,31,0.95); flex-direction:column; width:200px; padding:20px; display:none; border-radius:0 0 0 10px; z-index:1100; }
   .header-right.open { display:flex !important; flex-direction:column; gap:12px; }
@@ -159,7 +162,9 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 
   section.checkout { padding:30px 16px; }
   .container { grid-template-columns: 1fr; padding:0; gap:28px; width:100%; }
-  .order-item { padding:10px; gap:10px; /* keep inline */ }
+  
+  /* Scale text for tablet but preserve inline layout */
+  .order-item { padding:10px; gap:10px; }
   .order-item .right { flex:0 0 auto; font-size:0.95rem; }
   .order-item .title { font-size:15px; }
   .variant-attrs { font-size:0.92rem; }
@@ -172,18 +177,18 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   .checkout-variants-toggle { font-size:0.85rem; padding:5px 12px; }
   .checkout-variant-meta { font-size:0.85rem; }
 
-  /* ONLY scale down sizes — DO NOT change layout direction or stacking */
+  /* Reduce padding/sizes but DO NOT change layout direction */
   section.checkout { padding:20px 10px; }
   .checkout-form, .order-summary { padding:14px; }
 
-  /* Keep items inline as on desktop: reduce text sizes & control sizes */
+  /* Keep inline structure — only reduce spacing/sizes */
   .order-item { gap:8px; }
   .order-item .left { gap:6px; }
   .order-item .right { flex:0 0 auto; font-size:0.9rem; }
   .order-item .title { font-size:14px; }
   .order-item .meta { font-size:0.88rem; }
 
-  .variant-toggle { font-size:0.82rem; padding:5px 8px; height:auto; }
+  .variant-toggle { font-size:0.82rem; padding:5px 8px; height:auto; white-space:normal; } /* allow label wrapping when needed */
   .variant-attrs { font-size:0.88rem; }
   .variant-price { font-size:0.88rem; min-width:56px; margin-left:8px; }
 
@@ -192,12 +197,35 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 
   input, textarea, select { font-size:0.92rem; padding:8px; }
   .checkout-btn { padding:12px; font-size:0.95rem; }
+
+  /* Force items to respect viewport width (avoid overflow) */
+  .order-item, .variant-row, .variants-container, .checkout-form, .order-summary { width:100%; max-width:100%; box-sizing:border-box; overflow-x:hidden; }
+
+  /* Make only the label "Multiple Options selected" break into two lines.
+     This targets an element inside .variant-toggle with class .multiple-options-label.
+     Adjust max-width to control where it breaks. */
+  .variant-toggle .multiple-options-label {
+    display:inline-block;
+    white-space:normal !important;
+    word-break:break-word;
+    line-height:1.15;
+    max-width:90px; /* This width encourages a two-line wrap on small screens */
+    vertical-align:middle;
+    overflow-wrap:anywhere;
+  }
+
+  /* Ensure the rest of the text in the toggle doesn't force overflow */
+  .variant-toggle > *:not(.multiple-options-label) {
+    white-space:nowrap;
+  }
 }
 
 @media (max-width: 420px) {
   .order-item .right { flex:0 0 auto; font-size:0.88rem; }
   .variant-attrs { font-size:0.86rem; }
   .variant-price { font-size:0.86rem; min-width:52px; }
+  /* slightly smaller max-width for even smaller screens so the label wraps cleanly */
+  .variant-toggle .multiple-options-label { max-width:78px; font-size:0.86rem; }
 }
 
 
