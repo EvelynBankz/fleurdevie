@@ -454,19 +454,22 @@
 </style>
 </head>
 <body>
-  <header class="site-header" style="padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <header class="site-header">
     <div style="display:flex;align-items:center;gap:14px">
-      <img src="../asset/logo.png" alt="Fleur De Vie Logo" class="brand-logo" style="height:56px;object-fit:contain">
-      <div class="brand-title" style="font-weight:700;font-size:18px">Fleur De Vie</div>
+      <img src="../asset/logo.png" alt="Fleur De Vie Logo" class="brand-logo">
+      <div class="brand-title">Fleur De Vie</div>
     </div>
 
     <div class="mobile-cart">
-      <a href="../cart.html" style="color:inherit;text-decoration:none"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile" style="display:inline-block;margin-left:8px">0</span></a>
-    </div>
+    <a href="../cart.html"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count" id="cartCountMobile">0</span></a>
+  </div>
     
     <!-- Hamburger -->
-    <button class="hamburger" id="hamburger-btn" style="display:none;border:none;background:transparent">☰</button>
-    <nav class="header-right" id="nav-menu" style="display:none">
+    <<!-- Hamburger -->
+    <button class="hamburger" id="hamburger-btn">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="header-right" id="nav-menu">
       <a href="../index.html">Home</a>
       <a href="../about.html">About</a>
       <a href="../shop.html">Shop</a>
@@ -476,9 +479,9 @@
     </nav>
   </header>
 
-  <section class="hero"><div class="hero-text" style="padding:18px"><h1 style="margin:0">Checkout</h1></div></section>
+  <section class="hero"><div class="hero-text"><h1>Checkout</h1></div></section>
 
-  <section class="checkout">
+<section class="checkout">
     <div class="container">
       <!-- Billing Form -->
       <div class="checkout-form">
@@ -496,7 +499,8 @@
         </form>
       </div>
 
-      <!-- Order Summary -->
+
+    <!-- Order Summary -->
       <div class="order-summary">
         <h2>Order Summary</h2>
         <div class="currency-selector" id="currencySelectorWrapper" style="display:none">
@@ -515,7 +519,7 @@
       </div>
     </div>
   </section>
-
+  
   <!-- Floating support button -->
   <button id="floatingSupportBtn" aria-label="Support">
     <i class="fas fa-headset"></i>
