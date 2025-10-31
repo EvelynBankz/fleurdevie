@@ -1698,38 +1698,34 @@ try {
 </script>
 
 <script>
-(function () {
-  const applyFleurHeroPeek = () => {
-    const heroes = document.querySelectorAll(".hero");
+(function() {
+  const applyHeroPeek = () => {
+    const heroes = document.querySelectorAll('.hero');
+    heroes.forEach(hero => {
+      // Avoid duplicates
+      if (hero.nextElementSibling && hero.nextElementSibling.classList.contains('hero-peek')) return;
 
-    heroes.forEach((hero) => {
-      // Remove any existing peek after hero
-      const next = hero.nextElementSibling;
-      if (next && next.classList.contains("hero-peek")) next.remove();
+      const peek = document.createElement('div');
+      peek.className = 'hero-peek';
 
-      // Create the decorative peek element
-      const peek = document.createElement("div");
-      peek.className = "hero-peek";
-
-      // Determine background brightness of hero for theme
+      // Determine hero brightness (basic)
       const bg = window.getComputedStyle(hero).backgroundColor;
       let darkHero = true;
-
-      if (bg && bg.startsWith("rgb")) {
+      if (bg.startsWith('rgb')) {
         const rgb = bg.match(/\d+/g).map(Number);
-        const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+        const brightness = (rgb[0]*299 + rgb[1]*587 + rgb[2]*114) / 1000;
         darkHero = brightness < 128;
       }
 
-      peek.dataset.theme = darkHero ? "dark" : "light";
+      peek.dataset.theme = darkHero ? 'dark' : 'light';
 
-      // Insert peek directly *after* the hero element
-      hero.insertAdjacentElement("afterend", peek);
+      // 👇 Insert peek AFTER the hero (instead of inside)
+      hero.parentNode.insertBefore(peek, hero.nextSibling);
     });
   };
 
-  window.addEventListener("load", applyFleurHeroPeek);
-  window.addEventListener("resize", applyFleurHeroPeek);
+  window.addEventListener('load', applyHeroPeek);
+  window.addEventListener('resize', applyHeroPeek);
 })();
 </script>
 
