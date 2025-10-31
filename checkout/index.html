@@ -233,80 +233,106 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   
 <style>
 /* ===========================
-   Fleur de Vie Hero Peek (Curved Style - Top to Bottom Gradient)
+   Fleur de Vie Hero Peek — Robust, handles child or sibling insertion
 =========================== */
-@media (min-width: 200px) {
-  .hero {
-    position: relative;
-    overflow: visible;
-    margin-bottom: 60px; /* space below hero on larger screens */
-  }
+.hero {
+  position: relative; /* ensure hero can be a positioned ancestor if peek is inside */
+  overflow: visible;
+  margin-bottom: 60px; /* desktop gap (will be reduced on mobile below) */
+}
 
-  .hero-peek {
-    position: absolute;
-    bottom: -1px; /* perfectly hugs hero bottom edge */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    height: 22px;
-    border-radius: 12px / 50%;
-    z-index: 2;
-    box-shadow: 0 -6px 25px rgba(17, 46, 31, 0.35),
-                0 6px 25px rgba(245, 230, 204, 0.3); /* soft top & bottom glow */
-    background-size: 100% 200%;
-    animation: gradientMove 8s ease-in-out infinite alternate;
-    transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
-  }
+/* Default (safe) styling for hero-peek when it's inserted as a SIBLING */
+.hero-peek {
+  /* sibling-mode: place in normal flow and pull up to touch hero bottom */
+  position: relative;
+  display: block;
+  width: 90%;
+  height: 22px;
+  margin: -1px auto 40px; /* negative top margin pulls it up to appear touching hero */
+  border-radius: 12px / 50%;
+  z-index: 2;
+  box-shadow: 0 -6px 25px rgba(17, 46, 31, 0.35), 0 6px 18px rgba(247, 244, 232, 0.18);
+  background-size: 100% 200%;
+  animation: gradientMove 8s ease-in-out infinite alternate;
+  transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+}
 
-  /* LIGHT THEME */
-  .hero-peek[data-theme="light"] {
-    background: linear-gradient(
-      to bottom,
-      #112e1f 0%,    /* deep green start */
-      #b9a56a 55%,   /* green-gold middle */
-      #f7f4e8 100%   /* soft cream glow */
-    );
-  }
+/* If peek is placed INSIDE the .hero (child-mode), this rule makes it hug the hero bottom */
+.hero > .hero-peek,
+.hero .hero-peek {
+  position: absolute;
+  bottom: 0;            /* exactly touch hero bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 22px;
+  margin: 0;            /* no extra margins for absolute child */
+  /* reuse same visual styles */
+  border-radius: 12px / 50%;
+  z-index: 2;
+  box-shadow: 0 -6px 25px rgba(17, 46, 31, 0.35), 0 6px 18px rgba(247, 244, 232, 0.18);
+  background-size: 100% 200%;
+  animation: gradientMove 8s ease-in-out infinite alternate;
+  transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+}
 
-  /* DARK THEME */
-  .hero-peek[data-theme="dark"] {
-    background: linear-gradient(
-      to bottom,
-      #f7f4e8 0%,    /* cream top */
-      #b9a56a 45%,   /* golden mid */
-      #112e1f 100%   /* deep green bottom */
-    );
-  }
+/* LIGHT THEME */
+.hero-peek[data-theme="light"] {
+  background: linear-gradient(
+    to bottom,
+    #112e1f 0%,    /* dark green top */
+    #b9a56a 55%,   /* green-gold mid */
+    #f7f4e8 100%   /* cream bottom */
+  );
+}
 
-  /* Gradient floating animation */
-  @keyframes gradientMove {
-    0% {
-      background-position: 50% 0%;
-      opacity: 0.9;
-    }
-    100% {
-      background-position: 50% 100%;
-      opacity: 1;
-    }
+/* DARK THEME */
+.hero-peek[data-theme="dark"] {
+  background: linear-gradient(
+    to bottom,
+    #f7f4e8 0%,    /* cream top */
+    #b9a56a 45%,   /* gold mid */
+    #112e1f 100%   /* dark green bottom */
+  );
+}
+
+/* Gradient movement animation (vertical motion of the fill) */
+@keyframes gradientMove {
+  0% {
+    background-position: 50% 0%;
+    opacity: 0.95;
+  }
+  100% {
+    background-position: 50% 100%;
+    opacity: 1;
   }
 }
 
-/* ===========================
-   Mobile adjustments
-=========================== */
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .hero {
-    margin-bottom: 35px; /* smaller gap below hero on mobile */
+    margin-bottom: 35px; /* reduced gap on mobile */
   }
 
+  /* Sibling-mode adjustments for small screens */
   .hero-peek {
     height: 18px;
     width: 94%;
-    box-shadow: 0 -4px 18px rgba(17, 46, 31, 0.25),
-                0 4px 18px rgba(245, 230, 204, 0.25);
+    margin: -1px auto 30px; /* keep it touching visually and leave some breathing room below */
+    box-shadow: 0 -4px 18px rgba(17, 46, 31, 0.25), 0 4px 14px rgba(247, 244, 232, 0.15);
+  }
+
+  /* Child-mode absolute peek on mobile */
+  .hero > .hero-peek,
+  .hero .hero-peek {
+    height: 18px;
+    width: 94%;
+    bottom: 0; /* stay flush to hero bottom */
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 -4px 18px rgba(17, 46, 31, 0.25), 0 4px 14px rgba(247, 244, 232, 0.15);
   }
 }
-
 </style>
 
 
