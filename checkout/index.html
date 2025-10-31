@@ -233,7 +233,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   
 <style>
 /* ===========================
-   Fleur de Vie Hero Peek — Sibling or Child Mode (Refined Version)
+   Fleur de Vie Hero Peek — Sibling or Child Mode (Refined + Shimmer)
 =========================== */
 .hero {
   position: relative;
@@ -251,7 +251,7 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   border-radius: 14px / 50%;
   z-index: 2;
 
-  /* Softer glow instead of sharp border */
+  /* Base glow */
   box-shadow:
     0 0 20px rgba(17, 46, 31, 0.25),
     0 0 35px rgba(185, 165, 106, 0.3),
@@ -259,7 +259,26 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
 
   background-size: 200% 200%;
   animation: gradientFlow 12s ease-in-out infinite;
-  transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+  transition: background 0.6s ease-in-out, box-shadow 0.6s ease-in-out, filter 0.6s ease-in-out;
+  overflow: hidden;
+}
+
+/* Add shimmer overlay */
+.hero-peek::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmerMove 8s ease-in-out infinite;
+  pointer-events: none;
 }
 
 /* CHILD MODE (if JS ever injects it inside hero) */
@@ -302,7 +321,24 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   );
 }
 
-/* Animation for a subtle flowing light motion */
+/* Hover or scroll proximity effect — stronger glow */
+.hero-peek:hover,
+.hero-peek:focus-within {
+  box-shadow:
+    0 0 30px rgba(17, 46, 31, 0.4),
+    0 0 50px rgba(185, 165, 106, 0.4),
+    0 0 90px rgba(247, 244, 232, 0.35);
+  filter: brightness(1.08);
+}
+
+/* Optional: light scroll detection via subtle scaling */
+@media (hover: hover) {
+  .hero-peek:hover {
+    transform: scale(1.005);
+  }
+}
+
+/* Animation for subtle gradient flow */
 @keyframes gradientFlow {
   0% {
     background-position: 50% 0%;
@@ -315,6 +351,19 @@ footer { text-align:center;padding:20px; background:transparent; color:#112e1f; 
   100% {
     background-position: 50% 0%;
     opacity: 0.95;
+  }
+}
+
+/* Shimmer animation */
+@keyframes shimmerMove {
+  0% {
+    left: -75%;
+  }
+  50% {
+    left: 125%;
+  }
+  100% {
+    left: 125%;
   }
 }
 
